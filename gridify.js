@@ -25,7 +25,6 @@ let Gridify = function(container){
         grid.header.initialize(options);
         grid.body.initialize();
         grid.footer.initialize();
-        
         if(options.columns) grid.header.add_columns(options.columns);
         if(options.data) grid.data.set(options.data);
     }
@@ -40,6 +39,7 @@ let Gridify = function(container){
             else if(typeof(input_data)==='object')
                 for(let k in input_data) data.push(input_data[k]);
 
+            grid.body.clear();
             data.forEach((row_data, ridx)=>{
                 grid.body.add_row(row_data, ridx);
             });
@@ -79,7 +79,6 @@ let Gridify = function(container){
             
             let filter_cell = grid.table().tHead.rows[1].insertCell();
             grid.header._set_column_filter(filter_cell, column_definition);
-            
             grid.body.seed_row.add_column(column_definition);
         }
         , _set_header_label : function(header_cell, column_definition) {
@@ -105,10 +104,9 @@ let Gridify = function(container){
 
     grid.body = {
         initialize : function(table=grid.table()) {
-            let tbody = table.createTBody();
-            let seed_row = tbody.insertRow();
-            seed_row.id = grid.table().id + '_seed';
-            seed_row.style.display = 'none';
+            let main_body = table.createTBody();
+            
+            grid.body.seed_row.initialize();
         }
         , clear : function(){ _clear(grid.table().tBodies[0]); }
         , rows : function() { return Array.from(grid.table().tBodies[0].rows); }
@@ -127,8 +125,14 @@ let Gridify = function(container){
             });
         }
         , seed_row : {
-            clone : function() {
-                let seed = Array.from(grid.body.rows()).slice(-1)[0];
+            initialize : function(){
+                let seed_body = grid.table().createTBody();
+                let seed_row = seed_body.insertRow();
+                seed_row.id = grid.table().id + '_seed';
+                seed_row.style.display = 'none';
+            }
+            , clone : function() {
+                let seed = grid.table().tBodies[1].rows[0];
                 let row = seed.cloneNode(true);
                 row.style. display = '';
                 Array.from(seed.cells).forEach((scell, cidx)=>{
@@ -138,10 +142,12 @@ let Gridify = function(container){
                 return row;       
             }
             , add_column(column_definition){
-                let tr = grid.body.rows()[0];
+                window.grid = grid;
+                let tr = grid.table().tBodies[1].rows[0];
                 let td = tr.insertCell();
                 td.id = tr.id+'_'+column_definition.field;
                 td.innerHTML = 'test';
+                
                 grid.styling.stylize_body_cell(td, column_definition);
                 if(column_definition.click)
                     td.onclick = column_definition.click;
@@ -184,15 +190,15 @@ let Gridify = function(container){
     }
 
     grid.sorting = {
-        sort : function(property_name, options) {
+        sort : function(property_name, options = {}) {
             options = grid.sorting.set_default_options(options);
-            let asc = grid.sorting.column_sort_direction(property_name, options.parse);
+            let dir = grid.sorting.column_sort_direction(property_name, options);
             let rows = grid.body.rows();
             rows.sort((x,y)=>{
                 let xv = grid.data.get_cell_value(x, property_name);
                 let yv = grid.data.get_cell_value(y, property_name);
-                let compared = options.compare(xv, yv, options);
-                return +compared * asc;
+                let compared = options.comparator(xv, yv);
+                return +compared * dir;
             });
             
             grid.body.clear();
@@ -204,19 +210,18 @@ let Gridify = function(container){
         }
         , set_default_options : function(options){
             let sort_options = {}
-            sort_options.compare = options.compare || 
-                function(a, b){ if(a==b)return 0; return a<b ? -1 : 1; };
-            sort_options.parse = options.parse || null;
+            sort_options.comparator = options.comparator || 
+                function(a, b){ if(a==b)return 0; return a<b ? 1 : -1; };
             return sort_options;
         }
-        , column_sort_direction : function(property_name, parse) {
-            let v1 = grid.data.get_cell_value(0, property_name);
-            let v2 = grid.data.get_cell_value(grid.body.rows().length-1, property_name);
-            if(parse){
-                v1 = parse(v1);
-                v2 = parse(v2);
-            }
-            return v1 < v2 ? -1 : 1;
+        , column_sort_direction : function(property_name, options) {
+            let is_not_sorted = grid.body.rows().some((row, id)=>{
+                if(id+1 == grid.body.rows().length) return false;
+                let v1 = grid.data.get_cell_value(id, property_name);
+                let v2 = grid.data.get_cell_value(id+1, property_name);
+                if(options.comparator(v1, v2) == -1) return true;
+            });
+            return is_not_sorted ? -1 : 1;
         }
         
     }
