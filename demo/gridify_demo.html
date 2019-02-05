@@ -1,0 +1,29 @@
+
+<head>
+    <link rel='stylesheet' href='../css/gridify.css'>
+    <script src='../gridify.js'></script>
+
+</head>
+<body>
+    <div id='demo_grid'></div>
+    
+    <script>
+
+        let grid = Gridify('demo_grid');
+        grid.initialize({
+            data : [
+                { a : 1, b : 2, c : 3, default : 1 },
+                { a : 10, b : 20, c : 30, default : 2 },
+                { a : 20, b : 30, c : 40, default : 3 }
+            ],
+            columns : [
+                { field : 'a', header: 'Plain column' },
+                { field : 'b', header :'Sort Column', sort : true },
+                { field : 'c', header : 'Filter Column', filter : true },
+                { field : 'default' }
+            ]    
+        });
+        window.grid = grid;
+
+    </script>
+</body>

@@ -1,0 +1,19 @@
+.sort {
+    float:right;
+    position:absolute;
+}
+.sort:before,
+.sort:after {
+	border: 4px solid transparent;
+	content: "";
+	display: block;
+	margin-left:5px;
+	width: 0px;
+}
+.sort:before {
+	border-bottom-color: #666;
+}
+.sort:after {
+	border-top-color: #666;
+	margin-top: 1px;
+}
