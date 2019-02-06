@@ -98,7 +98,7 @@ let Gridify = function(container){
         , _set_column_filter : function(filter_cell, column_definition) {
             if(!column_definition.filter) return;
             filter_cell.id = grid.table().id+'_filter_columns_'+column_definition.field;
-            grid.filters.add_filter(filter_cell, column_definition)
+            grid.filtering.add_filter(filter_cell, column_definition.field, column_definition.filter)
         }  
     }
 
@@ -234,17 +234,40 @@ let Gridify = function(container){
             filter_pending = setTimeout(()=>{ callback(field_value, filter_value); }, 150);
         }
     }
-    grid.filters = { 
-        add_filter : function(filter_cell, column_definition) {
-            let rule = column_definition.filter == true ? grid.filters._default_filter_rule : column_definition.filter;
-            let control = column_definition.filter_control || grid.filters._default_filter_control(column_definition.field);
+    grid.filtering = { 
+        filter : function(){
+            let filter_controls = grid.filtering.filter_controls();
+            grid.body.rows().forEach((row, i)=>{
+                let filtered_out = filter_controls.some((filter_control)=>{
+                    let cell_value = grid.data.get_cell_value(i, filter_control.property);
+                    return !filter_control.rule(cell_value, filter_control.value);
+                });
+                row.style.display = filtered_out ? 'none' : ''
+            }); 
 
-            control.rule = rule;
-            control.property = column_definition.field;
-            control.addEventListener('keyup', filter_delay(grid.filters.filter_callback));  
-            filter_cell.appendChild(control);
+        }
+        , filter_callback : function() {
+            return filter_delay(grid.filtering.filter());
         }
         , cells : function() { return Array.from(grid.table().tHead.rows[1].cells); }
+        , filter_controls : function(){
+            return grid.filtering.cells().map(cell => cell.firstChild).filter(x => !!x);
+        }
+        , add_filter : function(filter_cell, field_name, options) {
+            options = grid.filtering._set_default_options(field_name, options);
+            let control = options.control;
+            control.rule = options.rule;
+            control.property = field_name;
+            control.addEventListener(options.event, grid.filtering.filter_callback);
+            filter_cell.appendChild(control);
+        }
+        , _set_default_options : function(field_name, options){
+            if(typeof(options) !== 'object') options = {};
+            options.rule = options.rule || grid.filtering._default_filter_rule;
+            options.control = options.control || grid.filtering._default_filter_control(field_name);
+            options.event = options.event || 'keyup';
+            return options;
+        }
         , _default_filter_rule : function(x, y){ 
             return (''+x).toLowerCase().substr(0, y.length) == y.toLowerCase();
         }
@@ -252,22 +275,8 @@ let Gridify = function(container){
             let control = document.createElement('input');
             control.type = 'text';
             control.id = grid.table().id + '_filter_' + property_name;
-            control.style.width = '80%';
-            control.style.display = 'block';
-            control.style.margin = 'auto';
+            control.style = 'width: 80%; display: block; margin: auto;'
             return control;
-        }
-        , filter_callback : function() {
-            let filter_controls = grid.filters.cells()
-                .map((cell) => { return cell.firstChild; })
-                .filter(x => !!x);
-            grid.body.rows().forEach((row, i)=>{
-                let filtered_out = filter_controls.some((filter_control)=>{
-                    return !filter_control.rule(
-                        grid.data.get_cell_value(i, filter_control.property), filter_control.value)
-                });
-                row.style.display = filtered_out ? 'none' : ''
-            });
         }
     }
 
@@ -275,9 +284,9 @@ let Gridify = function(container){
     grid.paging = { 
         // grid needs a footer. 
         // we can just hide rows after redraws. 
-            // it's going to have to interact with sorting and filters
+            // it's going to have to interact with sorting and filtering
             // sorting: picks up all the rows, sorts them, adds them back in. 
-            // filters: hides invalid cells. 
+            // filtering: hides invalid cells. 
             // after they are done, paging would need to be applied. 
             
     }
