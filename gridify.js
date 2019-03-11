@@ -169,7 +169,7 @@ let Gridify = function(container){
             initialize : function(options){
                 let paging_row = grid.table().tFoot.insertRow();
                 paging_row.id = grid.table().id + '_paging';
-                paging_row.options = JSON.stringify(options);
+                paging_row.options = JSON.stringify(options);                
 
                 let left_cell = paging_row.insertCell();
                 left_cell.id = grid.table().id + '_paging_left';
@@ -178,37 +178,43 @@ let Gridify = function(container){
                 let center_cell = paging_row.insertCell();
                 center_cell.id = grid.table().id + '_paging_center';
                 center_cell.style = 'width:33%;';
-                console.log('a');
                 center_cell.appendChild(grid.footer.pager.center_cell_control(options));
-                // page x of y  
 
                 let right_cell = paging_row.insertCell();
                 right_cell.id = grid.table().id + '_paging_right';
                 right_cell.style = 'width:33%'    
             }
-            , page : function(page){
-
+            , set_page : function(page_number){
+                let textbox = document.getElementById(grid.table().id + '_paging_center_textbox');
+                if(textbox) textbox.value = page_number;
+                // set row counter when up
             }
             , center_cell_control : function(options){
                 let container = document.createElement('div');
                 container.style = 'width:120px'
 
-                let left_arrow = document.createElement('div');
-                left_arrow.className = 'pager_left';
-                container.appendChild(left_arrow);
-
                 let textbox = document.createElement('input');
+                textbox.id = grid.table().id + '_paging_center_textbox';
                 textbox.className = 'pager_textbox';
                 textbox.value = options.current_page || 1;
-                container.appendChild(textbox);
 
                 let label = document.createElement('span');
                 label.style = 'width:40px;vertical-align:top';
                 label.innerText = ' of ' + options.total_pages || 1;
-                container.appendChild(label);
 
+                let left_arrow = document.createElement('div');
+                left_arrow.className = 'pager_left';
+                left_arrow.onclick = () => 
+                    grid.paging.page(textbox.value > 1 ? +textbox.value -1 : 1);
+                
                 let right_arrow = document.createElement('div');
                 right_arrow.className = 'pager_right';
+                right_arrow.onclick = () => 
+                    grid.paging.page(textbox.value < options.total_pages ? +textbox.value+1 : options.total_pages); 
+
+                container.appendChild(left_arrow);
+                container.appendChild(textbox);
+                container.appendChild(label);
                 container.appendChild(right_arrow);
 
                 return container;
@@ -333,7 +339,6 @@ let Gridify = function(container){
         }
     }
 
-    // paging 
     grid.paging = { 
         initialize : function(options){
             if(!options) return;
@@ -341,19 +346,21 @@ let Gridify = function(container){
             grid.footer.pager.initialize(options); 
             grid.paging.page(options.current_page);
         }
-        , page : function(options){
-            let page_number = !isNaN(options) ? options : options.page_number || 1;
-            console.log(1, page_number)
+        , page : function(page_number){
             grid.paging._set_row_visibility(page_number);
-            console.log(2)
             grid.paging._set_footer_values(page_number);
         }
         , _set_row_visibility : function(page_number){
-            // get currently visible rows
+            console.log(page_number);
+            //reset visibility from paging
+            let rows = grid.body.rows();
+            // get currently visible rows 
+            console.log(rows);
+
             // hide all but range
         }
         , _set_footer_values : function(page_number){
-
+            grid.footer.pager.set_page(page_number);
         }
         , _default_options : function(options){
             if(typeof(options) !== 'object') options = {};
@@ -366,17 +373,6 @@ let Gridify = function(container){
         }
     }
 
-
-
-    /*
-        grid.initialize({
-            paging : {
-                rows : a, // rows per page
-                total_rows : b, // total record count   1-20 of 12345
-                current_page : c, // current page 
-            }
-        })
-    */
 
     
     return grid;
