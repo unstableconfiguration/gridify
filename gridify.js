@@ -165,11 +165,14 @@ let Gridify = function(container){
         initialize : function() {
             grid.table().createTFoot();
         }
+        , options : function() { 
+            return JSON.parse(document.getElementById(grid.table().id + '_paging').options);
+        }
         , pager : {
             initialize : function(options){
                 let paging_row = grid.table().tFoot.insertRow();
                 paging_row.id = grid.table().id + '_paging';
-                paging_row.options = JSON.stringify(options);                
+                paging_row.options = JSON.stringify(options); 
 
                 let left_cell = paging_row.insertCell();
                 left_cell.id = grid.table().id + '_paging_left';
@@ -183,8 +186,13 @@ let Gridify = function(container){
                 let right_cell = paging_row.insertCell();
                 right_cell.id = grid.table().id + '_paging_right';
                 right_cell.style = 'width:33%'    
+
+                grid.footer.options = () => options;               
             }
             , set_page : function(page_number){
+                let options = grid.footer.options();
+                options.current_page = page_number;
+
                 let textbox = document.getElementById(grid.table().id + '_paging_center_textbox');
                 if(textbox) textbox.value = page_number;
                 // set row counter when up
@@ -347,17 +355,23 @@ let Gridify = function(container){
             grid.paging.page(options.current_page);
         }
         , page : function(page_number){
-            grid.paging._set_row_visibility(page_number);
             grid.paging._set_footer_values(page_number);
+            grid.paging._set_row_visibility(page_number);
         }
         , _set_row_visibility : function(page_number){
-            console.log(page_number);
-            //reset visibility from paging
             let rows = grid.body.rows();
-            // get currently visible rows 
-            console.log(rows);
+            let options = grid.footer.options();
+            // Undo previous paging 
+            rows.forEach(r => { if(r.paged) { r.paged = undefined; r.style.display = ''; } });
+            
+            let start = (options.current_page-1)*options.rows;
+            let end = options.current_page*options.rows;
+            // Only page visible rows
+            rows = rows.filter(r => r.style.display !== 'none');
+            rows = rows.filter((r, ix) => ix >= end || ix < start);
 
-            // hide all but range
+            rows.forEach(r => {r.style.display = 'none'; r.paged = true; });
+
         }
         , _set_footer_values : function(page_number){
             grid.footer.pager.set_page(page_number);
