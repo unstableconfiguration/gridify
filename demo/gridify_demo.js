@@ -35,6 +35,23 @@
         return demo;
     }
 
+    let paging_demo = new_demo('paging_test');
+    paging_demo.description = 'WIP';
+    paging_demo.grid_initialize = function(grid){
+        grid.initialize({
+            columns : [
+                { field : 'a' }
+            ],
+            data : [
+                { a : 1 }, { a : 2 }, { a : 3 }, { a : 4 }
+            ],
+           // paging : true
+            paging : { rows : 2, total_rows : 4, current_page : 1 } 
+        });
+    }
+    paging_demo.add_to_page();
+
+
     let base_demo = new_demo('base_test');
     base_demo.description = `Basic grid demonstrating data binding`;
     base_demo.grid_initialize = function(grid){
@@ -53,7 +70,8 @@
     base_demo.add_to_page();
 
     let sort_demo = new_demo('sort_test');
-    sort_demo.description = 'Demonstration of sort functionality';
+    sort_demo.description = `Demonstration of sort functionality. Default sort is alphabetical. The custom 
+        sort uses a custom comparator that sorts alphabetically, but skips the first two characters.`;
     sort_demo.grid_initialize = function(grid){
         // Custom sort. Ignore char: prefix.
         let comparator = function(a, b){
@@ -114,4 +132,5 @@
     }
     filter_demo.add_to_page();
 })();
+
 

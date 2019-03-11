@@ -27,11 +27,14 @@ let Gridify = function(container){
         grid.footer.initialize();
         if(options.columns) grid.header.add_columns(options.columns);
         if(options.data) grid.data.set(options.data);
+        grid.paging.initialize(options.paging);
     }
 
     grid.data = {
         get : function() {
             /* build data table from existing grid rows */
+            console.log('retrieve data placeholder')
+            return [1, 2, 3, 4];
         },
         set : function(input_data) {
             let data = [];
@@ -49,9 +52,9 @@ let Gridify = function(container){
         }
         , get_cell_value : function(row, property){
             if(typeof(row)==='number') row = grid.body.rows()[row];
-            let cells = Array.from(row.cells);
-            let cell = cells.find(x=>x.id.split('_').slice(-1)==property);
-            return cell.innerText;
+            return Array.from(row.cells)
+                .find(x=>x.id.split('_').slice(-1)==property)
+                .innerText;
         }
     }
 
@@ -62,6 +65,9 @@ let Gridify = function(container){
             tHead.insertRow(); // Filter
         }
         , cells : function() { return Array.from(grid.table().tHead.rows[0].cells); }
+        , find_cell : function(property_name) { 
+            return grid.header.cells().find(c => c.id.split('_').pop() === property_name); 
+        }
         , add_columns : function(column_definitions){
             if(!Array.isArray(column_definitions)) 
                 throw`.columns.set requires an array of column definitions`;
@@ -156,8 +162,57 @@ let Gridify = function(container){
     }
 
     grid.footer = {
-        initialize : function(){
+        initialize : function() {
             grid.table().createTFoot();
+        }
+        , pager : {
+            initialize : function(options){
+                let paging_row = grid.table().tFoot.insertRow();
+                paging_row.id = grid.table().id + '_paging';
+                paging_row.options = JSON.stringify(options);
+
+                let left_cell = paging_row.insertCell();
+                left_cell.id = grid.table().id + '_paging_left';
+                left_cell.style = 'width:33%;';
+
+                let center_cell = paging_row.insertCell();
+                center_cell.id = grid.table().id + '_paging_center';
+                center_cell.style = 'width:33%;';
+                console.log('a');
+                center_cell.appendChild(grid.footer.pager.center_cell_control(options));
+                // page x of y  
+
+                let right_cell = paging_row.insertCell();
+                right_cell.id = grid.table().id + '_paging_right';
+                right_cell.style = 'width:33%'    
+            }
+            , page : function(page){
+
+            }
+            , center_cell_control : function(options){
+                let container = document.createElement('div');
+                container.style = 'width:120px'
+
+                let left_arrow = document.createElement('div');
+                left_arrow.className = 'pager_left';
+                container.appendChild(left_arrow);
+
+                let textbox = document.createElement('input');
+                textbox.className = 'pager_textbox';
+                textbox.value = options.current_page || 1;
+                container.appendChild(textbox);
+
+                let label = document.createElement('span');
+                label.style = 'width:40px;vertical-align:top';
+                label.innerText = ' of ' + options.total_pages || 1;
+                container.appendChild(label);
+
+                let right_arrow = document.createElement('div');
+                right_arrow.className = 'pager_right';
+                container.appendChild(right_arrow);
+
+                return container;
+            }
         }
     }
 
@@ -189,10 +244,12 @@ let Gridify = function(container){
         }
     }
 
+
+
     grid.sorting = {
         sort : function(property_name, options = {}) {
-            options = grid.sorting.set_default_options(options);
-            let dir = grid.sorting.column_sort_direction(property_name, options);
+            options = grid.sorting._set_default_options(options);
+            let dir = grid.sorting._column_sort_direction(property_name, options);
             let rows = grid.body.rows();
             rows.sort((x,y)=>{
                 let xv = grid.data.get_cell_value(x, property_name);
@@ -208,20 +265,16 @@ let Gridify = function(container){
         , sort_callback : function(property_name, options){
             return ()=>{ grid.sorting.sort(property_name, options); }
         }
-        , set_default_options : function(options){
-            let sort_options = {}
-            sort_options.comparator = options.comparator || 
-                function(a, b){ if(a==b)return 0; return a<b ? 1 : -1; };
-            return sort_options;
+        , _set_default_options : function(options){
+            if(typeof(options) !== 'object') options = {};
+            if(!options.comparator) options.comparator = grid.sorting._default_comparator;
+            return options;
         }
-        , column_sort_direction : function(property_name, options) {
-            let is_not_sorted = grid.body.rows().some((row, id)=>{
-                if(id+1 == grid.body.rows().length) return false;
-                let v1 = grid.data.get_cell_value(id, property_name);
-                let v2 = grid.data.get_cell_value(id+1, property_name);
-                if(options.comparator(v1, v2) == -1) return true;
-            });
-            return is_not_sorted ? -1 : 1;
+        , _default_comparator : function(a, b) { if(a==b) return 0; return a<b ? 1 : -1; }
+        , _column_sort_direction : function(property_name, options) {
+            let sort_span = grid.header.find_cell(property_name).children[1];
+            sort_span.direction = sort_span.direction !== 'asc' ? 'asc' : 'desc';
+            return sort_span.direction === 'asc' ? -1 : 1;
         }
         
     }
@@ -282,14 +335,49 @@ let Gridify = function(container){
 
     // paging 
     grid.paging = { 
-        // grid needs a footer. 
-        // we can just hide rows after redraws. 
-            // it's going to have to interact with sorting and filtering
-            // sorting: picks up all the rows, sorts them, adds them back in. 
-            // filtering: hides invalid cells. 
-            // after they are done, paging would need to be applied. 
-            
+        initialize : function(options){
+            if(!options) return;
+            options = grid.paging._default_options(options);
+            grid.footer.pager.initialize(options); 
+            grid.paging.page(options.current_page);
+        }
+        , page : function(options){
+            let page_number = !isNaN(options) ? options : options.page_number || 1;
+            console.log(1, page_number)
+            grid.paging._set_row_visibility(page_number);
+            console.log(2)
+            grid.paging._set_footer_values(page_number);
+        }
+        , _set_row_visibility : function(page_number){
+            // get currently visible rows
+            // hide all but range
+        }
+        , _set_footer_values : function(page_number){
+
+        }
+        , _default_options : function(options){
+            if(typeof(options) !== 'object') options = {};
+            options.rows = options.rows || 20;
+            options.total_rows = options.total_rows || grid.data.get().length;
+            options.total_pages = Math.ceil(options.total_rows/options.rows);
+            options.current_page = options.current_page || 1;
+                // need to extract from UI if present
+            return options;
+        }
     }
+
+
+
+    /*
+        grid.initialize({
+            paging : {
+                rows : a, // rows per page
+                total_rows : b, // total record count   1-20 of 12345
+                current_page : c, // current page 
+            }
+        })
+    */
+
     
     return grid;
 }

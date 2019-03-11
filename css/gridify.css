@@ -17,3 +17,38 @@
 	border-top-color: #666;
 	margin-top: 1px;
 }
+
+
+/* Pager */
+
+.pager_left {	
+	border-right: 9px solid #666;
+	border-bottom : 9px solid transparent;
+	border-left : 9px solid transparent;
+	border-top : 9px solid transparent;
+	content : '';
+	display: inline-block;
+	margin-left: 4px;
+	margin-right:4px;
+	width: 0;
+	height : 0;
+}
+
+.pager_textbox {
+	width:20px;
+	vertical-align:top;
+	text-align:center
+}
+
+.pager_right {	
+	border-right: 9px solid transparent;
+	border-bottom : 9px solid transparent;
+	border-left : 9px solid #666;
+	border-top : 9px solid transparent;
+	content : '';
+	display: inline-block;
+	margin-left: 4px;
+	margin-right:4px;
+	width: 0;
+	height : 0;
+}
