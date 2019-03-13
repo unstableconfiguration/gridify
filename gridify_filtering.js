@@ -13,7 +13,6 @@ Gridify.prototype.extensions.filtering = function(div){
     grid.header.on_column_added = function(header_cell, column_definition)
     {
         on_column_added(header_cell, column_definition);
-        console.log('filter column added')
         let filter_cell = grid.table().tHead.rows[1].insertCell();
         if(!column_definition.filter) return;
         filter_cell.id = grid.table().id + '_filters_' + column_definition.field;
