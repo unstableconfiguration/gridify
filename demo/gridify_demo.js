@@ -46,7 +46,7 @@
                 { a : 1 }, { a : 2 }, { a : 3 }, { a : 4 }
             ],
            // paging : true
-            paging : { rows : 2, total_rows : 4, current_page : 1 } 
+            paging : { rows : 2 } 
         });
     }
     paging_demo.add_to_page();

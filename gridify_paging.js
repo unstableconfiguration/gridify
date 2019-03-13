@@ -28,9 +28,6 @@ Gridify.prototype.extensions.paging = function(div){
 
         }
         , set_page : function(page_number){
-            let options = grid.options();
-            options.current_page = page_number;
-
             let textbox = document.getElementById(grid.table().id + '_paging_center_textbox');
             if(textbox) textbox.value = page_number;
             // set row counter when up
@@ -76,12 +73,14 @@ Gridify.prototype.extensions.paging = function(div){
             grid.paging.page(options.current_page);
         }
         , page : function(page_number){
+            grid.options().paging.current_page = page_number;
             grid.paging._set_footer_values(page_number);
             grid.paging._set_row_visibility(page_number);
         }
         , _set_row_visibility : function(page_number){
             let rows = grid.body.rows();
             let options = grid.options().paging;
+            
             // Undo previous paging 
             rows.forEach(r => { if(r.paged) { r.paged = undefined; r.style.display = ''; } });
             

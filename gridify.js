@@ -21,8 +21,8 @@ let Gridify = function(container){
         grid.body.initialize();
         grid.footer.initialize();
         
-        if(options.columns) grid.header.add_columns(options.columns);
-        if(options.data) grid.data.set(options.data);
+        if(typeof(options.columns) === 'object') grid.header.add_columns(options.columns);
+        if(typeof(options.data) === 'object') grid.data.set(options.data);
         
         grid.table().options = options;
         grid.on_initialized(options);

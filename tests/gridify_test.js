@@ -50,10 +50,20 @@ describe('Gridify Tests', function(){
     });
 
     describe('Data access', function(){
-        // can we set the data for the row independent of the initialization?
-            // I think the idea is there, we set the ghost row to hold the style info 
-        it('Allows the table data to be set outside of initialize', function(){
-            let grid = newgrid('data_access_test_1');
+        it('Can modify a cell\'s value');
+        it('Can modify a row\'s value');
+
+        it('Allows the table data to be set after initialization', function(){
+            let grid = newgrid('data_access_test_3.1');
+            grid.initialize({
+                columns : [ { field : 'Col ' } ]
+            });
+            assert.isTrue(grid.body.rows().length == 0);
+            grid.data.set([{ Col : 'a' }]);
+            assert.isTrue(grid.body.rows().length == 1);
+        });// 3.1
+        it('Allows the table data to be reset outside of initialization', function(){
+            let grid = newgrid('data_access_test_3');//3.2
             grid.initialize({
                 columns : [{field : 'Col'}],
                 data : [{ Col : 'a' }]
@@ -63,8 +73,16 @@ describe('Gridify Tests', function(){
             grid.data.set([{ Col : 'b' }, { Col : 'c' }]);
             assert.isTrue(grid.body.rows().length == 2);
         });
+        it('Can retrieve a cell value from the table', function(){
+            let grid = newgrid('data_access_test_4');
+            grid.initialize({
+                columns : [ { field : 'ColA' }, { field : 'ColB' } ],
+                data : [ { ColA : 'a', ColB : 'b' }, { ColA : 1, ColB : 2 } ]
+            });
+            assert.isTrue(grid.data.get_cell_value(1,'ColB') == 2)
+        });
         it('Can retrieve a data row from the table', function(){
-            let grid = newgrid('data_access_test_2');
+            let grid = newgrid('data_access_test_5');
             grid.initialize({
                 columns : [ { field : 'ColA'}, { field : 'ColB'} ],
                 data : [{ ColA : 'a', ColB : 'b'}, { ColA : 'aa', ColB : 'bb'} ]
@@ -74,7 +92,7 @@ describe('Gridify Tests', function(){
             assert.isTrue(second_row_data.ColB === 'bb')
         });
         it('Can retrieve a data set from the table', function(){
-            let grid = newgrid('data_access_test_3');
+            let grid = newgrid('data_access_test_6');
             let data = [ { Col : 'a'}, { Col : 'b'}, { Col : 'c'} ];
             grid.initialize({
                 columns : [ { field : 'Col'} ],
@@ -84,17 +102,6 @@ describe('Gridify Tests', function(){
             assert.isTrue(grid_data !== data); // not a reference to the same object 
             assert.isTrue(JSON.stringify(grid_data) === JSON.stringify(data)); // same values
         });
-        it('Can retrieve a cell value from the table', function(){
-            let grid = newgrid('data_access_test_4');
-            grid.initialize({
-                columns : [ { field : 'ColA' }, { field : 'ColB' } ],
-                data : [ { ColA : 'a', ColB : 'b' }, { ColA : 1, ColB : 2 } ]
-            });
-            assert.isTrue(grid.data.get_cell_value(1,'ColB') == 2)
-        });
-        it('Can modify a cell\'s value');
-        it('Can modify a row\'s value');
-
     });
 
     describe('Sorting', function(){
@@ -231,9 +238,37 @@ describe('Gridify Tests', function(){
     });
 
     describe('Paging', function(){
-        it('Limits visible results when paging is true');
-        it('')
-
+        it('Limits visible results when paging is true', function(){
+            let grid = newgrid('paging_test_1');
+            grid.initialize({
+                columns : [ { Col : 'a' } ],
+                data : [ { Col : '1' }, { Col : '2' }, { Col : '3' } ],
+                paging : { rows : 2 }
+            });
+            let rows = grid.body.rows();
+            rows = rows.filter(r => r.style.display === '');
+            assert.isTrue(rows.length === 2);
+        });
+        it('Allows displayed total pages/rows to be overriden');
+        it('Can have the page be set programmatically', function(){
+            let grid = newgrid('paging_test_3');
+            grid.initialize({
+                columns : [ { Col : 'a' } ],
+                data : [ { Col : '1' }, { Col : '2' }, { Col : '3' } ],
+                paging : { rows : 2, current_page : 1 }
+            });
+            grid.paging.page(2);
+            let rows = grid.body.rows();
+            rows = rows.filter(r => r.style.display === '');
+            assert.isTrue(rows.length === 1);
+        
+        });
+        it('Can be set after initialization')
     });
+
+    describe('Integration', function(){
+        it('Repages after a row has been sorted');
+        it('Repages after a filter has been applied');
+    })
 
 });
