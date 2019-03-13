@@ -6,6 +6,7 @@ Gridify.prototype.extensions.sorting = function(div){
     let on_column_added = grid.header.on_column_added;
     grid.header.on_column_added = function(header_cell, column_definition){
         on_column_added(header_cell, column_definition);
+        console.log('sort column added')
         if(!column_definition.sort) return;
         let sort_icon = header_cell.appendChild(document.createElement('span'));
         sort_icon.className = 'sort'

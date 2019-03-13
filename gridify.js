@@ -92,8 +92,9 @@ let Gridify = function(container){
         initialize : function(options){
             let tHead = grid.table().createTHead();
             tHead.insertRow(); // Label 
-            tHead.insertRow(); // Filter
+            grid.header.on_initialized(options);
         }
+        , on_initialized : function(options){}
         , cells : function() { return Array.from(grid.table().tHead.rows[0].cells); }
         , find_cell : function(property_name) { 
             return grid.header.cells().find(c => c.id.split('_').pop() === property_name); 
@@ -113,11 +114,12 @@ let Gridify = function(container){
             grid.header._set_header_style(header_cell, column_definition);
             
             grid.header.on_column_added(header_cell, column_definition);
-            let filter_cell = grid.table().tHead.rows[1].insertCell();
-            grid.header._set_column_filter(filter_cell, column_definition);
             grid.body.seed_row.add_column(column_definition);
         }
-        , on_column_added : function(header_cell, column_definition){ }
+        , on_column_added : function(header_cell, column_definition){ 
+            console.log('base column added')
+            // used by extensions to further modify and add functionality to columns.
+        }     
         , _set_header_label : function(header_cell, column_definition) {
             let label = header_cell.appendChild(document.createElement('span'));
             label.innerHTML = column_definition.header || column_definition.field;
@@ -125,11 +127,6 @@ let Gridify = function(container){
         , _set_header_style : function(header_cell, column_definition) {
             grid.styling.stylize_header_cell(header_cell, column_definition);
         }
-        , _set_column_filter : function(filter_cell, column_definition) {
-            if(!column_definition.filter) return;
-            filter_cell.id = grid.table().id+'_filter_columns_'+column_definition.field;
-            grid.filtering.add_filter(filter_cell, column_definition.field, column_definition.filter)
-        }  
     }
 
     grid.body = {
@@ -279,60 +276,6 @@ let Gridify = function(container){
             grid.styling.stylize(td, grid.styling.defaults.tbody.td);
             // all cols 
             grid.styling.stylize(td, col.style);
-        }
-    }
-
- 
-    let filter_pending = 0;
-    let filter_delay = function(callback) {
-        return function(field_value, filter_value) {
-            clearTimeout(filter_pending);
-            filter_pending = setTimeout(()=>{ callback(field_value, filter_value); }, 150);
-        }
-    }
-    grid.filtering = { 
-        filter : function(){
-            let filter_controls = grid.filtering.filter_controls();
-            grid.body.rows().forEach((row, i)=>{
-                let filtered_out = filter_controls.some((filter_control)=>{
-                    let cell_value = grid.data.get_cell_value(i, filter_control.property);
-                    return !filter_control.rule(cell_value, filter_control.value);
-                });
-                row.style.display = filtered_out ? 'none' : ''
-            }); 
-
-        }
-        , filter_callback : function() {
-            return filter_delay(grid.filtering.filter());
-        }
-        , cells : function() { return Array.from(grid.table().tHead.rows[1].cells); }
-        , filter_controls : function(){
-            return grid.filtering.cells().map(cell => cell.firstChild).filter(x => !!x);
-        }
-        , add_filter : function(filter_cell, field_name, options) {
-            options = grid.filtering._set_default_options(field_name, options);
-            let control = options.control;
-            control.rule = options.rule;
-            control.property = field_name;
-            control.addEventListener(options.event, grid.filtering.filter_callback);
-            filter_cell.appendChild(control);
-        }
-        , _set_default_options : function(field_name, options){
-            if(typeof(options) !== 'object') options = {};
-            options.rule = options.rule || grid.filtering._default_filter_rule;
-            options.control = options.control || grid.filtering._default_filter_control(field_name);
-            options.event = options.event || 'keyup';
-            return options;
-        }
-        , _default_filter_rule : function(x, y){ 
-            return (''+x).toLowerCase().substr(0, y.length) == y.toLowerCase();
-        }
-        , _default_filter_control : function(property_name){
-            let control = document.createElement('input');
-            control.type = 'text';
-            control.id = grid.table().id + '_filter_' + property_name;
-            control.style = 'width: 80%; display: block; margin: auto;'
-            return control;
         }
     }
 
