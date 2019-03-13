@@ -17,7 +17,7 @@
             let grid_div = document.createElement('div');
             grid_div.id = test_name + '_grid';
             div.appendChild(grid_div);
-            let grid = Gridify(grid_div);
+            let grid = new Gridify(grid_div);
             demo.grid_initialize(grid);
             
             let pre = document.createElement('pre');
@@ -48,6 +48,7 @@
            // paging : true
             paging : { rows : 2, total_rows : 4, current_page : 1 } 
         });
+        window.demo = grid;
     }
     paging_demo.add_to_page();
 
@@ -90,6 +91,8 @@
                 { Default : 'delta', Custom : 'Z:Alpha' }
             ]
         });
+
+        window.sort = grid;
     }
     sort_demo.add_to_page();
 

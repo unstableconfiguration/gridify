@@ -1,17 +1,48 @@
 
 
+/* Thoughts and todos for paging WIP 
+    Need to get paging to work with sorting and filtering. 
+        * Changing the sort order willl need to retrigger the paging 
+        * Changing the filters will need to retrigger the paging 
+    Ideally this can be done in such a way as they are not super tightly coupled 
+    but first and foremost lets get it working. 
+
+    Questions/Answers: 
+        * Does modifying filter values change the 'total rows'?
+        * Probably. We're paging only over the visible/available rows unless otherwise told. 
+
+
+
+
+
+    Need to think about server-side options for paging since that was a concern when 
+    architecting it. The idea is that page forward or page backward can make a 
+    call to a server API. The server API can return partial data sets, but can also 
+    inform us of the total number of rows, so that we can display 'page 5 of 60' even 
+    if we only have the rows for page 5 at hand. 
+
+    Need to start splitting features off into modules. 
+
+*/
+/*  Ok, so monkey patching it. 
+    Main gridify: Builds html table around a data set 
+        Data access
+        Header
+        Footer
+        Body
+    
+    
+*/
 
 
 let Gridify = function(container){   
-    let GridifyModel = function(container){
-        if(typeof(container)==='string') container = document.getElementById(container);
-        if(!container instanceof HTMLDivElement) 
-            throw('Gridify container must be <div>');
-        this.container = container;
-        return this;
-    }
+    if(typeof(container)==='string') container = document.getElementById(container);
+    if(!container instanceof HTMLDivElement) 
+        throw('Gridify container must be <div>');
+    
+    let grid = this;
+    grid.container = container;
 
-    let grid = new GridifyModel(container);
     grid.table = () => grid.container.firstChild;
     let _clear = (container)=> { if(!container) return; while(container.firstChild) container.removeChild(container.firstChild); }        
 
@@ -21,7 +52,6 @@ let Gridify = function(container){
         grid.container
             .appendChild(document.createElement('table'))
             .id = grid.container.id +'_table';
-        
         grid.header.initialize(options);
         grid.body.initialize();
         grid.footer.initialize();
@@ -81,25 +111,19 @@ let Gridify = function(container){
             header_cell.id = grid.table().id+'_header_'+column_definition.field;
             grid.header._set_header_label(header_cell, column_definition);
             grid.header._set_header_style(header_cell, column_definition);
-            grid.header._set_column_sort(header_cell, column_definition);
             
+            grid.header.on_column_added(header_cell, column_definition);
             let filter_cell = grid.table().tHead.rows[1].insertCell();
             grid.header._set_column_filter(filter_cell, column_definition);
             grid.body.seed_row.add_column(column_definition);
         }
+        , on_column_added : function(header_cell, column_definition){ }
         , _set_header_label : function(header_cell, column_definition) {
             let label = header_cell.appendChild(document.createElement('span'));
             label.innerHTML = column_definition.header || column_definition.field;
         }
         , _set_header_style : function(header_cell, column_definition) {
             grid.styling.stylize_header_cell(header_cell, column_definition);
-        }
-        , _set_column_sort : function(header_cell, column_definition) {
-            if(!column_definition.sort) return;
-            let sort_icon = header_cell.appendChild(document.createElement('span'));
-            sort_icon.className = 'sort'
-            header_cell.style.paddingRight = '30px';
-            header_cell.addEventListener('click', grid.sorting.sort_callback(column_definition.field, column_definition.sort));
         }
         , _set_column_filter : function(filter_cell, column_definition) {
             if(!column_definition.filter) return;
@@ -258,42 +282,7 @@ let Gridify = function(container){
         }
     }
 
-
-
-    grid.sorting = {
-        sort : function(property_name, options = {}) {
-            options = grid.sorting._set_default_options(options);
-            let dir = grid.sorting._column_sort_direction(property_name, options);
-            let rows = grid.body.rows();
-            rows.sort((x,y)=>{
-                let xv = grid.data.get_cell_value(x, property_name);
-                let yv = grid.data.get_cell_value(y, property_name);
-                let compared = options.comparator(xv, yv);
-                return +compared * dir;
-            });
-            
-            grid.body.clear();
-            let tbody = grid.table().tBodies[0];
-            rows.forEach(x=>tbody.appendChild(x));
-        }
-        , sort_callback : function(property_name, options){
-            return ()=>{ grid.sorting.sort(property_name, options); }
-        }
-        , _set_default_options : function(options){
-            if(typeof(options) !== 'object') options = {};
-            if(!options.comparator) options.comparator = grid.sorting._default_comparator;
-            return options;
-        }
-        , _default_comparator : function(a, b) { if(a==b) return 0; return a<b ? 1 : -1; }
-        , _column_sort_direction : function(property_name, options) {
-            let sort_span = grid.header.find_cell(property_name).children[1];
-            sort_span.direction = sort_span.direction !== 'asc' ? 'asc' : 'desc';
-            return sort_span.direction === 'asc' ? -1 : 1;
-        }
-        
-    }
-
-
+ 
     let filter_pending = 0;
     let filter_delay = function(callback) {
         return function(field_value, filter_value) {
@@ -387,10 +376,12 @@ let Gridify = function(container){
         }
     }
 
-
+    for(var k in grid.extensions)
+        grid.extensions[k].apply(grid, arguments);
     
     return grid;
 }
+Gridify.prototype.extensions = {};
 
 //return Gridify;
 
