@@ -48,7 +48,6 @@
            // paging : true
             paging : { rows : 2, total_rows : 4, current_page : 1 } 
         });
-        window.demo = grid;
     }
     paging_demo.add_to_page();
 
@@ -92,7 +91,6 @@
             ]
         });
 
-        window.sort = grid;
     }
     sort_demo.add_to_page();
 

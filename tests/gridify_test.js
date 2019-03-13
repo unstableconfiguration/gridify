@@ -63,11 +63,37 @@ describe('Gridify Tests', function(){
             grid.data.set([{ Col : 'b' }, { Col : 'c' }]);
             assert.isTrue(grid.body.rows().length == 2);
         });
-        // not implemented
-        it('Can retrieve a data set from the table');
-        it('Can retrieve a data row from the table');
-        it('Can retrieve a cell value from the table');
+        it('Can retrieve a data row from the table', function(){
+            let grid = newgrid('data_access_test_2');
+            grid.initialize({
+                columns : [ { field : 'ColA'}, { field : 'ColB'} ],
+                data : [{ ColA : 'a', ColB : 'b'}, { ColA : 'aa', ColB : 'bb'} ]
+            });
+            let second_row = grid.body.rows()[1];
+            let second_row_data = grid.data.get_row_data(second_row);
+            assert.isTrue(second_row_data.ColB === 'bb')
+        });
+        it('Can retrieve a data set from the table', function(){
+            let grid = newgrid('data_access_test_3');
+            let data = [ { Col : 'a'}, { Col : 'b'}, { Col : 'c'} ];
+            grid.initialize({
+                columns : [ { field : 'Col'} ],
+                data : data
+            });
+            let grid_data = grid.data.get();
+            assert.isTrue(grid_data !== data); // not a reference to the same object 
+            assert.isTrue(JSON.stringify(grid_data) === JSON.stringify(data)); // same values
+        });
+        it('Can retrieve a cell value from the table', function(){
+            let grid = newgrid('data_access_test_4');
+            grid.initialize({
+                columns : [ { field : 'ColA' }, { field : 'ColB' } ],
+                data : [ { ColA : 'a', ColB : 'b' }, { ColA : 1, ColB : 2 } ]
+            });
+            assert.isTrue(grid.data.get_cell_value(1,'ColB') == 2)
+        });
         it('Can modify a cell\'s value');
+        it('Can modify a row\'s value');
 
     });
 

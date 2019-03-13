@@ -81,7 +81,7 @@ Gridify.prototype.extensions.paging = function(div){
         }
         , _set_row_visibility : function(page_number){
             let rows = grid.body.rows();
-            let options = grid.options();
+            let options = grid.options().paging;
             // Undo previous paging 
             rows.forEach(r => { if(r.paged) { r.paged = undefined; r.style.display = ''; } });
             
@@ -92,7 +92,6 @@ Gridify.prototype.extensions.paging = function(div){
             rows = rows.filter((r, ix) => ix >= end || ix < start);
 
             rows.forEach(r => {r.style.display = 'none'; r.paged = true; });
-
         }
         , _set_footer_values : function(page_number){
             grid.footer.pager.set_page(page_number);

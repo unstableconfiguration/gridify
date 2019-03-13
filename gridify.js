@@ -16,9 +16,11 @@ let Gridify = function(container){
         grid.container
             .appendChild(document.createElement('table'))
             .id = grid.container.id +'_table';
+        
         grid.header.initialize(options);
         grid.body.initialize();
         grid.footer.initialize();
+        
         if(options.columns) grid.header.add_columns(options.columns);
         if(options.data) grid.data.set(options.data);
         
@@ -31,11 +33,16 @@ let Gridify = function(container){
     grid.options = function(){ return grid.table().options; }
     grid.data = {
         get : function() {
-            /* build data table from existing grid rows */
-            console.log('retrieve data placeholder')
-            return [1, 2, 3, 4];
+            return grid.body.rows().map(r => grid.data.get_row_data(r));
         },
-        set : function(input_data) {
+        get_row_data : function(row){
+            let cell_data = {};
+            Array.from(row.cells).forEach(c => {
+                cell_data[c.id.split('_').pop()] = c.innerText;
+            });
+            return cell_data;
+        }
+        , set : function(input_data) {
             let data = [];
             if(Array.isArray(input_data)) data = input_data;
             else if(typeof(input_data)==='object')
@@ -47,7 +54,7 @@ let Gridify = function(container){
             });
         }
         , get_fields : function() {
-            return grid.header.cells().map(x => x.id.split('_').slice(-1));
+            return grid.header.cells().map(x => x.id.split('_').slice(-1)[0]);
         }
         , get_cell_value : function(row, property){
             if(typeof(row)==='number') row = grid.body.rows()[row];
