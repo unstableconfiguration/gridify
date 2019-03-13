@@ -7,7 +7,7 @@ describe('Gridify Tests', function(){
         div.id = id;
         div.style.display = 'none';
         document.body.appendChild(div);
-        return Gridify(id);
+        return new Gridify(id);
     }
     
     describe('Initialization', function(){

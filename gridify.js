@@ -7,7 +7,6 @@ let Gridify = function(container){
     
     let grid = this;
     grid.container = container;
-
     grid.table = () => grid.container.firstChild;
     let _clear = (container)=> { if(!container) return; while(container.firstChild) container.removeChild(container.firstChild); }        
 
