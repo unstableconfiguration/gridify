@@ -116,7 +116,7 @@ describe('Gridify Tests', function(){
         it('Defaults to alphabetical sorting.', function(){
             let grid = newgrid('sorting_test_2');
             grid.initialize({
-                columns : [{field : 'Col', sort : true }],
+                columns : [{ field : 'Col', sort : true }],
                 data : [{ Col : 'b' }, { Col : 'c' }, { Col : 'a' }]
             });
             assert.isTrue(grid.data.get_cell_value(0, 'Col') == 'b');
@@ -241,7 +241,7 @@ describe('Gridify Tests', function(){
         it('Limits visible results when paging is true', function(){
             let grid = newgrid('paging_test_1');
             grid.initialize({
-                columns : [ { Col : 'a' } ],
+                columns : [ { field : 'Col' } ],
                 data : [ { Col : '1' }, { Col : '2' }, { Col : '3' } ],
                 paging : { rows : 2 }
             });
@@ -253,7 +253,7 @@ describe('Gridify Tests', function(){
         it('Can have the page be set programmatically', function(){
             let grid = newgrid('paging_test_3');
             grid.initialize({
-                columns : [ { Col : 'a' } ],
+                columns : [ { field : 'Col' } ],
                 data : [ { Col : '1' }, { Col : '2' }, { Col : '3' } ],
                 paging : { rows : 2, current_page : 1 }
             });
@@ -267,8 +267,38 @@ describe('Gridify Tests', function(){
     });
 
     describe('Integration', function(){
-        it('Repages after a row has been sorted');
-        it('Repages after a filter has been applied');
+        it('Repages after a row has been sorted, preserving the current page', function(){
+            let grid = newgrid('integration_test_1');
+            grid.initialize({
+                columns : [ { field : 'Col', sort : true }  ],
+                data : [ { Col : 'a' }, { Col : 'b' }, { Col : 'c' }],
+                paging : { rows : 2 }
+            });
+            assert.isTrue(grid.body.rows()[0].innerText === 'a');
+            grid.paging.page(2);
+            let get_visible_value = function(){
+                return grid.body.rows().find(r => r.style.display === '').innerText;
+            }
+            assert.isTrue(get_visible_value() === 'c');
+            grid.sorting.sort('Col'); grid.sorting.sort('Col');
+            assert.isTrue(get_visible_value() === 'a');       
+        });
+        it('Repages after a filter has been applied', function(){
+            let grid = newgrid('integration_test_2');
+            grid.initialize({
+                columns : [ { field : 'Col', filter : true }  ],
+                data : [ { Col : 'a' }, { Col : 'a' }, { Col : 'c' }],
+                paging : { rows : 2 }
+            });
+            grid.paging.page(2);
+            assert.isTrue(grid.body.rows().filter(r => r.style.display === '').length === 1);
+            let filter_textbox = grid.table().tHead.rows[1].cells[0].firstChild;
+            filter_textbox.value = 'a';
+            grid.filtering.filter();
+            assert.isTrue(grid.table().options.paging.current_page === 1);
+            assert.isTrue(grid.body.rows().filter(r => r.style.display === '').length === 2);
+
+        });
     })
 
 });

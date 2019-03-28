@@ -7,26 +7,6 @@ Gridify.prototype.extensions.paging = function(div){
         grid.paging.initialize(options.paging);
     }
 
-    // not sure yet how to make these agnostic of one another.
-    if(typeof(grid.sorting) !== 'undefined'){
-        let sort = grid.sorting.sort;
-        grid.sorting.sort = function(property_name, options = {}){
-            grid.paging.clear();
-            sort(property_name, options);
-            let current_page = grid.table().options.paging.current_page;    
-            grid.paging.page(current_page);
-        }
-    }
-
-    if(typeof(grid.filtering) !== 'undefined'){
-        let filter = grid.filtering.filter;
-        grid.filtering.filter = function(){
-            grid.paging.clear();
-            filter(); 
-            grid.paging.page();
-        }
-    }
-
     grid.footer.pager = {
         initialize : function(options){
             let paging_row = grid.table().tFoot.insertRow();
@@ -84,14 +64,38 @@ Gridify.prototype.extensions.paging = function(div){
         }
     }
 
-
     grid.paging = { 
         initialize : function(options){
             if(!options) return;
+            grid.paging.extend_sorting();
+            grid.paging.extend_filtering();
             options = grid.paging._default_options(options);
             grid.table().options.paging = options;
             grid.footer.pager.initialize(options); 
             grid.paging.page(options.current_page);
+        }
+        // Not sure how to make these modules agnostic of one another. 
+        // In the meantime, paging needs to know about sorting and filtering.
+        , extend_sorting : function(){
+            if(typeof(grid.sorting) !== 'undefined'){
+                let sort = grid.sorting.sort;
+                grid.sorting.sort = function(property_name, options = {}){
+                    grid.paging.clear();
+                    sort(property_name, options);
+                    let current_page = grid.table().options.paging.current_page;    
+                    grid.paging.page(current_page);
+                }
+            }
+        }
+        , extend_filtering : function(){
+            if(typeof(grid.filtering) !== 'undefined'){
+                let filter = grid.filtering.filter;
+                grid.filtering.filter = function(){
+                    grid.paging.clear();
+                    filter(); 
+                    grid.paging.page();
+                }
+            }
         }
         , page : function(page_number = 1){
             grid.options().paging.current_page = page_number;
