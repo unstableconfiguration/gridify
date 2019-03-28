@@ -35,23 +35,6 @@
         return demo;
     }
 
-    let paging_demo = new_demo('paging_test');
-    paging_demo.description = 'WIP';
-    paging_demo.grid_initialize = function(grid){
-        grid.initialize({
-            columns : [
-                { field : 'a' }
-            ],
-            data : [
-                { a : 1 }, { a : 2 }, { a : 3 }, { a : 4 }
-            ],
-           // paging : true
-            paging : { rows : 2 } 
-        });
-    }
-    paging_demo.add_to_page();
-
-
     let base_demo = new_demo('base_test');
     base_demo.description = `Basic grid demonstrating data binding`;
     base_demo.grid_initialize = function(grid){
@@ -132,6 +115,54 @@
         })
     }
     filter_demo.add_to_page();
+
+    let paging_demo = new_demo('paging_test');
+    paging_demo.description = `Demonstration of paging.
+        It defaults to paging 20 rows at a time, which can be overridden with the 'rows' option. `;
+    paging_demo.grid_initialize = function(grid){
+        grid.initialize({
+            columns : [
+                { field : 'n' }
+            ],
+            data : [
+                { n : 1 }, { n : 2 }, { n : 3 }, { n : 4 },
+                { n : 5 }, { n : 6 }, { n : 7 }, { n : 8 },
+                { n : 9 }, { n : 10 }, { n : 11 }, { n : 12 },
+                { n : 13 }, { n : 14 }, { n : 15 }, { n : 16 },
+                { n : 17 }, { n : 18 }, { n : 19 }, { n : 20 },
+                { n : 21 }, { n : 22 }, { n : 23 }, { n : 24 },
+                
+            ],
+            paging : { rows : 6 } 
+        });
+    }
+    paging_demo.add_to_page();
+
+
+    let integration_demo = new_demo('integration_test');
+    integration_demo.description = `Integration of sorting, paging, and filtering. 
+        <br>Sorting needs to trigger the pager to refresh while maintaining the current page.
+        <br>Filtering needs to trigger the pager to refresh while setting current page to 1.
+        <br>Paging needs to page over filtered items.`;
+    integration_demo.grid_initialize = function(grid){
+        grid.initialize({
+            columns : [
+                { field : 'bin', header : 'Nybble', filter : true, sort: true }
+            ],
+            data : [
+                { bin : '0001' },{ bin : '0010' },{ bin : '0011' },
+                { bin : '0100' },{ bin : '0101' },{ bin : '0110' },
+                { bin : '0111' },{ bin : '1000' },{ bin : '1001' },
+                { bin : '1010' },{ bin : '1011' },{ bin : '1100' },
+                { bin : '1101' },{ bin : '1110' },{ bin : '1111' },
+            ],
+            paging : { rows : 5 },
+        
+        });
+    }
+    integration_demo.add_to_page();
+
+
 })();
 
 
