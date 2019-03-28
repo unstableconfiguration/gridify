@@ -1,14 +1,19 @@
 
 
+
+
 let Gridify = function(container){   
-    if(typeof(container)==='string') container = document.getElementById(container);
+    if(typeof(container) === 'string') container = document.getElementById(container);
     if(!container instanceof HTMLDivElement) 
         throw('Gridify container must be <div>');
     
     let grid = this;
     grid.container = container;
     grid.table = () => grid.container.firstChild;
-    let _clear = (container)=> { if(!container) return; while(container.firstChild) container.removeChild(container.firstChild); }        
+    let _clear = (container)=> { 
+        if(!container) return; 
+        while(container.firstChild) container.removeChild(container.firstChild); 
+    }        
 
     /* Initializes grid within provided container. */
     grid.initialize = function(options){

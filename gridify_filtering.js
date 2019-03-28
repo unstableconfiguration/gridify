@@ -10,8 +10,7 @@ Gridify.prototype.extensions.filtering = function(div){
     }
 
     let on_column_added = grid.header.on_column_added;
-    grid.header.on_column_added = function(header_cell, column_definition)
-    {
+    grid.header.on_column_added = function(header_cell, column_definition){
         on_column_added(header_cell, column_definition);
         let filter_cell = grid.table().tHead.rows[1].insertCell();
         if(!column_definition.filter) return;
@@ -34,9 +33,9 @@ Gridify.prototype.extensions.filtering = function(div){
                     let cell_value = grid.data.get_cell_value(i, filter_control.property);
                     return !filter_control.rule(cell_value, filter_control.value);
                 });
+                row.filtered = filtered_out;
                 row.style.display = filtered_out ? 'none' : ''
             }); 
-
         }
         , filter_callback : function() {
             return filter_delay(grid.filtering.filter());

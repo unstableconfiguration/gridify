@@ -7,6 +7,26 @@ Gridify.prototype.extensions.paging = function(div){
         grid.paging.initialize(options.paging);
     }
 
+    // not sure yet how to make these agnostic of one another.
+    if(typeof(grid.sorting) !== 'undefined'){
+        let sort = grid.sorting.sort;
+        grid.sorting.sort = function(property_name, options = {}){
+            grid.paging.clear();
+            sort(property_name, options);
+            let current_page = grid.table().options.paging.current_page;    
+            grid.paging.page(current_page);
+        }
+    }
+
+    if(typeof(grid.filtering) !== 'undefined'){
+        let filter = grid.filtering.filter;
+        grid.filtering.filter = function(){
+            grid.paging.clear();
+            filter(); 
+            grid.paging.page();
+        }
+    }
+
     grid.footer.pager = {
         initialize : function(options){
             let paging_row = grid.table().tFoot.insertRow();
@@ -24,7 +44,7 @@ Gridify.prototype.extensions.paging = function(div){
 
             let right_cell = paging_row.insertCell();
             right_cell.id = grid.table().id + '_paging_right';
-            right_cell.style = 'width:33%'    
+            right_cell.style = 'width:33%;'    
 
         }
         , set_page : function(page_number){
@@ -69,23 +89,28 @@ Gridify.prototype.extensions.paging = function(div){
         initialize : function(options){
             if(!options) return;
             options = grid.paging._default_options(options);
+            grid.table().options.paging = options;
             grid.footer.pager.initialize(options); 
             grid.paging.page(options.current_page);
         }
-        , page : function(page_number){
+        , page : function(page_number = 1){
             grid.options().paging.current_page = page_number;
             grid.paging._set_footer_values(page_number);
             grid.paging._set_row_visibility(page_number);
+        }
+        , clear : function() { 
+            let rows = grid.body.rows();
+            rows.forEach(r => { if(r.paged) { r.paged = undefined; r.style.display = ''; } });
         }
         , _set_row_visibility : function(page_number){
             let rows = grid.body.rows();
             let options = grid.options().paging;
             
-            // Undo previous paging 
-            rows.forEach(r => { if(r.paged) { r.paged = undefined; r.style.display = ''; } });
-            
+            grid.paging.clear();
+
             let start = (options.current_page-1)*options.rows;
             let end = options.current_page*options.rows;
+
             // Only page visible rows
             rows = rows.filter(r => r.style.display !== 'none');
             rows = rows.filter((r, ix) => ix >= end || ix < start);
@@ -101,7 +126,6 @@ Gridify.prototype.extensions.paging = function(div){
             options.total_rows = options.total_rows || grid.data.get().length;
             options.total_pages = Math.ceil(options.total_rows/options.rows);
             options.current_page = options.current_page || 1;
-                // need to extract from UI if present
             return options;
         }
     }
