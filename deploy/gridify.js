@@ -282,9 +282,11 @@ Gridify.prototype.extensions.filtering = function(div){
     grid.filtering = { 
         filter : function(){
             let filter_controls = grid.filtering.filter_controls();
+            let grid_data = grid.data.get();
+            
             grid.body.rows().forEach((row, i)=>{
                 let filtered_out = filter_controls.some((filter_control)=>{
-                    let cell_value = grid.data.get_cell_value(i, filter_control.property);
+                    let cell_value = grid_data[i][filter_control.property];
                     return !filter_control.rule(cell_value, filter_control.value);
                 });
                 row.filtered = filtered_out;
