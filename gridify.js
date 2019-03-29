@@ -47,6 +47,12 @@ let Gridify = function(container){
             });
             return cell_data;
         }
+        , get_cell_value : function(row, property){
+            if(typeof(row)==='number') row = grid.body.rows()[row];
+            return Array.from(row.cells)
+                .find(x=>x.id.split('_').slice(-1)==property)
+                .innerText;
+        }
         , set : function(input_data) {
             let data = [];
             if(Array.isArray(input_data)) data = input_data;
@@ -60,12 +66,6 @@ let Gridify = function(container){
         }
         , get_fields : function() {
             return grid.header.cells().map(x => x.id.split('_').slice(-1)[0]);
-        }
-        , get_cell_value : function(row, property){
-            if(typeof(row)==='number') row = grid.body.rows()[row];
-            return Array.from(row.cells)
-                .find(x=>x.id.split('_').slice(-1)==property)
-                .innerText;
         }
     }
 
