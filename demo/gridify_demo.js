@@ -35,6 +35,23 @@
         return demo;
     }
 
+    let style_demo = new_demo('style_test');
+    style_demo.description = `Testing css and class overrides.`;
+    style_demo.grid_initialize = function(grid) {
+        grid.initialize({
+            columns : [
+                { field : 'a', header : 'Default Col' }
+                , { field : 'b', header : 'Col Style', style : 'background: teal' }
+            ],
+            data : [
+                { a : 1, b : 'a' }, { a : 2, b : 'b' }, { a : 3, b : 'c' }
+            ],
+            style : `border: solid thin black;`,
+            className : 'style_demo'
+        });
+    }
+    style_demo.add_to_page();
+
     let base_demo = new_demo('base_test');
     base_demo.description = `Basic grid demonstrating data binding`;
     base_demo.grid_initialize = function(grid){

@@ -1,0 +1,9 @@
+
+
+.style_demo tr:hover {
+    font-style:italic
+}
+
+.style_demo thead { 
+    border-bottom: solid thin black
+}

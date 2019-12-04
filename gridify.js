@@ -22,6 +22,10 @@ let Gridify = function(container){
             .appendChild(document.createElement('table'))
             .id = grid.container.id +'_table';
         
+        console.log(grid.table())
+        grid.styling.stylize_grid(grid.table(), options)
+            
+        
         grid.header.initialize(options);
         grid.body.initialize();
         grid.footer.initialize();
@@ -112,7 +116,6 @@ let Gridify = function(container){
     grid.body = {
         initialize : function(table=grid.table()) {
             let main_body = table.createTBody();
-            
             grid.body.seed_row.initialize();
         }
         , clear : function(){ _clear(grid.table().tBodies[0]); }
@@ -170,6 +173,7 @@ let Gridify = function(container){
 
     grid.styling = {
         defaults : { 
+            grid : `border-collapse:collapse`,
             tbody : {
                 tr : `` // border bottom
                 , td : `border-bottom:solid thin;padding:.08rem .25rem;overflow:hidden;text-align:left;text-overflow:ellipses;white-space:nowrap`
@@ -184,14 +188,19 @@ let Gridify = function(container){
                 .map(x => x.trim().split(':'))
                 .forEach(kv => el.style[kv[0]]=kv[1]);
         }
+        , stylize_grid : function(table, options){
+            grid.styling.stylize(table, grid.styling.defaults.grid);
+            if(typeof(options.className) !== 'undefined') table.className = options.className;
+            if(options.style) grid.styling.stylize(table, options.style);
+        }
         , stylize_header_cell : function(td, col) {
             grid.styling.stylize(td, grid.styling.defaults.thead.td);
-            // 'all columns' options
+            if(typeof(col.className) !== 'undefined') td.className = col.className;
             grid.styling.stylize(td, col.header_style);
         }
         , stylize_body_cell: function(td, col) {
             grid.styling.stylize(td, grid.styling.defaults.tbody.td);
-            // all cols 
+            if(typeof(col.className) !== 'undefined') td.className = col.className;
             grid.styling.stylize(td, col.style);
         }
     }
