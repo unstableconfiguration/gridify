@@ -85,23 +85,23 @@ let Gridify = function(container){
             });
         }
         , addColumn : function(columnDefinition){
-            let header_cell = grid.table.tHead.rows[0].insertCell();
-            header_cell.id = grid.table.id + '_header_' + columnDefinition.field;
-            grid.header._setHeaderLabel(header_cell, columnDefinition);
-            grid.header._setHeaderStyle(header_cell, columnDefinition);
+            let headerCell = grid.table.tHead.rows[0].insertCell();
+            headerCell.id = grid.table.id + '_header_' + columnDefinition.field;
+            grid.header._setHeaderLabel(headerCell, columnDefinition);
+            grid.header._setHeaderStyle(headerCell, columnDefinition);
             
-            grid.header.onColumnAdded(header_cell, columnDefinition);
+            grid.header.onColumnAdded(headerCell, columnDefinition);
             grid.body.seed_row.addColumn(columnDefinition);
         }
-        , onColumnAdded : function(header_cell, columnDefinition){ 
+        , onColumnAdded : function(headerCell, columnDefinition){ 
             // used by extensions to further modify and add functionality to columns.
         }     
-        , _setHeaderLabel : function(header_cell, columnDefinition) {
-            let label = header_cell.appendChild(document.createElement('span'));
+        , _setHeaderLabel : function(headerCell, columnDefinition) {
+            let label = headerCell.appendChild(document.createElement('span'));
             label.innerHTML = columnDefinition.header || columnDefinition.field;
         }
-        , _setHeaderStyle : function(header_cell, columnDefinition) {
-            grid.styling.stylizeHeaderCell(header_cell, columnDefinition);
+        , _setHeaderStyle : function(headerCell, columnDefinition) {
+            grid.styling.stylizeHeaderCell(headerCell, columnDefinition);
         }
     }
     Object.defineProperty(grid.header, 'cells', { get : () => Array.from(grid.table.tHead.rows[0].cells) });
