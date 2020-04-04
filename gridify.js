@@ -47,7 +47,7 @@ let Gridify = function(container){
         , set : function(data) {
             grid.body.clear();
             data.forEach((rowData, ridx) => {
-                grid.body.add_row(rowData, ridx);
+                grid.body.addRow(rowData, ridx);
             });
         }
         , getRowValues : function(row){
@@ -91,7 +91,7 @@ let Gridify = function(container){
             grid.header._setHeaderStyle(headerCell, columnDefinition);
             
             grid.header.onColumnAdded(headerCell, columnDefinition);
-            grid.body.seed_row.addColumn(columnDefinition);
+            grid.body.seedRow.addColumn(columnDefinition);
         }
         , onColumnAdded : function(headerCell, columnDefinition){ 
             // used by extensions to further modify and add functionality to columns.
@@ -107,32 +107,32 @@ let Gridify = function(container){
     Object.defineProperty(grid.header, 'cells', { get : () => Array.from(grid.table.tHead.rows[0].cells) });
 
     grid.body = {
-        initialize : function(table=grid.table) {
+        initialize : function(table = grid.table) {
             let main_body = table.createTBody();
-            grid.body.seed_row.initialize();
+            grid.body.seedRow.initialize();
         }
         , clear : function(){ _clear(grid.table.tBodies[0]); }
         //, rows : defined as property below
-        , _set_body_cell : function(body_cell, value, column_definition) {
-            let label = body_cell.appendChild(document.createElement('span'));
+        , _setBodyCell : function(bodyCell, value, columnDefinition) {
+            let label = bodyCell.appendChild(document.createElement('span'));
             label.innerHTML = value;
         }
-        , add_row : function(row_data, rowid) {
-            let row = grid.body.seed_row.clone();
-            row.id = grid.table.id+'_'+rowid;
+        , addRow : function(rowData, rowid) {
+            let row = grid.body.seedRow.clone();
+            row.id = grid.table.id + '_' + rowid;
             grid.table.tBodies[0].appendChild(row);
             Array.from(row.cells).forEach((cell)=>{
                 let field = cell.id.split('_').slice(-1);
                 cell.id = row.id + '_' + field;
-                cell.innerHTML = row_data[field];
+                cell.innerHTML = rowData[field];
             });
         }
-        , seed_row : {
+        , seedRow : {
             initialize : function(){
                 let seed_body = grid.table.createTBody();
-                let seed_row = seed_body.insertRow();
-                seed_row.id = grid.table.id + '_seed';
-                seed_row.style.display = 'none';
+                let seedRow = seed_body.insertRow();
+                seedRow.id = grid.table.id + '_seed';
+                seedRow.style.display = 'none';
             }
             , clone : function() {
                 let seed = grid.table.tBodies[1].rows[0];
@@ -144,15 +144,15 @@ let Gridify = function(container){
                 });
                 return row;       
             }
-            , addColumn(column_definition){
+            , addColumn(columnDefinition){
                 let tr = grid.table.tBodies[1].rows[0];
                 let td = tr.insertCell();
-                td.id = tr.id + '_' + column_definition.field;
+                td.id = tr.id + '_' + columnDefinition.field;
                 td.innerHTML = 'test';
                 
-                grid.styling.stylizeTableCell(td, column_definition);
-                if(column_definition.click)
-                    td.onclick = column_definition.click;
+                grid.styling.stylizeTableCell(td, columnDefinition);
+                if(columnDefinition.click)
+                    td.onclick = columnDefinition.click;
             }
         }
     }
