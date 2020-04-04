@@ -86,24 +86,14 @@ describe('Gridify Tests', function(){
             assert.isTrue(cell.style.backgroundColor === 'blue');
         });
 
-        it('Should set the class property of the header cell when .header.class is supplied in the column definition');
-
-
-        it('Allows header style defaults to be overridden.', function(){
-            let grid = newgrid('column_definitions_test_3');
+        it('Should set the class property of the header cell when .header.class is supplied in the column definition', function() {
+            let grid = newgrid('css_cell_style_test');
             grid.initialize({
-                data : [ { Col : 'a' } ]
-                , columns : [{ field : 'Col', header_style : 'color:blue' }]
+                columns : [ { field : 'col', header : { class : 'bgBlue' } } ],
+                data : [ { col : 'a' } ],
             });
-            assert.isTrue(grid.header.cells[0].style.color == 'blue')
-        });
-        it('Allows column style defaults to be overridden', function(){
-            let grid = newgrid('column_definitions_test_4');
-            grid.initialize({
-                data : [ { Col : 'a' } ]
-                , columns : [{ field : 'Col', style : 'color:blue' }]
-            });
-            assert.isTrue(grid.body.rows[0].cells[0].style.color == 'blue')
+            let cell = grid.header.cells[0];
+            assert.isTrue(cell.className.includes('bgBlue'));
         });
 
     });
