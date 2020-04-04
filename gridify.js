@@ -11,7 +11,7 @@ let Gridify = function(container){
     let grid = this;
     grid.container = container;
     Object.defineProperty(grid, 'table', { get : () => grid.container.firstChild });
-
+    Object.defineProperty(grid, 'options', { get : () => grid.table.options });
 
     let _clear = (container)=> { 
         if(!container) return; 
@@ -41,7 +41,6 @@ let Gridify = function(container){
     grid.on_initialized = function(options){}
 
 
-    grid.options = function(){ return grid.table.options; }
     grid.data = {
         get : function() {
             return grid.body.rows.map(r => grid.data.get_row_data(r));
