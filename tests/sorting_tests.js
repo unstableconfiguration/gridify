@@ -25,14 +25,14 @@ describe('Sorting', function(){
             columns : [{ field : 'Col', sort : true }],
             data : [{ Col : 'b' }, { Col : 'c' }, { Col : 'a' }]
         });
-        assert.isTrue(grid.data.get_cell_value(0, 'Col') == 'b');
-        assert.isTrue(grid.data.get_cell_value(2, 'Col') == 'a');
+        assert.isTrue(grid.data.getCellValue(0, 'Col') == 'b');
+        assert.isTrue(grid.data.getCellValue(2, 'Col') == 'a');
         grid.sorting.sort('Col');
-        assert.isTrue(grid.data.get_cell_value(0, 'Col') == 'a');
-        assert.isTrue(grid.data.get_cell_value(2, 'Col') == 'c');
+        assert.isTrue(grid.data.getCellValue(0, 'Col') == 'a');
+        assert.isTrue(grid.data.getCellValue(2, 'Col') == 'c');
         grid.sorting.sort('Col'); // reverse
-        assert.isTrue(grid.data.get_cell_value(0, 'Col') == 'c');
-        assert.isTrue(grid.data.get_cell_value(2, 'Col') == 'a');  
+        assert.isTrue(grid.data.getCellValue(0, 'Col') == 'c');
+        assert.isTrue(grid.data.getCellValue(2, 'Col') == 'a');  
     });
 
     let comparator = function(a, b) { 
@@ -47,10 +47,10 @@ describe('Sorting', function(){
         });
         // ascending: c1, b2, a3; descending: a3, b2, c1
         grid.sorting.sort('Col', { comparator : comparator });   
-        console.log(grid.data.get_cell_value(0, 'Col'))
-        assert.isTrue(grid.data.get_cell_value(0, 'Col') == 'c1');
+        console.log(grid.data.getCellValue(0, 'Col'))
+        assert.isTrue(grid.data.getCellValue(0, 'Col') == 'c1');
         grid.sorting.sort('Col', { comparator : comparator });   
-        assert.isTrue(grid.data.get_cell_value(0, 'Col') == 'a3');     
+        assert.isTrue(grid.data.getCellValue(0, 'Col') == 'a3');     
     });
 
     it('Allows for custom sorting if sort function is provided.', function(){
@@ -61,9 +61,9 @@ describe('Sorting', function(){
         });
         // ascending: c1, b2, a3; descending: a3, b2, c1
         grid.sorting.sort('Col', { comparator : comparator });   
-        assert.isTrue(grid.data.get_cell_value(0, 'Col') == 'c1');
+        assert.isTrue(grid.data.getCellValue(0, 'Col') == 'c1');
         grid.sorting.sort('Col', { comparator : comparator });   
-        assert.isTrue(grid.data.get_cell_value(0, 'Col') == 'a3');     
+        assert.isTrue(grid.data.getCellValue(0, 'Col') == 'a3');     
     });
 
 });

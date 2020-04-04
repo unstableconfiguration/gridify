@@ -40,37 +40,34 @@ let Gridify = function(container){
     }
     grid.on_initialized = function(options){}
 
-
     grid.data = {
         get : function() {
-            return grid.body.rows.map(r => grid.data.get_row_data(r));
-        },
-        get_row_data : function(row){
+            return grid.body.rows.map(r => grid.data.getRowValues(r));
+        }
+        , set : function(input_data) {
+            let data = [];
+            if(Array.isArray(input_data)) { data = input_data; }
+            else if(typeof(input_data) === 'object') {
+                for(let k in input_data) data.push(input_data[k]);
+            }
+
+            grid.body.clear();
+            data.forEach((row_data, ridx) => {
+                grid.body.add_row(row_data, ridx);
+            });
+        }
+        , getRowValues : function(row){
             let cell_data = {};
             Array.from(row.cells).forEach(c => {
                 cell_data[c.id.split('_').pop()] = c.innerText;
             });
             return cell_data;
         }
-        , get_cell_value : function(row, property){
-            if(typeof(row)==='number') row = grid.body.rows[row];
+        , getCellValue : function(row, property){
+            if(typeof(row) === 'number') { row = grid.body.rows[row]; }
             return Array.from(row.cells)
-                .find(x=>x.id.split('_').slice(-1)==property)
+                .find(x => x.id.split('_').slice(-1) == property)
                 .innerText;
-        }
-        , set : function(input_data) {
-            let data = [];
-            if(Array.isArray(input_data)) data = input_data;
-            else if(typeof(input_data)==='object')
-                for(let k in input_data) data.push(input_data[k]);
-
-            grid.body.clear();
-            data.forEach((row_data, ridx)=>{
-                grid.body.add_row(row_data, ridx);
-            });
-        }
-        , get_fields : function() {
-            return grid.header.cells.map(x => x.id.split('_').slice(-1)[0]);
         }
     }
 

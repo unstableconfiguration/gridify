@@ -98,7 +98,7 @@ Gridify.prototype.extensions.paging = function(div){
             }
         }
         , page : function(page_number = 1){
-            .grid.options.paging.current_page = page_number;
+            grid.options.paging.current_page = page_number;
             grid.paging._set_footer_values(page_number);
             grid.paging._set_row_visibility(page_number);
         }
@@ -108,7 +108,7 @@ Gridify.prototype.extensions.paging = function(div){
         }
         , _set_row_visibility : function(page_number){
             let rows = grid.body.rows;
-            let options = .grid.options.paging;
+            let options = grid.options.paging;
             
             grid.paging.clear();
 

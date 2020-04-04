@@ -19,8 +19,8 @@ Gridify.prototype.extensions.sorting = function(div){
             let dir = grid.sorting._column_sort_direction(property_name, options);
             let rows = grid.body.rows;
             rows.sort((x,y)=>{
-                let xv = grid.data.get_cell_value(x, property_name);
-                let yv = grid.data.get_cell_value(y, property_name);
+                let xv = grid.data.getCellValue(x, property_name);
+                let yv = grid.data.getCellValue(y, property_name);
                 let compared = options.comparator(xv, yv);
                 return +compared * dir;
             });
