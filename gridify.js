@@ -9,10 +9,7 @@ let Gridify = function(container){
     }
 
     let grid = this;
-
     grid.container = container;
-    // .table : access to html table 
-
     Object.defineProperty(grid, 'table', { get : () => grid.container.firstChild });
 
 
@@ -28,7 +25,7 @@ let Gridify = function(container){
             .appendChild(document.createElement('table'))
             .id = grid.container.id +'_table';
         
-        grid.styling.stylize_grid(grid.table, options)
+        grid.styling.stylizeGrid(grid.table, options)
             
         
         grid.header.initialize(options);
@@ -114,7 +111,7 @@ let Gridify = function(container){
             label.innerHTML = column_definition.header || column_definition.field;
         }
         , _set_header_style : function(header_cell, column_definition) {
-            grid.styling.stylize_header_cell(header_cell, column_definition);
+            grid.styling.stylizeHeaderCell(header_cell, column_definition);
         }
     }
 
@@ -163,7 +160,7 @@ let Gridify = function(container){
                 td.id = tr.id+'_'+column_definition.field;
                 td.innerHTML = 'test';
                 
-                grid.styling.stylize_body_cell(td, column_definition);
+                grid.styling.stylizeTableCell(td, column_definition);
                 if(column_definition.click)
                     td.onclick = column_definition.click;
             }
@@ -193,19 +190,21 @@ let Gridify = function(container){
                 .map(x => x.trim().split(':'))
                 .forEach(kv => el.style[kv[0]]=kv[1]);
         }
-        , stylize_grid : function(table, options){
+        , stylizeGrid : function(table, options){
             grid.styling.stylize(table, grid.styling.defaults.grid);
-            if(typeof(options.className) !== 'undefined') table.className = options.className;
-            if(options.style) grid.styling.stylize(table, options.style);
+            if(typeof(options.className) !== 'undefined') { table.className = options.className; }
+            if(options.style) { grid.styling.stylize(table, options.style); }
         }
-        , stylize_header_cell : function(td, col) {
+        // columns : [ { header : { style : 'xyz' } }]
+        , stylizeHeaderCell : function(td, col) {
             grid.styling.stylize(td, grid.styling.defaults.thead.td);
-            if(typeof(col.className) !== 'undefined') td.className = col.className;
+            if(typeof(col.className) !== 'undefined') { td.className = col.className; }
             grid.styling.stylize(td, col.header_style);
         }
-        , stylize_body_cell: function(td, col) {
+        // columns : [ { style : 'xyz' }]
+        , stylizeTableCell: function(td, col) {
             grid.styling.stylize(td, grid.styling.defaults.tbody.td);
-            if(typeof(col.className) !== 'undefined') td.className = col.className;
+            if(typeof(col.className) !== 'undefined') { td.className = col.className; }
             grid.styling.stylize(td, col.style);
         }
     }

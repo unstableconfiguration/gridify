@@ -1,0 +1,28 @@
+describe('Paging', function(){
+    it('Limits visible results when paging is true', function(){
+        let grid = newgrid('paging_test_1');
+        grid.initialize({
+            columns : [ { field : 'Col' } ],
+            data : [ { Col : '1' }, { Col : '2' }, { Col : '3' } ],
+            paging : { rows : 2 }
+        });
+        let rows = grid.body.rows();
+        rows = rows.filter(r => r.style.display === '');
+        assert.isTrue(rows.length === 2);
+    });
+    it('Allows displayed total pages/rows to be overriden');
+    it('Can have the page be set programmatically', function(){
+        let grid = newgrid('paging_test_3');
+        grid.initialize({
+            columns : [ { field : 'Col' } ],
+            data : [ { Col : '1' }, { Col : '2' }, { Col : '3' } ],
+            paging : { rows : 2, current_page : 1 }
+        });
+        grid.paging.page(2);
+        let rows = grid.body.rows();
+        rows = rows.filter(r => r.style.display === '');
+        assert.isTrue(rows.length === 1);
+    
+    });
+    it('Can be set after initialization')
+});
