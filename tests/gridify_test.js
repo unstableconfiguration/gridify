@@ -170,7 +170,7 @@ describe('Gridify Tests', function(){
                 columns : [{field : 'Col', filter : true }],
                 data : [{ Col : 'a' }]
             });
-            assert.isTrue(grid.table().tHead.rows[1].cells[0].firstChild != undefined);
+            assert.isTrue(grid.table.tHead.rows[1].cells[0].firstChild != undefined);
         });
         it('Defaults to xyz% filtering function', function(){
             let grid = newgrid('filter_test_2');
@@ -178,7 +178,7 @@ describe('Gridify Tests', function(){
                 columns : [{field : 'Col', filter : true }],
                 data : [ { Col : 'aab' }, { Col : 'abc' }, { Col : 'bca'}]
             });
-            let filter_textbox = grid.table().tHead.rows[1].cells[0].firstChild;
+            let filter_textbox = grid.table.tHead.rows[1].cells[0].firstChild;
             filter_textbox.value = 'a';
             grid.filtering.filter();
             assert.isTrue(grid.body.rows().filter(r => r.style.display == 'none').length == 1);
@@ -196,8 +196,8 @@ describe('Gridify Tests', function(){
                     { ColA : 'b', ColB : 'a' },
                     { ColA : 'b', ColB : 'b' } ]
             });
-            grid.table().tHead.rows[1].cells[0].firstChild.value = 'a';
-            grid.table().tHead.rows[1].cells[1].firstChild.value = 'b';
+            grid.table.tHead.rows[1].cells[0].firstChild.value = 'a';
+            grid.table.tHead.rows[1].cells[1].firstChild.value = 'b';
             grid.filtering.filter();
             assert.isTrue(grid.body.rows().filter(r => r.style.display == 'none').length == 3);
         });
@@ -212,7 +212,7 @@ describe('Gridify Tests', function(){
                 } }],
                 data : [{ Col : 'abcd' }, { Col : 'dcba' }]
             });
-            grid.table().tHead.rows[1].cells[0].firstChild.value = 'bc';
+            grid.table.tHead.rows[1].cells[0].firstChild.value = 'bc';
             grid.filtering.filter();
             assert.isTrue(grid.body.rows().filter(r => r.style.display == 'none').length == 1);
         });
@@ -239,7 +239,7 @@ describe('Gridify Tests', function(){
                 } }],
                 data : [{ Col : 1 }, { Col : 2 }, { Col : 3 }]
             });
-            grid.table().tHead.rows[1].cells[0].firstChild.value = 1;
+            grid.table.tHead.rows[1].cells[0].firstChild.value = 1;
             grid.filtering.filter();
             assert.isTrue(grid.body.rows().filter(r => r.style.display == 'none').length == 2);
         });
@@ -300,10 +300,10 @@ describe('Gridify Tests', function(){
             });
             grid.paging.page(2);
             assert.isTrue(grid.body.rows().filter(r => r.style.display === '').length === 1);
-            let filter_textbox = grid.table().tHead.rows[1].cells[0].firstChild;
+            let filter_textbox = grid.table.tHead.rows[1].cells[0].firstChild;
             filter_textbox.value = 'a';
             grid.filtering.filter();
-            assert.isTrue(grid.table().options.paging.current_page === 1);
+            assert.isTrue(grid.table.options.paging.current_page === 1);
             assert.isTrue(grid.body.rows().filter(r => r.style.display === '').length === 2);
 
         });

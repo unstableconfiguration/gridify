@@ -26,7 +26,7 @@ Gridify.prototype.extensions.sorting = function(div){
             });
             
             grid.body.clear();
-            let tbody = grid.table().tBodies[0];
+            let tbody = grid.table.tBodies[0];
             rows.forEach(x=>tbody.appendChild(x));
         }
         , sort_callback : function(property_name, options){

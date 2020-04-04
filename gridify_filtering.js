@@ -5,16 +5,16 @@ Gridify.prototype.extensions.filtering = function(div){
     // add header row 
     let on_header_initialized = grid.header.on_initialized;
     grid.header.on_initialized = function(header_options){
-        let filter_row = grid.table().tHead.insertRow();
-        filter_row.id = grid.table().id + '_filters'
+        let filter_row = grid.table.tHead.insertRow();
+        filter_row.id = grid.table.id + '_filters'
     }
 
     let on_column_added = grid.header.on_column_added;
     grid.header.on_column_added = function(header_cell, column_definition){
         on_column_added(header_cell, column_definition);
-        let filter_cell = grid.table().tHead.rows[1].insertCell();
+        let filter_cell = grid.table.tHead.rows[1].insertCell();
         if(!column_definition.filter) return;
-        filter_cell.id = grid.table().id + '_filters_' + column_definition.field;
+        filter_cell.id = grid.table.id + '_filters_' + column_definition.field;
         grid.filtering.add_filter(filter_cell, column_definition.field, column_definition.filter);
     }
 
@@ -42,7 +42,7 @@ Gridify.prototype.extensions.filtering = function(div){
         , filter_callback : function() {
             return filter_delay(grid.filtering.filter());
         }
-        , cells : function() { return Array.from(grid.table().tHead.rows[1].cells); }
+        , cells : function() { return Array.from(grid.table.tHead.rows[1].cells); }
         , filter_controls : function(){
             return grid.filtering.cells().map(cell => cell.firstChild).filter(x => !!x);
         }
@@ -67,7 +67,7 @@ Gridify.prototype.extensions.filtering = function(div){
         , _default_filter_control : function(property_name){
             let control = document.createElement('input');
             control.type = 'text';
-            control.id = grid.table().id + '_filter_' + property_name;
+            control.id = grid.table.id + '_filter_' + property_name;
             control.style = 'width: 80%; display: block; margin: auto;'
             return control;
         }

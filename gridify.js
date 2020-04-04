@@ -1,15 +1,21 @@
 
-
-
-
 let Gridify = function(container){   
-    if(typeof(container) === 'string') container = document.getElementById(container);
-    if(!container instanceof HTMLDivElement) 
+    if(typeof(container) === 'string') { 
+        container = document.getElementById(container);
+    }
+
+    if(!container instanceof HTMLDivElement) {    
         throw('Gridify container must be <div>');
-    
+    }
+
     let grid = this;
+
     grid.container = container;
-    grid.table = () => grid.container.firstChild;
+    // .table : access to html table 
+
+    Object.defineProperty(grid, 'table', { get : () => grid.container.firstChild });
+
+
     let _clear = (container)=> { 
         if(!container) return; 
         while(container.firstChild) container.removeChild(container.firstChild); 
@@ -22,7 +28,7 @@ let Gridify = function(container){
             .appendChild(document.createElement('table'))
             .id = grid.container.id +'_table';
         
-        grid.styling.stylize_grid(grid.table(), options)
+        grid.styling.stylize_grid(grid.table, options)
             
         
         grid.header.initialize(options);
@@ -32,13 +38,13 @@ let Gridify = function(container){
         if(typeof(options.columns) === 'object') grid.header.add_columns(options.columns);
         if(typeof(options.data) === 'object') grid.data.set(options.data);
         
-        grid.table().options = options;
+        grid.table.options = options;
         grid.on_initialized(options);
     }
     grid.on_initialized = function(options){}
 
 
-    grid.options = function(){ return grid.table().options; }
+    grid.options = function(){ return grid.table.options; }
     grid.data = {
         get : function() {
             return grid.body.rows().map(r => grid.data.get_row_data(r));
@@ -74,12 +80,12 @@ let Gridify = function(container){
 
     grid.header = {
         initialize : function(options){
-            let tHead = grid.table().createTHead();
+            let tHead = grid.table.createTHead();
             tHead.insertRow(); // Label 
             grid.header.on_initialized(options);
         }
         , on_initialized : function(options){}
-        , cells : function() { return Array.from(grid.table().tHead.rows[0].cells); }
+        , cells : function() { return Array.from(grid.table.tHead.rows[0].cells); }
         , find_cell : function(property_name) { 
             return grid.header.cells().find(c => c.id.split('_').pop() === property_name); 
         }
@@ -92,8 +98,8 @@ let Gridify = function(container){
             });
         }
         , add_column : function(column_definition){
-            let header_cell = grid.table().tHead.rows[0].insertCell();
-            header_cell.id = grid.table().id+'_header_'+column_definition.field;
+            let header_cell = grid.table.tHead.rows[0].insertCell();
+            header_cell.id = grid.table.id+'_header_'+column_definition.field;
             grid.header._set_header_label(header_cell, column_definition);
             grid.header._set_header_style(header_cell, column_definition);
             
@@ -113,20 +119,20 @@ let Gridify = function(container){
     }
 
     grid.body = {
-        initialize : function(table=grid.table()) {
+        initialize : function(table=grid.table) {
             let main_body = table.createTBody();
             grid.body.seed_row.initialize();
         }
-        , clear : function(){ _clear(grid.table().tBodies[0]); }
-        , rows : function() { return Array.from(grid.table().tBodies[0].rows); }
+        , clear : function(){ _clear(grid.table.tBodies[0]); }
+        , rows : function() { return Array.from(grid.table.tBodies[0].rows); }
         , _set_body_cell : function(body_cell, value, column_definition) {
             let label = body_cell.appendChild(document.createElement('span'));
             label.innerHTML = value;
         }
         , add_row : function(row_data, rowid) {
             let row = grid.body.seed_row.clone();
-            row.id = grid.table().id+'_'+rowid;
-            grid.table().tBodies[0].appendChild(row);
+            row.id = grid.table.id+'_'+rowid;
+            grid.table.tBodies[0].appendChild(row);
             Array.from(row.cells).forEach((cell)=>{
                 let field = cell.id.split('_').slice(-1);
                 cell.id = row.id + '_' + field;
@@ -135,13 +141,13 @@ let Gridify = function(container){
         }
         , seed_row : {
             initialize : function(){
-                let seed_body = grid.table().createTBody();
+                let seed_body = grid.table.createTBody();
                 let seed_row = seed_body.insertRow();
-                seed_row.id = grid.table().id + '_seed';
+                seed_row.id = grid.table.id + '_seed';
                 seed_row.style.display = 'none';
             }
             , clone : function() {
-                let seed = grid.table().tBodies[1].rows[0];
+                let seed = grid.table.tBodies[1].rows[0];
                 let row = seed.cloneNode(true);
                 row.style. display = '';
                 Array.from(seed.cells).forEach((scell, cidx)=>{
@@ -152,7 +158,7 @@ let Gridify = function(container){
             }
             , add_column(column_definition){
                 window.grid = grid;
-                let tr = grid.table().tBodies[1].rows[0];
+                let tr = grid.table.tBodies[1].rows[0];
                 let td = tr.insertCell();
                 td.id = tr.id+'_'+column_definition.field;
                 td.innerHTML = 'test';
@@ -166,7 +172,7 @@ let Gridify = function(container){
 
     grid.footer = {
         initialize : function() {
-            grid.table().createTFoot();
+            grid.table.createTFoot();
         }
     }
 
