@@ -16,7 +16,7 @@ describe('Sorting', function(){
             columns : [{field : 'Col', sort : true }],
             data : [{ Col : 'a' }]
         });
-        assert.isTrue(grid.header.cells()[0].children[1].className == 'sort');
+        assert.isTrue(grid.header.cells[0].children[1].className == 'sort');
     });
 
     it('Defaults to alphabetical sorting.', function(){

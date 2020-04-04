@@ -22,7 +22,7 @@ describe('Gridify Tests', function(){
                 data : [ { Col : 'a' } ]
                 , columns : [{ field : 'Col' }]
             });
-            assert.isTrue(grid.header.cells()[0].firstChild.innerHTML == 'Col')
+            assert.isTrue(grid.header.cells[0].firstChild.innerHTML == 'Col')
         });
         it('Allows header text to be set with "header" property', function(){
             let grid = newgrid('column_definitions_test_2');
@@ -30,7 +30,7 @@ describe('Gridify Tests', function(){
                 data : [ { Col : 'a' } ]
                 , columns : [{ field : 'Col', header:'test' }]
             });
-            assert.isTrue(grid.header.cells()[0].firstChild.innerHTML == 'test')
+            assert.isTrue(grid.header.cells[0].firstChild.innerHTML == 'test')
         });
 
     });6
@@ -63,10 +63,29 @@ describe('Gridify Tests', function(){
                 data : [ { col : 'a' } ],
             });
             let cell = grid.body.rows[0].cells[0];
-            assert.isTrue(cell.style.backgroundColor == 'blue');
+            assert.isTrue(cell.style.backgroundColor === 'blue');
         });
-        it('Should set the class property of the column cells when .class is supplied in the column definition');
-        it('Should set the style property of the header cell when .header.style is supplied in the column definition');
+
+        it('Should set the class property of the column cells when .class is supplied in the column definition', function() {
+            let grid = newgrid('css_cell_style_test');
+            grid.initialize({
+                columns : [ { field : 'col', class : 'bgBlue' } ],
+                data : [ { col : 'a' } ],
+            });
+            let cell = grid.body.rows[0].cells[0];
+            assert.isTrue(cell.className.includes('bgBlue'));
+        });
+
+        it('Should set the style property of the header cell when .header.style is supplied in the column definition', function() {
+            let grid = newgrid('css_cell_style_test');
+            grid.initialize({
+                columns : [ { field : 'col', header : { style : 'background: blue' } } ],
+                data : [ { col : 'a' } ],
+            });
+            let cell = grid.header.cells[0];
+            assert.isTrue(cell.style.backgroundColor === 'blue');
+        });
+
         it('Should set the class property of the header cell when .header.class is supplied in the column definition');
 
 
@@ -76,7 +95,7 @@ describe('Gridify Tests', function(){
                 data : [ { Col : 'a' } ]
                 , columns : [{ field : 'Col', header_style : 'color:blue' }]
             });
-            assert.isTrue(grid.header.cells()[0].style.color == 'blue')
+            assert.isTrue(grid.header.cells[0].style.color == 'blue')
         });
         it('Allows column style defaults to be overridden', function(){
             let grid = newgrid('column_definitions_test_4');

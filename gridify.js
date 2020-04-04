@@ -71,7 +71,7 @@ let Gridify = function(container){
             });
         }
         , get_fields : function() {
-            return grid.header.cells().map(x => x.id.split('_').slice(-1)[0]);
+            return grid.header.cells.map(x => x.id.split('_').slice(-1)[0]);
         }
     }
 
@@ -82,9 +82,9 @@ let Gridify = function(container){
             grid.header.on_initialized(options);
         }
         , on_initialized : function(options){}
-        , cells : function() { return Array.from(grid.table.tHead.rows[0].cells); }
+        //, cells : defined using object.defineProperty below
         , find_cell : function(property_name) { 
-            return grid.header.cells().find(c => c.id.split('_').pop() === property_name); 
+            return grid.header.cells.find(c => c.id.split('_').pop() === property_name); 
         }
         , add_columns : function(column_definitions){
             if(!Array.isArray(column_definitions)) 
@@ -114,6 +114,7 @@ let Gridify = function(container){
             grid.styling.stylizeHeaderCell(header_cell, column_definition);
         }
     }
+    Object.defineProperty(grid.header, 'cells', { get : () => Array.from(grid.table.tHead.rows[0].cells) });
 
     grid.body = {
         initialize : function(table=grid.table) {
@@ -193,19 +194,19 @@ let Gridify = function(container){
         }
         , stylizeGrid : function(table, options){
             grid.styling.stylize(table, grid.styling.defaults.grid);
-            if(typeof(options.class) !== 'undefined') { table.className = options.class; }
+            if(options.class) { table.className = options.class; }
             if(options.style) { grid.styling.stylize(table, options.style); }
         }
         // columns : [ { header : { style : 'xyz' } }]
         , stylizeHeaderCell : function(td, col) {
             grid.styling.stylize(td, grid.styling.defaults.thead.td);
-            if(typeof(col.class) !== 'undefined') { td.className = col.classe; }
-            grid.styling.stylize(td, col.header_style);
+            if(col.header && col.header.class) { td.className = col.header.class; }
+            if(col.header && col.header.style) { grid.styling.stylize(td, col.header.style); }
         }
         // columns : [ { style : 'xyz' }]
         , stylizeTableCell: function(td, col) {
             grid.styling.stylize(td, grid.styling.defaults.tbody.td);
-            if(typeof(col.class) !== 'undefined') { td.className = col.class; }
+            if(col.class) { td.className = col.class; }
             grid.styling.stylize(td, col.style);
         }
     }
