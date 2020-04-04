@@ -1,4 +1,13 @@
 describe('Paging', function(){
+
+    let newgrid = function(id){
+        let div = document.createElement('div');
+        div.id = id;
+        div.style.display = 'none';
+        document.body.appendChild(div);
+        return new Gridify(id);
+    }
+
     it('Limits visible results when paging is true', function(){
         let grid = newgrid('paging_test_1');
         grid.initialize({
