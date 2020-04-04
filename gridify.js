@@ -151,7 +151,6 @@ let Gridify = function(container){
                 return row;       
             }
             , add_column(column_definition){
-                window.grid = grid;
                 let tr = grid.table.tBodies[1].rows[0];
                 let td = tr.insertCell();
                 td.id = tr.id + '_' + column_definition.field;

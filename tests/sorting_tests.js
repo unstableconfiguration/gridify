@@ -47,7 +47,6 @@ describe('Sorting', function(){
         });
         // ascending: c1, b2, a3; descending: a3, b2, c1
         grid.sorting.sort('Col', { comparator : comparator });   
-        console.log(grid.data.getCellValue(0, 'Col'))
         assert.isTrue(grid.data.getCellValue(0, 'Col') == 'c1');
         grid.sorting.sort('Col', { comparator : comparator });   
         assert.isTrue(grid.data.getCellValue(0, 'Col') == 'a3');     
