@@ -44,24 +44,18 @@ let Gridify = function(container){
         get : function() {
             return grid.body.rows.map(r => grid.data.getRowValues(r));
         }
-        , set : function(input_data) {
-            let data = [];
-            if(Array.isArray(input_data)) { data = input_data; }
-            else if(typeof(input_data) === 'object') {
-                for(let k in input_data) data.push(input_data[k]);
-            }
-
+        , set : function(data) {
             grid.body.clear();
-            data.forEach((row_data, ridx) => {
-                grid.body.add_row(row_data, ridx);
+            data.forEach((rowData, ridx) => {
+                grid.body.add_row(rowData, ridx);
             });
         }
         , getRowValues : function(row){
-            let cell_data = {};
+            let rowValues = {};
             Array.from(row.cells).forEach(c => {
-                cell_data[c.id.split('_').pop()] = c.innerText;
+                rowValues[c.id.split('_').pop()] = c.innerText;
             });
-            return cell_data;
+            return rowValues;
         }
         , getCellValue : function(row, property){
             if(typeof(row) === 'number') { row = grid.body.rows[row]; }
