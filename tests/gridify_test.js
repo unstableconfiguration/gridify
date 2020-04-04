@@ -113,6 +113,7 @@ describe('Gridify Tests', function(){
             });
             assert.isTrue(grid.header.cells()[0].children[1].className == 'sort');
         });
+
         it('Defaults to alphabetical sorting.', function(){
             let grid = newgrid('sorting_test_2');
             grid.initialize({
@@ -128,31 +129,38 @@ describe('Gridify Tests', function(){
             assert.isTrue(grid.data.get_cell_value(0, 'Col') == 'c');
             assert.isTrue(grid.data.get_cell_value(2, 'Col') == 'a');  
         });
-        it('Allows for custom sorting if sort function is provided.', function(){
-            let grid = newgrid('sorting_test_3');
-            // custom comparator: separates evens from odds before numeric sorting
-            let comparator = function(a, b){
-                let aeven = (a%2 == 0);
-                let beven = (b%2 == 0);
 
-                if(aeven && beven) return a <= b ? 1 : -1;
-                if(aeven && !beven) return 1;
-                if(!aeven && beven) return -1;
-                if(!aeven && !beven) return a <= b ? 1 : -1;
-            }
-            
+        let comparator = function(a, b) { 
+            return +a[1] <= +b[1] ? 1 : -1;
+        }
+
+        it('Allows for custom sorting if sort options are provided with comparator function.', function(){
+            let grid = newgrid('sorting_test_3');      
             grid.initialize({
                 columns : [{field : 'Col', sort : { comparator : comparator } }],
-                data : [{ Col : 2}, { Col : 3 }, { Col : 1 }, { Col : 4 }]
+                data : [{ Col : 'a3' }, { Col : 'b2' }, { Col : 'c1' }]
             });
-            // ascending: 2, 4, 1, 3; descending: 3, 1, 4, 2
+            // ascending: c1, b2, a3; descending: a3, b2, c1
             grid.sorting.sort('Col', { comparator : comparator });   
-            assert.isTrue(grid.data.get_cell_value(0, 'Col') == 2);
-            assert.isTrue(grid.data.get_cell_value(2, 'Col') == 1);
+            console.log(grid.data.get_cell_value(0, 'Col'))
+            assert.isTrue(grid.data.get_cell_value(0, 'Col') == 'c1');
             grid.sorting.sort('Col', { comparator : comparator });   
-            assert.isTrue(grid.data.get_cell_value(0, 'Col') == 3);
-            assert.isTrue(grid.data.get_cell_value(2, 'Col') == 4);     
+            assert.isTrue(grid.data.get_cell_value(0, 'Col') == 'a3');     
         });
+
+        it('Allows for custom sorting if sort function is provided.', function(){
+            let grid = newgrid('sorting_test_3');      
+            grid.initialize({
+                columns : [{field : 'Col', sort : comparator }],
+                data : [{ Col : 'a3' }, { Col : 'b2' }, { Col : 'c1' }]
+            });
+            // ascending: c1, b2, a3; descending: a3, b2, c1
+            grid.sorting.sort('Col', { comparator : comparator });   
+            assert.isTrue(grid.data.get_cell_value(0, 'Col') == 'c1');
+            grid.sorting.sort('Col', { comparator : comparator });   
+            assert.isTrue(grid.data.get_cell_value(0, 'Col') == 'a3');     
+        });
+
     });
 
     describe('Filtering', function(){

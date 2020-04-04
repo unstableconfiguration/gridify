@@ -22,7 +22,6 @@ let Gridify = function(container){
             .appendChild(document.createElement('table'))
             .id = grid.container.id +'_table';
         
-        console.log(grid.table())
         grid.styling.stylize_grid(grid.table(), options)
             
         

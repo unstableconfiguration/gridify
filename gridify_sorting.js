@@ -33,7 +33,9 @@ Gridify.prototype.extensions.sorting = function(div){
             return ()=>{ grid.sorting.sort(property_name, options); }
         }
         , _set_default_options : function(options){
+            if(typeof(options) === 'function') options = { comparator : options };
             if(typeof(options) !== 'object') options = {};
+
             if(!options.comparator) options.comparator = grid.sorting._default_comparator;
             return options;
         }
