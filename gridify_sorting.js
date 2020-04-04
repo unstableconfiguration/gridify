@@ -3,9 +3,9 @@
 Gridify.prototype.extensions.sorting = function(div){
     let grid = this;
 
-    let on_column_added = grid.header.on_column_added;
-    grid.header.on_column_added = function(header_cell, column_definition){
-        on_column_added(header_cell, column_definition);
+    let onColumnAdded = grid.header.onColumnAdded;
+    grid.header.onColumnAdded = function(header_cell, column_definition){
+        onColumnAdded(header_cell, column_definition);
         if(!column_definition.sort) return;
         let sort_icon = header_cell.appendChild(document.createElement('span'));
         sort_icon.className = 'sort'
@@ -41,7 +41,7 @@ Gridify.prototype.extensions.sorting = function(div){
         }
         , _default_comparator : function(a, b) { if(a==b) return 0; return a<b ? 1 : -1; }
         , _column_sort_direction : function(property_name, options) {
-            let sort_span = grid.header.find_cell(property_name).children[1];
+            let sort_span = grid.header.findCell(property_name).children[1];
             sort_span.direction = sort_span.direction !== 'asc' ? 'asc' : 'desc';
             return sort_span.direction === 'asc' ? -1 : 1;
         }   

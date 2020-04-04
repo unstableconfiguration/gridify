@@ -1,8 +1,8 @@
 Gridify.prototype.extensions.paging = function(div){
     let grid = this;
 
-    let on_grid_initialized = grid.on_initialized;
-    grid.on_initialized = function(options){
+    let on_grid_initialized = grid.onInitialized;
+    grid.onInitialized = function(options){
         on_grid_initialized(options);
         grid.paging.initialize(options.paging);
     }

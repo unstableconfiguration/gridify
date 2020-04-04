@@ -3,15 +3,15 @@ Gridify.prototype.extensions.filtering = function(div){
     let grid = this;
 
     // add header row 
-    let on_header_initialized = grid.header.on_initialized;
-    grid.header.on_initialized = function(header_options){
+    let on_header_initialized = grid.header.onInitialized;
+    grid.header.onInitialized = function(header_options){
         let filter_row = grid.table.tHead.insertRow();
         filter_row.id = grid.table.id + '_filters'
     }
 
-    let on_column_added = grid.header.on_column_added;
-    grid.header.on_column_added = function(header_cell, column_definition){
-        on_column_added(header_cell, column_definition);
+    let onColumnAdded = grid.header.onColumnAdded;
+    grid.header.onColumnAdded = function(header_cell, column_definition){
+        onColumnAdded(header_cell, column_definition);
         let filter_cell = grid.table.tHead.rows[1].insertCell();
         if(!column_definition.filter) return;
         filter_cell.id = grid.table.id + '_filters_' + column_definition.field;

@@ -32,13 +32,13 @@ let Gridify = function(container){
         grid.body.initialize();
         grid.footer.initialize();
         
-        if(typeof(options.columns) === 'object') grid.header.add_columns(options.columns);
+        if(typeof(options.columns) === 'object') grid.header.addColumns(options.columns);
         if(typeof(options.data) === 'object') grid.data.set(options.data);
         
         grid.table.options = options;
-        grid.on_initialized(options);
+        grid.onInitialized(options);
     }
-    grid.on_initialized = function(options){}
+    grid.onInitialized = function(options){}
 
     grid.data = {
         get : function() {
@@ -69,39 +69,39 @@ let Gridify = function(container){
         initialize : function(options){
             let tHead = grid.table.createTHead();
             tHead.insertRow(); // Label 
-            grid.header.on_initialized(options);
+            grid.header.onInitialized(options);
         }
-        , on_initialized : function(options){}
+        , onInitialized : function(options){}
         //, cells : defined using object.defineProperty below
-        , find_cell : function(property_name) { 
-            return grid.header.cells.find(c => c.id.split('_').pop() === property_name); 
+        , findCell : function(property) { 
+            return grid.header.cells.find(c => c.id.split('_').pop() === property); 
         }
-        , add_columns : function(column_definitions){
-            if(!Array.isArray(column_definitions)) 
+        , addColumns : function(columnDefinitions){
+            if(!Array.isArray(columnDefinitions)) 
                 throw`.columns.set requires an array of column definitions`;
 
-            column_definitions.forEach(col => {
-                grid.header.add_column(col);
+            columnDefinitions.forEach(col => {
+                grid.header.addColumn(col);
             });
         }
-        , add_column : function(column_definition){
+        , addColumn : function(columnDefinition){
             let header_cell = grid.table.tHead.rows[0].insertCell();
-            header_cell.id = grid.table.id+'_header_'+column_definition.field;
-            grid.header._set_header_label(header_cell, column_definition);
-            grid.header._set_header_style(header_cell, column_definition);
+            header_cell.id = grid.table.id + '_header_' + columnDefinition.field;
+            grid.header._setHeaderLabel(header_cell, columnDefinition);
+            grid.header._setHeaderStyle(header_cell, columnDefinition);
             
-            grid.header.on_column_added(header_cell, column_definition);
-            grid.body.seed_row.add_column(column_definition);
+            grid.header.onColumnAdded(header_cell, columnDefinition);
+            grid.body.seed_row.addColumn(columnDefinition);
         }
-        , on_column_added : function(header_cell, column_definition){ 
+        , onColumnAdded : function(header_cell, columnDefinition){ 
             // used by extensions to further modify and add functionality to columns.
         }     
-        , _set_header_label : function(header_cell, column_definition) {
+        , _setHeaderLabel : function(header_cell, columnDefinition) {
             let label = header_cell.appendChild(document.createElement('span'));
-            label.innerHTML = column_definition.header || column_definition.field;
+            label.innerHTML = columnDefinition.header || columnDefinition.field;
         }
-        , _set_header_style : function(header_cell, column_definition) {
-            grid.styling.stylizeHeaderCell(header_cell, column_definition);
+        , _setHeaderStyle : function(header_cell, columnDefinition) {
+            grid.styling.stylizeHeaderCell(header_cell, columnDefinition);
         }
     }
     Object.defineProperty(grid.header, 'cells', { get : () => Array.from(grid.table.tHead.rows[0].cells) });
@@ -144,7 +144,7 @@ let Gridify = function(container){
                 });
                 return row;       
             }
-            , add_column(column_definition){
+            , addColumn(column_definition){
                 let tr = grid.table.tBodies[1].rows[0];
                 let td = tr.insertCell();
                 td.id = tr.id + '_' + column_definition.field;
