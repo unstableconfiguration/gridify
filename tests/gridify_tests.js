@@ -1,7 +1,8 @@
-let assert = chai.assert;
+
 
 describe('Gridify Tests', function(){
-
+    let assert = chai.assert;
+    
     let newgrid = function(id){
         let div = document.createElement('div');
         div.id = id;
@@ -31,6 +32,44 @@ describe('Gridify Tests', function(){
             });
             assert.isTrue(grid.header.cells()[0].firstChild.innerHTML == 'test')
         });
+
+    });6
+
+    describe('CSS', function() {
+        it('Should set the style property of the html table when .style is supplied in the grid definition', function() {
+            let grid = newgrid('css_table_style_test');
+            grid.initialize({
+                columns : [ { field : 'col' } ],
+                data : [ { col : 'a' } ],
+                style : 'border: solid thin blue;'
+            });
+            assert.isTrue(grid.table.style.border === 'thin solid blue');
+        });
+
+        it('Should set the class property of the html table when .class supplied in the grid definition', function() {
+            let grid = newgrid('css_table_class_test');
+            grid.initialize({
+                columns : [ { field : 'col' } ],
+                data : [ { col : 'a' } ],
+                class : 'testClass'
+            });
+            assert.isTrue(grid.table.className.includes('testClass'));    
+        });
+
+        it('Should set the style property of the column cells when .style is supplied in the column definition', function() {
+            let grid = newgrid('css_cell_style_test');
+            grid.initialize({
+                columns : [ { field : 'col', style : 'background: blue' } ],
+                data : [ { col : 'a' } ],
+            });
+            let cell = grid.body.rows[0].cells[0];
+            assert.isTrue(cell.style.backgroundColor == 'blue');
+        });
+        it('Should set the class property of the column cells when .class is supplied in the column definition');
+        it('Should set the style property of the header cell when .header.style is supplied in the column definition');
+        it('Should set the class property of the header cell when .header.class is supplied in the column definition');
+
+
         it('Allows header style defaults to be overridden.', function(){
             let grid = newgrid('column_definitions_test_3');
             grid.initialize({
@@ -45,8 +84,9 @@ describe('Gridify Tests', function(){
                 data : [ { Col : 'a' } ]
                 , columns : [{ field : 'Col', style : 'color:blue' }]
             });
-            assert.isTrue(grid.body.rows()[0].cells[0].style.color == 'blue')
+            assert.isTrue(grid.body.rows[0].cells[0].style.color == 'blue')
         });
+
     });
 
     describe('Data access', function(){
@@ -58,9 +98,9 @@ describe('Gridify Tests', function(){
             grid.initialize({
                 columns : [ { field : 'Col ' } ]
             });
-            assert.isTrue(grid.body.rows().length == 0);
+            assert.isTrue(grid.body.rows.length == 0);
             grid.data.set([{ Col : 'a' }]);
-            assert.isTrue(grid.body.rows().length == 1);
+            assert.isTrue(grid.body.rows.length == 1);
         });// 3.1
         it('Allows the table data to be reset outside of initialization', function(){
             let grid = newgrid('data_access_test_3');//3.2
@@ -68,10 +108,10 @@ describe('Gridify Tests', function(){
                 columns : [{field : 'Col'}],
                 data : [{ Col : 'a' }]
             });
-            assert.isTrue(grid.body.rows().length == 1);
+            assert.isTrue(grid.body.rows.length == 1);
 
             grid.data.set([{ Col : 'b' }, { Col : 'c' }]);
-            assert.isTrue(grid.body.rows().length == 2);
+            assert.isTrue(grid.body.rows.length == 2);
         });
         it('Can retrieve a cell value from the table', function(){
             let grid = newgrid('data_access_test_4');
@@ -87,7 +127,7 @@ describe('Gridify Tests', function(){
                 columns : [ { field : 'ColA'}, { field : 'ColB'} ],
                 data : [{ ColA : 'a', ColB : 'b'}, { ColA : 'aa', ColB : 'bb'} ]
             });
-            let second_row = grid.body.rows()[1];
+            let second_row = grid.body.rows[1];
             let second_row_data = grid.data.get_row_data(second_row);
             assert.isTrue(second_row_data.ColB === 'bb')
         });
@@ -114,10 +154,10 @@ describe('Gridify Tests', function(){
                 data : [ { Col : 'a' }, { Col : 'b' }, { Col : 'c' }],
                 paging : { rows : 2 }
             });
-            assert.isTrue(grid.body.rows()[0].innerText === 'a');
+            assert.isTrue(grid.body.rows[0].innerText === 'a');
             grid.paging.page(2);
             let get_visible_value = function(){
-                return grid.body.rows().find(r => r.style.display === '').innerText;
+                return grid.body.rows.find(r => r.style.display === '').innerText;
             }
             assert.isTrue(get_visible_value() === 'c');
             grid.sorting.sort('Col'); grid.sorting.sort('Col');
@@ -131,12 +171,12 @@ describe('Gridify Tests', function(){
                 paging : { rows : 2 }
             });
             grid.paging.page(2);
-            assert.isTrue(grid.body.rows().filter(r => r.style.display === '').length === 1);
+            assert.isTrue(grid.body.rows.filter(r => r.style.display === '').length === 1);
             let filter_textbox = grid.table.tHead.rows[1].cells[0].firstChild;
             filter_textbox.value = 'a';
             grid.filtering.filter();
             assert.isTrue(grid.table.options.paging.current_page === 1);
-            assert.isTrue(grid.body.rows().filter(r => r.style.display === '').length === 2);
+            assert.isTrue(grid.body.rows.filter(r => r.style.display === '').length === 2);
 
         });
     })

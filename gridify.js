@@ -44,7 +44,7 @@ let Gridify = function(container){
     grid.options = function(){ return grid.table.options; }
     grid.data = {
         get : function() {
-            return grid.body.rows().map(r => grid.data.get_row_data(r));
+            return grid.body.rows.map(r => grid.data.get_row_data(r));
         },
         get_row_data : function(row){
             let cell_data = {};
@@ -54,7 +54,7 @@ let Gridify = function(container){
             return cell_data;
         }
         , get_cell_value : function(row, property){
-            if(typeof(row)==='number') row = grid.body.rows()[row];
+            if(typeof(row)==='number') row = grid.body.rows[row];
             return Array.from(row.cells)
                 .find(x=>x.id.split('_').slice(-1)==property)
                 .innerText;
@@ -121,7 +121,7 @@ let Gridify = function(container){
             grid.body.seed_row.initialize();
         }
         , clear : function(){ _clear(grid.table.tBodies[0]); }
-        , rows : function() { return Array.from(grid.table.tBodies[0].rows); }
+        //, rows : defined as property below
         , _set_body_cell : function(body_cell, value, column_definition) {
             let label = body_cell.appendChild(document.createElement('span'));
             label.innerHTML = value;
@@ -157,7 +157,7 @@ let Gridify = function(container){
                 window.grid = grid;
                 let tr = grid.table.tBodies[1].rows[0];
                 let td = tr.insertCell();
-                td.id = tr.id+'_'+column_definition.field;
+                td.id = tr.id + '_' + column_definition.field;
                 td.innerHTML = 'test';
                 
                 grid.styling.stylizeTableCell(td, column_definition);
@@ -166,6 +166,7 @@ let Gridify = function(container){
             }
         }
     }
+    Object.defineProperty(grid.body, 'rows', { get : () => Array.from(grid.table.tBodies[0].rows) });
 
     grid.footer = {
         initialize : function() {
@@ -192,19 +193,19 @@ let Gridify = function(container){
         }
         , stylizeGrid : function(table, options){
             grid.styling.stylize(table, grid.styling.defaults.grid);
-            if(typeof(options.className) !== 'undefined') { table.className = options.className; }
+            if(typeof(options.class) !== 'undefined') { table.className = options.class; }
             if(options.style) { grid.styling.stylize(table, options.style); }
         }
         // columns : [ { header : { style : 'xyz' } }]
         , stylizeHeaderCell : function(td, col) {
             grid.styling.stylize(td, grid.styling.defaults.thead.td);
-            if(typeof(col.className) !== 'undefined') { td.className = col.className; }
+            if(typeof(col.class) !== 'undefined') { td.className = col.classe; }
             grid.styling.stylize(td, col.header_style);
         }
         // columns : [ { style : 'xyz' }]
         , stylizeTableCell: function(td, col) {
             grid.styling.stylize(td, grid.styling.defaults.tbody.td);
-            if(typeof(col.className) !== 'undefined') { td.className = col.className; }
+            if(typeof(col.class) !== 'undefined') { td.className = col.class; }
             grid.styling.stylize(td, col.style);
         }
     }

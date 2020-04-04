@@ -30,7 +30,7 @@ Gridify.prototype.extensions.filtering = function(div){
             let filter_controls = grid.filtering.filter_controls();
             let grid_data = grid.data.get();
             
-            grid.body.rows().forEach((row, i)=>{
+            grid.body.rows.forEach((row, i)=>{
                 let filtered_out = filter_controls.some((filter_control)=>{
                     let cell_value = grid_data[i][filter_control.property];
                     return !filter_control.rule(cell_value, filter_control.value);

@@ -1,6 +1,6 @@
 
 describe('Filtering', function(){
-
+    let assert = chai.assert;
     
     let newgrid = function(id){
         let div = document.createElement('div');
@@ -27,10 +27,10 @@ describe('Filtering', function(){
         let filter_textbox = grid.table.tHead.rows[1].cells[0].firstChild;
         filter_textbox.value = 'a';
         grid.filtering.filter();
-        assert.isTrue(grid.body.rows().filter(r => r.style.display == 'none').length == 1);
+        assert.isTrue(grid.body.rows.filter(r => r.style.display == 'none').length == 1);
         filter_textbox.value = 'aa';
         grid.filtering.filter();
-        assert.isTrue(grid.body.rows().filter(r => r.style.display == 'none').length == 2);
+        assert.isTrue(grid.body.rows.filter(r => r.style.display == 'none').length == 2);
     });
     it('Applies all filters to the data set', function(){
         let grid = newgrid('filter_test_3');
@@ -45,7 +45,7 @@ describe('Filtering', function(){
         grid.table.tHead.rows[1].cells[0].firstChild.value = 'a';
         grid.table.tHead.rows[1].cells[1].firstChild.value = 'b';
         grid.filtering.filter();
-        assert.isTrue(grid.body.rows().filter(r => r.style.display == 'none').length == 3);
+        assert.isTrue(grid.body.rows.filter(r => r.style.display == 'none').length == 3);
     });
     it('Allows for custom filter logic', function(){
         let grid = newgrid('filter_test_4');
@@ -60,7 +60,7 @@ describe('Filtering', function(){
         });
         grid.table.tHead.rows[1].cells[0].firstChild.value = 'bc';
         grid.filtering.filter();
-        assert.isTrue(grid.body.rows().filter(r => r.style.display == 'none').length == 1);
+        assert.isTrue(grid.body.rows.filter(r => r.style.display == 'none').length == 1);
     });
     it('Allows for custom filter control', function(){
         let grid = newgrid('filter_test_5');
@@ -87,7 +87,7 @@ describe('Filtering', function(){
         });
         grid.table.tHead.rows[1].cells[0].firstChild.value = 1;
         grid.filtering.filter();
-        assert.isTrue(grid.body.rows().filter(r => r.style.display == 'none').length == 2);
+        assert.isTrue(grid.body.rows.filter(r => r.style.display == 'none').length == 2);
     });
 });
 

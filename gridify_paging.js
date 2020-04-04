@@ -103,11 +103,11 @@ Gridify.prototype.extensions.paging = function(div){
             grid.paging._set_row_visibility(page_number);
         }
         , clear : function() { 
-            let rows = grid.body.rows();
+            let rows = grid.body.rows;
             rows.forEach(r => { if(r.paged) { r.paged = undefined; r.style.display = ''; } });
         }
         , _set_row_visibility : function(page_number){
-            let rows = grid.body.rows();
+            let rows = grid.body.rows;
             let options = grid.options().paging;
             
             grid.paging.clear();

@@ -1,5 +1,6 @@
 describe('Paging', function(){
-
+    let assert = chai.assert;
+    
     let newgrid = function(id){
         let div = document.createElement('div');
         div.id = id;
@@ -15,7 +16,7 @@ describe('Paging', function(){
             data : [ { Col : '1' }, { Col : '2' }, { Col : '3' } ],
             paging : { rows : 2 }
         });
-        let rows = grid.body.rows();
+        let rows = grid.body.rows;
         rows = rows.filter(r => r.style.display === '');
         assert.isTrue(rows.length === 2);
     });
@@ -28,7 +29,7 @@ describe('Paging', function(){
             paging : { rows : 2, current_page : 1 }
         });
         grid.paging.page(2);
-        let rows = grid.body.rows();
+        let rows = grid.body.rows;
         rows = rows.filter(r => r.style.display === '');
         assert.isTrue(rows.length === 1);
     

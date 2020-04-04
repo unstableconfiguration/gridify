@@ -1,5 +1,6 @@
 
 describe('Sorting', function(){
+    let assert = chai.assert;
 
     let newgrid = function(id){
         let div = document.createElement('div');
