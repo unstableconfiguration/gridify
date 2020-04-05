@@ -8,44 +8,51 @@ Gridify.prototype.extensions.sorting = function(){
         onColumnAdded(headerCell, columnDefinition);
         if(!columnDefinition.sort) { return; }
 
-        let sortIcon = headerCell.appendChild(document.createElement('span'));
-        sortIcon.className = 'sort'
-
-        headerCell.style.paddingRight = '30px';
-        headerCell.addEventListener('click', grid.sorting.sortCallback(columnDefinition.field, columnDefinition.sort));
+        grid.sorting._addSortIcon(headerCell);
+        let sortCallback = grid.sorting._getSortCallback(columnDefinition.field, columnDefinition.sort);
+        headerCell.addEventListener('click', sortCallback);
     }
-
     grid.sorting = {
-        sort : function(property, options = {}) {
-            options = grid.sorting.setDefaultOptions(options);
-            let dir = grid.sorting._columnSortDirection(property, options);
+        sort : function(property, options) {
+            options = grid.sorting._getSortOptions(property, options);
+            
             let rows = grid.body.rows;
-            rows.sort((x,y)=>{
+            rows.sort((x,y) => {
                 let xv = grid.data.getCellValue(x, property);
                 let yv = grid.data.getCellValue(y, property);
                 let compared = options.comparator(xv, yv);
-                return +compared * dir;
+                return +compared * options.direction;
             });
             
-            grid.body.clear();
-            let tbody = grid.table.tBodies[0];
-            rows.forEach(x=>tbody.appendChild(x));
+            grid.sorting._redrawGrid(rows);
         }
-        , sortCallback : function(property, options){
-            return ()=>{ grid.sorting.sort(property, options); }
+        , _addSortIcon : function(headerCell) { 
+            let sortIcon = headerCell.appendChild(document.createElement('span'));
+            sortIcon.className = 'sort'
+            headerCell.style.paddingRight = '30px';
         }
-        , setDefaultOptions : function(options){
-            if(typeof(options) === 'function') options = { comparator : options };
-            if(typeof(options) !== 'object') options = {};
+        , _getSortDirection : function(property) {
+            let sortSpan = grid.header.findCell(property).children[1];
+            sortSpan.direction = sortSpan.direction !== 'asc' ? 'asc' : 'desc';
+            return sortSpan.direction === 'asc' ? -1 : 1;
+        }
+        // , defaultComparator : Defined using defineProperty() below
+        , _getSortCallback : function(property, options) {
+            return () => { grid.sorting.sort(property, options); }
+        }
+        , _getSortOptions : function(property, options) { 
+            if(typeof(options) === 'function') { options = { comparator : options } };
+            if(typeof(options) !== 'object') { options = { comparator : grid.sorting.defaultComparator } };
+            if(!options.comparator) { options.comparator = grid.sorting.defaultComparator; }
 
-            if(!options.comparator) options.comparator = grid.sorting._defaultComparator;
+            options.direction = grid.sorting._getSortDirection(property);
             return options;
         }
-        , _defaultComparator : function(a, b) { if(a==b) return 0; return a<b ? 1 : -1; }
-        , _columnSortDirection : function(property, options) {
-            let sort_span = grid.header.findCell(property).children[1];
-            sort_span.direction = sort_span.direction !== 'asc' ? 'asc' : 'desc';
-            return sort_span.direction === 'asc' ? -1 : 1;
-        }   
+        , _redrawGrid : function(rows) {
+            grid.body.clear();
+            let tbody = grid.table.tBodies[0];
+            rows.forEach(r => tbody.appendChild(r));
+        }
     }
+    Object.defineProperty(grid.sorting, 'defaultComparator', { get : () => function(a, b) { if(a == b) { return 0; } return a < b ? 1 : -1; } });
 }
