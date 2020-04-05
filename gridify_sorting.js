@@ -1,26 +1,28 @@
 
 
-Gridify.prototype.extensions.sorting = function(div){
+Gridify.prototype.extensions.sorting = function(){
     let grid = this;
 
     let onColumnAdded = grid.header.onColumnAdded;
-    grid.header.onColumnAdded = function(header_cell, column_definition){
-        onColumnAdded(header_cell, column_definition);
-        if(!column_definition.sort) return;
-        let sort_icon = header_cell.appendChild(document.createElement('span'));
-        sort_icon.className = 'sort'
-        header_cell.style.paddingRight = '30px';
-        header_cell.addEventListener('click', grid.sorting.sort_callback(column_definition.field, column_definition.sort));
+    grid.header.onColumnAdded = function(headerCell, columnDefinition){
+        onColumnAdded(headerCell, columnDefinition);
+        if(!columnDefinition.sort) { return; }
+
+        let sortIcon = headerCell.appendChild(document.createElement('span'));
+        sortIcon.className = 'sort'
+
+        headerCell.style.paddingRight = '30px';
+        headerCell.addEventListener('click', grid.sorting.sortCallback(columnDefinition.field, columnDefinition.sort));
     }
 
     grid.sorting = {
-        sort : function(property_name, options = {}) {
-            options = grid.sorting._set_default_options(options);
-            let dir = grid.sorting._column_sort_direction(property_name, options);
+        sort : function(property, options = {}) {
+            options = grid.sorting.setDefaultOptions(options);
+            let dir = grid.sorting._columnSortDirection(property, options);
             let rows = grid.body.rows;
             rows.sort((x,y)=>{
-                let xv = grid.data.getCellValue(x, property_name);
-                let yv = grid.data.getCellValue(y, property_name);
+                let xv = grid.data.getCellValue(x, property);
+                let yv = grid.data.getCellValue(y, property);
                 let compared = options.comparator(xv, yv);
                 return +compared * dir;
             });
@@ -29,19 +31,19 @@ Gridify.prototype.extensions.sorting = function(div){
             let tbody = grid.table.tBodies[0];
             rows.forEach(x=>tbody.appendChild(x));
         }
-        , sort_callback : function(property_name, options){
-            return ()=>{ grid.sorting.sort(property_name, options); }
+        , sortCallback : function(property, options){
+            return ()=>{ grid.sorting.sort(property, options); }
         }
-        , _set_default_options : function(options){
+        , setDefaultOptions : function(options){
             if(typeof(options) === 'function') options = { comparator : options };
             if(typeof(options) !== 'object') options = {};
 
-            if(!options.comparator) options.comparator = grid.sorting._default_comparator;
+            if(!options.comparator) options.comparator = grid.sorting._defaultComparator;
             return options;
         }
-        , _default_comparator : function(a, b) { if(a==b) return 0; return a<b ? 1 : -1; }
-        , _column_sort_direction : function(property_name, options) {
-            let sort_span = grid.header.findCell(property_name).children[1];
+        , _defaultComparator : function(a, b) { if(a==b) return 0; return a<b ? 1 : -1; }
+        , _columnSortDirection : function(property, options) {
+            let sort_span = grid.header.findCell(property).children[1];
             sort_span.direction = sort_span.direction !== 'asc' ? 'asc' : 'desc';
             return sort_span.direction === 'asc' ? -1 : 1;
         }   
