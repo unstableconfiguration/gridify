@@ -1,64 +1,63 @@
 Gridify.prototype.extensions.paging = function(div){
     let grid = this;
 
-    let on_grid_initialized = grid.onInitialized;
+    let onGridInitialized = grid.onInitialized;
     grid.onInitialized = function(options){
-        on_grid_initialized(options);
+        onGridInitialized(options);
         grid.paging.initialize(options.paging);
     }
 
     grid.footer.pager = {
         initialize : function(options){
-            let paging_row = grid.table.tFoot.insertRow();
-            paging_row.id = grid.table.id + '_paging';
-            paging_row.options = JSON.stringify(options); 
+            let pagingRow = grid.table.tFoot.insertRow();
+            pagingRow.id = grid.table.id + '_paging';
+            pagingRow.options = JSON.stringify(options); 
 
-            let left_cell = paging_row.insertCell();
-            left_cell.id = grid.table.id + '_paging_left';
-            left_cell.style = 'width:33%;';
+            let leftCell = pagingRow.insertCell();
+            leftCell.id = grid.table.id + '_paging_left';
+            leftCell.style = 'width:33%;';
 
-            let center_cell = paging_row.insertCell();
-            center_cell.id = grid.table.id + '_paging_center';
-            center_cell.style = 'width:33%;';
-            center_cell.appendChild(grid.footer.pager.center_cell_control(options));
+            let centerCell = pagingRow.insertCell();
+            centerCell.id = grid.table.id + '_paging_center';
+            centerCell.style = 'width:33%;';
+            centerCell.appendChild(grid.footer.pager.centerCell_control(options));
 
-            let right_cell = paging_row.insertCell();
-            right_cell.id = grid.table.id + '_paging_right';
-            right_cell.style = 'width:33%;'    
-
+            let rightCell = pagingRow.insertCell();
+            rightCell.id = grid.table.id + '_paging_right';
+            rightCell.style = 'width:33%;'    
         }
-        , set_page : function(page_number){
+        , setPage : function(pageNumber){
             let textbox = document.getElementById(grid.table.id + '_paging_center_textbox');
-            if(textbox) textbox.value = page_number;
+            if(textbox) textbox.value = pageNumber;
             // set row counter when up
         }
-        , center_cell_control : function(options){
+        , centerCell_control : function(options){
             let container = document.createElement('div');
             container.style = 'width:120px'
 
             let textbox = document.createElement('input');
             textbox.id = grid.table.id + '_paging_center_textbox';
             textbox.className = 'pager_textbox';
-            textbox.value = options.current_page || 1;
+            textbox.value = options.currentPage || 1;
 
             let label = document.createElement('span');
             label.style = 'width:40px;vertical-align:top';
-            label.innerText = ' of ' + options.total_pages || 1;
+            label.innerText = ' of ' + options.totalPages || 1;
 
-            let left_arrow = document.createElement('div');
-            left_arrow.className = 'pager_left';
-            left_arrow.onclick = () => 
+            let leftArrow = document.createElement('div');
+            leftArrow.className = 'pager_left';
+            leftArrow.onclick = () => 
                 grid.paging.page(textbox.value > 1 ? +textbox.value -1 : 1);
             
-            let right_arrow = document.createElement('div');
-            right_arrow.className = 'pager_right';
-            right_arrow.onclick = () => 
-                grid.paging.page(textbox.value < options.total_pages ? +textbox.value+1 : options.total_pages); 
+            let rightArrow = document.createElement('div');
+            rightArrow.className = 'pager_right';
+            rightArrow.onclick = () => 
+                grid.paging.page(textbox.value < options.totalPages ? +textbox.value+1 : options.totalPages); 
 
-            container.appendChild(left_arrow);
+            container.appendChild(leftArrow);
             container.appendChild(textbox);
             container.appendChild(label);
-            container.appendChild(right_arrow);
+            container.appendChild(rightArrow);
 
             return container;
         }
@@ -67,27 +66,27 @@ Gridify.prototype.extensions.paging = function(div){
     grid.paging = { 
         initialize : function(options){
             if(!options) return;
-            grid.paging.extend_sorting();
-            grid.paging.extend_filtering();
-            options = grid.paging._default_options(options);
+            grid.paging.extendSorting();
+            grid.paging.extendFiltering();
+            options = grid.paging._defaultOptions(options);
             grid.table.options.paging = options;
             grid.footer.pager.initialize(options); 
-            grid.paging.page(options.current_page);
+            grid.paging.page(options.currentPage);
         }
         // Not sure how to make these modules agnostic of one another. 
         // In the meantime, paging needs to know about sorting and filtering.
-        , extend_sorting : function(){
+        , extendSorting : function(){
             if(typeof(grid.sorting) !== 'undefined'){
                 let sort = grid.sorting.sort;
-                grid.sorting.sort = function(property_name, options = {}){
+                grid.sorting.sort = function(field, options = {}){
                     grid.paging.clear();
-                    sort(property_name, options);
-                    let current_page = grid.table.options.paging.current_page;    
-                    grid.paging.page(current_page);
+                    sort(field, options);
+                    let currentPage = grid.table.options.paging.currentPage;    
+                    grid.paging.page(currentPage);
                 }
             }
         }
-        , extend_filtering : function(){
+        , extendFiltering : function(){
             if(typeof(grid.filtering) !== 'undefined'){
                 let filter = grid.filtering.filter;
                 grid.filtering.filter = function(){
@@ -97,23 +96,23 @@ Gridify.prototype.extensions.paging = function(div){
                 }
             }
         }
-        , page : function(page_number = 1){
-            grid.options.paging.current_page = page_number;
-            grid.paging._set_footer_values(page_number);
-            grid.paging._set_row_visibility(page_number);
+        , page : function(pageNumber = 1){
+            grid.options.paging.currentPage = pageNumber;
+            grid.paging._setFooterValues(pageNumber);
+            grid.paging._setRowVisibility(pageNumber);
         }
         , clear : function() { 
             let rows = grid.body.rows;
             rows.forEach(r => { if(r.paged) { r.paged = undefined; r.style.display = ''; } });
         }
-        , _set_row_visibility : function(page_number){
+        , _setRowVisibility : function(pageNumber){
             let rows = grid.body.rows;
             let options = grid.options.paging;
             
             grid.paging.clear();
 
-            let start = (options.current_page-1)*options.rows;
-            let end = options.current_page*options.rows;
+            let start = (options.currentPage-1)*options.rows;
+            let end = options.currentPage*options.rows;
 
             // Only page visible rows
             rows = rows.filter(r => r.style.display !== 'none');
@@ -121,15 +120,15 @@ Gridify.prototype.extensions.paging = function(div){
 
             rows.forEach(r => {r.style.display = 'none'; r.paged = true; });
         }
-        , _set_footer_values : function(page_number){
-            grid.footer.pager.set_page(page_number);
+        , _setFooterValues : function(pageNumber){
+            grid.footer.pager.setPage(pageNumber);
         }
-        , _default_options : function(options){
+        , _defaultOptions : function(options){
             if(typeof(options) !== 'object') options = {};
             options.rows = options.rows || 20;
-            options.total_rows = options.total_rows || grid.data.get().length;
-            options.total_pages = Math.ceil(options.total_rows/options.rows);
-            options.current_page = options.current_page || 1;
+            options.totalRows = options.totalRows || grid.data.get().length;
+            options.totalPages = Math.ceil(options.totalRows/options.rows);
+            options.currentPage = options.currentPage || 1;
             return options;
         }
     }

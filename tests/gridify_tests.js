@@ -184,7 +184,7 @@ describe('Gridify Tests', function(){
             let filter_textbox = grid.table.tHead.rows[1].cells[0].firstChild;
             filter_textbox.value = 'a';
             grid.filtering.filter();
-            assert.isTrue(grid.table.options.paging.current_page === 1);
+            assert.isTrue(grid.table.options.paging.currentPage === 1);
             assert.isTrue(grid.body.rows.filter(r => r.style.display === '').length === 2);
 
         });

@@ -26,7 +26,7 @@ describe('Paging', function(){
         grid.initialize({
             columns : [ { field : 'Col' } ],
             data : [ { Col : '1' }, { Col : '2' }, { Col : '3' } ],
-            paging : { rows : 2, current_page : 1 }
+            paging : { rows : 2, currentPage : 1 }
         });
         grid.paging.page(2);
         let rows = grid.body.rows;
