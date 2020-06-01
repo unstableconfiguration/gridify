@@ -74,34 +74,36 @@ let Gridify = function(container){
         , onInitialized : function(options){}
         //, cells : defined using object.defineProperty below
         , findCell : function(property) { 
-            return grid.header.cells.find(c => c.id.split('_').pop() === property); 
+            return grid.header.cells.find(c => c.id.split('-').pop() === property); 
         }
-        , addColumns : function(columnDefinitions){
-            if(!Array.isArray(columnDefinitions)) 
+        , addColumns : function(colDefs){
+            if(!Array.isArray(colDefs)) 
                 throw`.columns.set requires an array of column definitions`;
 
-            columnDefinitions.forEach(col => {
+            colDefs.forEach(col => {
                 grid.header.addColumn(col);
             });
         }
-        , addColumn : function(columnDefinition){
-            let headerCell = grid.table.tHead.rows[0].insertCell();
-            headerCell.id = grid.table.id + '_header_' + columnDefinition.field;
-            grid.header._setHeaderLabel(headerCell, columnDefinition);
-            grid.header._setHeaderStyle(headerCell, columnDefinition);
+        , addColumn : function(colDef) {
+            let th = document.createElement('th');
+            th.id = grid.table.id + '-header-' + colDef.field;
+            grid.table.tHead.rows[0].appendChild(th);
+
+            grid.header._setHeaderLabel(th, colDef);
+            grid.header._setHeaderStyle(th, colDef);
             
-            grid.header.onColumnAdded(headerCell, columnDefinition);
-            grid.body.seedRow.addColumn(columnDefinition);
+            grid.header.onColumnAdded(th, colDef);
+            grid.body.seedRow.addColumn(colDef);
         }
-        , onColumnAdded : function(headerCell, columnDefinition){ 
+        , onColumnAdded : function(headerCell, colDef){ 
             // used by extensions to further modify and add functionality to columns.
         }     
-        , _setHeaderLabel : function(headerCell, columnDefinition) {
+        , _setHeaderLabel : function(headerCell, colDef) {
             let label = headerCell.appendChild(document.createElement('span'));
-            label.innerHTML = columnDefinition.header || columnDefinition.field;
+            label.innerHTML = colDef.header || colDef.field;
         }
-        , _setHeaderStyle : function(headerCell, columnDefinition) {
-            grid.styling.stylizeHeaderCell(headerCell, columnDefinition);
+        , _setHeaderStyle : function(headerCell, colDef) {
+            grid.styling.stylizeHeaderCell(headerCell, colDef);
         }
     }
     Object.defineProperty(grid.header, 'cells', { get : () => Array.from(grid.table.tHead.rows[0].cells) });
@@ -113,7 +115,7 @@ let Gridify = function(container){
         }
         , clear : function(){ _clear(grid.table.tBodies[0]); }
         //, rows : defined as property below
-        , _setBodyCell : function(bodyCell, value, columnDefinition) {
+        , _setBodyCell : function(bodyCell, value, colDef) {
             let label = bodyCell.appendChild(document.createElement('span'));
             label.innerHTML = value;
         }
@@ -144,15 +146,15 @@ let Gridify = function(container){
                 });
                 return row;       
             }
-            , addColumn(columnDefinition){
+            , addColumn(colDef){
                 let tr = grid.table.tBodies[1].rows[0];
                 let td = tr.insertCell();
-                td.id = tr.id + '_' + columnDefinition.field;
+                td.id = tr.id + '_' + colDef.field;
                 td.innerHTML = 'test';
                 
-                grid.styling.stylizeTableCell(td, columnDefinition);
-                if(columnDefinition.click)
-                    td.onclick = columnDefinition.click;
+                grid.styling.stylizeTableCell(td, colDef);
+                if(colDef.click)
+                    td.onclick = colDef.click;
             }
         }
     }
