@@ -30,7 +30,7 @@ describe('Table Creation', function() {
             let grid = new Gridify({ footers : [{}, {}] });
             assert.exists(grid.html.tFoot);
         });
-        it('Should execute onInitialized events for each created element', function() {
+        it('Should execute onInitialized events for each initialized element', function() {
             let grid = new Gridify({
                 caption : { text : ''},
                 headers : [ { } ],
@@ -44,6 +44,22 @@ describe('Table Creation', function() {
             
         });
     });
+
+    describe('Creation', function() {
+        it('Should execute onCreated events for each created element', function() {
+            let grid = new Gridify({
+                caption : { text : ''},
+                headers : [ { } ],
+                columns : [ { } ],
+                footers : [ { } ]
+            });
+            grid.caption.onCreated = (e) => assert.isTrue(c.id === 'new-grid-caption');
+            grid.header.onCreated = (e) => assert.isTrue(c.id === 'new-grid-footer');
+            grid.body.onCreated = (e) => assert.isTrue(c.id === 'new-grid-body');
+            grid.footer.onCreated = (e) => assert.isTrue(c.id === 'new-grid-footer');
+            
+        });
+    })
 
 });
 

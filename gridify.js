@@ -13,6 +13,15 @@ let Gridify = function(options = {}) {
         grid.footer.initialize(options.footers);
     }
 
+    grid.create = function(options) {
+        if(grid.container) { _clear(grid.container); }
+
+        grid.caption.create();
+        grid.header.create();
+        grid.body.create();
+        grid.footer.create();
+    }
+
     let _clear = function(container) {
         while(container && container.firstChild) { 
             container.removeChild(container.firstChild); 
@@ -39,6 +48,12 @@ let Gridify = function(options = {}) {
             grid.caption.onInitialized(caption);
         }
         , onInitialized : function(caption) {}
+        , create : function() {
+
+        }
+        , onCreated : function(caption) {
+
+        }
     }
 
     grid.header = {
@@ -51,6 +66,12 @@ let Gridify = function(options = {}) {
             grid.header.onInitialized(tHead);
         }
         , onInitialized(header) {}
+        , create : function() {
+
+        }
+        , onCreated : function(header) {
+
+        }
     }
 
     grid.body = {
@@ -62,6 +83,12 @@ let Gridify = function(options = {}) {
             grid.body.onInitialized(tBody);
         }
         , onInitialized(body) {}
+        , create : function() {
+
+        }
+        , onCreated : function(body) {
+
+        }
     }
 
     grid.footer = { 
@@ -73,6 +100,12 @@ let Gridify = function(options = {}) {
             grid.footer.onInitialized(tFoot)
         }
         , onInitialized(footer) {}
+        , create : function() {
+
+        }
+        , onCreated : function(footer) {
+
+        }
     }
 
     for(var k in grid.extensions) {
