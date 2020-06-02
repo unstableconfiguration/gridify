@@ -61,7 +61,31 @@ describe('Table Creation', function() {
             grid.footer.onCreated = (e) => assert.isTrue(e.id === 'new-grid-tfoot');
             grid.create();
         });
-    })
+    });
+
+    describe('Caption', function() {
+        it('Should set caption text if .caption is a string', function() { 
+            let grid = new Gridify({ caption : 'test caption 1' });
+            assert.isTrue(grid.html.caption.innerHTML === 'test caption 1');
+        });
+        it('Should set caption text if .caption.text is set', function() {
+            let grid = new Gridify({ caption : { text : 'test caption 2' }});
+            assert.isTrue(grid.html.caption.innerHTML === 'test caption 2');
+        });
+        it('Should set attributes if .caption.attributes is set', function() { 
+            let grid = new Gridify({
+                caption : {
+                    text : 'test',
+                    attributes : { title : 'test caption' }
+                }
+            });
+            assert.isTrue(grid.html.caption.title === 'test caption');
+        });
+    });
+
+    describe('Header', function() {
+
+    });
 
 });
 

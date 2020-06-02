@@ -13,7 +13,7 @@ let Gridify = function(options = {}) {
         grid.footer.initialize(options.footers);
     }
 
-    grid.create = function(options) {
+    grid.create = function() {
         if(grid.container) { _clear(grid.container); }
 
         grid.caption.create();
@@ -61,12 +61,25 @@ let Gridify = function(options = {}) {
         , onInitialized : function(caption) {}
         , create : function() {
             if(!_table.caption) { return ; }
-
+            grid.caption.setText();
+            grid.caption.setAttributes();
             grid.caption.onCreated(_table.caption);
         }
         , onCreated : function(caption) {
 
         }
+        , setText : function() {
+            let caption = grid.html.caption;
+            if(typeof(caption.options) === 'string') { caption.innerHTML = caption.options; }
+            else if(caption.options.text) { caption.innerHTML = caption.options.text; }
+        }
+        , setAttributes : function() { 
+            let caption = grid.html.caption;
+            let attributes = caption.options.attributes;
+            for(let k in attributes) { 
+                caption.setAttribute(k, attributes[k]); 
+            }
+        }   
     }
 
     grid.header = {
@@ -131,6 +144,7 @@ let Gridify = function(options = {}) {
     }
 
     grid.initialize(options);
+    grid.create();
 
     return grid;
 }
