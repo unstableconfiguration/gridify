@@ -1,12 +1,41 @@
 
-let Gridify = function(container){   
-    if(typeof(container) === 'string') { 
-        container = document.getElementById(container);
-    }
 
-    if(!container instanceof HTMLDivElement) {    
-        throw('Gridify container must be <div>');
-    }
+/*
+    Major rewrite 
+    instead of 
+        new Gridify(container).initialize(options); 
+
+    we're going to do 
+    new Gridify(options); 
+        which will return the grid and, if a container is provided, will attach it to the container
+
+    we're going to change up some of our flow and events 
+    change .initialize to .create
+    create stores the relevant information in its associated element, then creates its stuff 
+        every main event will have a onX followup event for extension
+
+
+    we're going to move styling out of here as an extension 
+
+    main gridify will create an unformatted table of data. 
+    
+*/
+
+
+
+
+let Gridify = function(options) {   
+    let grid = {};
+
+    // initialize: 
+        // clear and recreate major grid elements. 
+        // table, head, body, footer, caption
+        // store data in those elements 
+    // onInitialized
+    // create:
+        // populate major elements 
+        // execute oncreated 
+
 
     let grid = this;
     grid.container = container;
