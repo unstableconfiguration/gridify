@@ -1,6 +1,54 @@
 
+describe('Table Creation', function() {
+    let assert = chai.assert;
 
-describe('Gridify Tests', function(){
+    let div = function(id) {
+        let div = document.createElement('div');
+        div.id = id;
+        div.style.display = none;
+        document.body.appendChild(div);
+    }
+
+    describe('Initialization', function() {
+        it('Should create a <table> element accessible through the .html property', function() {
+            let grid = new Gridify();
+            assert.exists(grid.html);
+        });
+        it('Should create an empty <caption> if .caption is present', function() {
+            let grid = new Gridify({ caption : { text : '' }});
+            assert.exists(grid.html.caption)
+        });
+        it('Should create an empty <thead> if .headers is present', function() {
+            let grid = new Gridify({ headers : [{}, {}]});
+            assert.exists(grid.html.tHead);
+        });
+        it('Should create an empty <tbody> if .columns is present', function() {
+            let grid = new Gridify({ columns : [{}, {}] });
+            assert.exists(grid.html.tBodies[0]);
+        });
+        it('Should create an empty <tfoot> if .footers is present', function() {
+            let grid = new Gridify({ footers : [{}, {}] });
+            assert.exists(grid.html.tFoot);
+        });
+        it('Should execute onInitialized events for each created element', function() {
+            let grid = new Gridify({
+                caption : { text : ''},
+                headers : [ { } ],
+                columns : [ { } ],
+                footers : [ { } ]
+            });
+            grid.caption.onInitialized = (e) => assert.isTrue(c.id === 'new-grid-caption');
+            grid.header.onInitialized = (e) => assert.isTrue(c.id === 'new-grid-footer');
+            grid.body.onInitialized = (e) => assert.isTrue(c.id === 'new-grid-body');
+            grid.footer.onInitialized = (e) => assert.isTrue(c.id === 'new-grid-footer');
+            
+        });
+    });
+
+});
+
+
+/*describe('Gridify Tests', function(){
     let assert = chai.assert;
     
     let newgrid = function(id){
@@ -190,4 +238,4 @@ describe('Gridify Tests', function(){
         });
     })
 
-});
+});*/
