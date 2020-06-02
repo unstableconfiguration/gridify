@@ -63,11 +63,11 @@ describe('Table Creation', function() {
         });
         it('Should set caption text if .caption is a string', function() { 
             let grid = new Gridify({ caption : 'test caption 1' });
-            assert(grid.html.caption.innerHTML === 'test caption 1');
+            assert(grid.html.caption.innerText === 'test caption 1');
         });
         it('Should set caption text if .caption.text is set', function() {
             let grid = new Gridify({ caption : { text : 'test caption 2' }});
-            assert(grid.html.caption.innerHTML === 'test caption 2');
+            assert(grid.html.caption.innerText === 'test caption 2');
         });
         it('Should set attributes if .caption.attributes is set', function() { 
             let grid = new Gridify({
@@ -78,8 +78,22 @@ describe('Table Creation', function() {
             });
             assert(grid.html.caption.title === 'test caption');
         });
-        it('Should call onInitialized after the caption has been initialized');
-        it('Should call onCreated after the caption has been created');
+        it('Should call onInitialized after the caption has been initialized', function() {
+            let grid = new Gridify();
+            grid.caption.onInitialized = (caption) => assert(caption.id === 'new-grid-caption');
+            grid.initialize({
+                caption : { text : 'cap' }
+            });
+            grid.create();
+        });
+        it('Should call onCreated after the caption has been created', function() {
+            let grid = new Gridify();
+            grid.caption.onCreated = (caption) => assert(caption.innerText === 'cap');
+            grid.initialize({
+                caption : 'cap'
+            });
+            grid.create();
+        });
     });
 
     describe('Header', function() {
@@ -107,9 +121,31 @@ describe('Table Creation', function() {
             });
             assert(grid.html.tHead.rows[0].cells[0].title === 'test three');
         });
-        it('Should call onInitialized after the header has been initialized');
-        it('Should call onHeaderCellAdded after each header cell has been added');
-        it('Should call onCreated after the header has been created');
+        it('Should call onInitialized after the header has been initialized', function() {
+            let grid = new Gridify({});
+            grid.header.onInitialized = (e) => assert(e.id === 'new-grid-thead');
+            grid.initialize({});
+        });
+        it('Should call onHeaderCellAdded after each header cell has been added', function() {
+            let grid = new Gridify({});
+            grid.header.onHeaderCellAdded = (th) => assert(th.innerText === 'test');
+            grid.initialize({ 
+                headers : [
+                    { text : 'test' }
+                ]
+            });
+            grid.create();
+        });
+        it('Should call onCreated after the header has been created', function(){
+            let grid = new Gridify({});
+            grid.header.onCreated = (head) => assert(head.rows[0].cells.length == 2);
+            grid.initialize({
+                headers : [
+                    { text : 'test1' }, { text : 'test2' } 
+                ]
+            });
+            grid.create();
+        });
     });
 
     describe('Body', function() { 

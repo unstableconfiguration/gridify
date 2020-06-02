@@ -74,7 +74,7 @@ let Gridify = function(options = {}) {
         , onCreated : function(caption) { }
         , _setText : function() {
             let caption = grid.html.caption;
-            caption.innerHTML = caption.options.text; 
+            caption.innerText = caption.options.text; 
         } 
     }
 
