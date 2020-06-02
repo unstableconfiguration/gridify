@@ -88,7 +88,7 @@ let Gridify = function(options = {}) {
             tHead.insertRow();
             grid.header.onInitialized(tHead);
         }
-        , onInitialized(header) {}
+        , onInitialized(header) { }
         , create : function() {
             if(!_table.tHead) { return; }
 
@@ -100,50 +100,63 @@ let Gridify = function(options = {}) {
             let options = _table.tHead.options;
             options.forEach(o => { grid.header.addHeaderCell(o); });
         }
-        , addHeaderCell : function(columnDefinition) {
+        , addHeaderCell : function(headerDefinition) {
             let th = document.createElement('th');
             th.id = _table.tHead.id + '-' + 'mmm';
 
-            grid.header._setHeaderText(th, columnDefinition);
-            _setAttributes(th, columnDefinition.attributes);
+            grid.header._setHeaderText(th, headerDefinition);
+            _setAttributes(th, headerDefinition.attributes);
 
             _table.tHead.rows[0].appendChild(th);
             grid.header.onHeaderCellAdded(th); 
         }
-        , _setHeaderText : function(th, columnDefinition) {
-            th.innerHTML = typeof(columnDefinition) === 'string'
-                ? columnDefinition
-                : columnDefinition.text;
+        , _setHeaderText : function(th, headerDefinition) {
+            th.innerHTML = typeof(headerDefinition) === 'string'
+                ? headerDefinition
+                : headerDefinition.text;
         }
         , onHeaderCellAdded : function(th) { }
     }
 
     grid.body = {
-        initialize : function(options) {
+        initialize : function(columnDefinitions) {
             while(_table.tBodies.length) { _table.removeChild(_table.tBodies[0]); }
             let tBody = _table.createTBody();
             tBody.id = _table.id + '-tbody';
-            tBody.options = options;
+            tBody.columnDefinitions = columnDefinitions;
             grid.body.onInitialized(tBody);
         }
-        , onInitialized(body) {}
+        , onInitialized(body) { }
+        , clear : function() { _clear(_table.tBodies[0]); }
         , create : function(data = options.data) {
-            _clear(_table.tBodies[0]);
-
+            grid.body.clear();
             for(let k in data) {
                 grid.body.addTableRow(k, data[k]);
             }
 
             grid.body.onCreated(_table.tBodies[0]);
         }
+        , getColumnDefinition : function(field) {
+            let colDefs = _table.tBodies[0].columnDefinitions;
+            if(!colDefs) { return; }
+            return colDefs.find(d => d.field == field);
+        }
         , onCreated : function(body) { }
-        , clear : function() { _clear(_table.tBodies[0]); }
         , addTableRow : function(ridx, rowData) {
             let tr = _table.tBodies[0].insertRow();
             tr.id = _table.tBodies[0].id + '-' + ridx;
 
-            for(let field in rowData) {
-                grid.body.addTableCell(tr, field, rowData[field]);
+            let colDefs = _table.tBodies[0].columnDefinitions;
+            if(colDefs){
+                for(let d in colDefs) {
+                    let field = colDefs[d].field;
+                    grid.body.addTableCell(tr, field, rowData[field])
+                }
+            }
+            else { 
+                for(let field in rowData) {
+                    grid.body.addTableCell(tr, field, rowData[field]);
+                }
             }
 
             grid.body.onTableRowAdded(tr);
@@ -155,6 +168,9 @@ let Gridify = function(options = {}) {
 
             td.field = field;
             td.innerText = value;
+
+            let colDef = grid.body.getColumnDefinition(field);
+            if(colDef && colDef.attributes) { _setAttributes(td, colDef.attributes); }
             
             grid.body.onTableCellAdded(td);
         }
@@ -189,7 +205,7 @@ let Gridify = function(options = {}) {
         , onInitialized(footer) {}
         , create : function() {
             if(!_table.tFoot) { return; }
-
+            // todo: similar to header
             grid.footer.onCreated(_table.tFoot);
         }
         , onCreated : function(footer) { }
