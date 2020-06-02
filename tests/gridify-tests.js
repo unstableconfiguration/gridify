@@ -31,17 +31,18 @@ describe('Table Creation', function() {
             assert.exists(grid.html.tFoot);
         });
         it('Should execute onInitialized events for each initialized element', function() {
-            let grid = new Gridify({
+            let grid = new Gridify();
+            grid.table.onInitialized = (e) => assert.isTrue(e.id === 'new-grid');
+            grid.caption.onInitialized = (e) => assert.isTrue(e.id === 'new-grid-caption');
+            grid.header.onInitialized = (e) => assert.isTrue(e.id === 'new-grid-thead');
+            grid.body.onInitialized = (e) => assert.isTrue(e.id === 'new-grid-tbody');
+            grid.footer.onInitialized = (e) => assert.isTrue(e.id === 'new-grid-tfoot');
+            grid.initialize({
                 caption : { text : ''},
                 headers : [ { } ],
                 columns : [ { } ],
                 footers : [ { } ]
             });
-            grid.caption.onInitialized = (e) => assert.isTrue(c.id === 'new-grid-caption');
-            grid.header.onInitialized = (e) => assert.isTrue(c.id === 'new-grid-footer');
-            grid.body.onInitialized = (e) => assert.isTrue(c.id === 'new-grid-body');
-            grid.footer.onInitialized = (e) => assert.isTrue(c.id === 'new-grid-footer');
-            
         });
     });
 
@@ -53,11 +54,12 @@ describe('Table Creation', function() {
                 columns : [ { } ],
                 footers : [ { } ]
             });
-            grid.caption.onCreated = (e) => assert.isTrue(c.id === 'new-grid-caption');
-            grid.header.onCreated = (e) => assert.isTrue(c.id === 'new-grid-footer');
-            grid.body.onCreated = (e) => assert.isTrue(c.id === 'new-grid-body');
-            grid.footer.onCreated = (e) => assert.isTrue(c.id === 'new-grid-footer');
-            
+            grid.table.onCreated = (e) => assert.isTrue(e.id === 'new-grid');
+            grid.caption.onCreated = (e) => assert.isTrue(e.id === 'new-grid-caption');
+            grid.header.onCreated = (e) => assert.isTrue(e.id === 'new-grid-thead');
+            grid.body.onCreated = (e) => assert.isTrue(e.id === 'new-grid-tbody');
+            grid.footer.onCreated = (e) => assert.isTrue(e.id === 'new-grid-tfoot');
+            grid.create();
         });
     })
 

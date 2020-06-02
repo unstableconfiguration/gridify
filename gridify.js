@@ -28,28 +28,41 @@ let Gridify = function(options = {}) {
         }
     }
 
-
+    let _table;
     grid.table = { 
         initialize : function(options) {
-            grid.table = document.createElement('table');
-            if(options.id) { grid.table.id = options.id; }
-            else if(grid.container) { grid.table.id = grid.container.id + '-grid'; }
-            else { grid.table.id = 'new-grid'; }
+            _table = document.createElement('table');
+            if(options.id) { _table.id = options.id; }
+            else if(grid.container) { _table.id = grid.container.id + '-grid'; }
+            else { _table.id = 'new-grid'; }
+            grid.table.onInitialized(_table);
+        }
+        , onInitialized : function(table) {
+
+        }
+        , create : function() {
+            console.log(1)
+            grid.table.onCreated(_table);
+        }
+        , onCreated : function(table) {
+
         }
     }
-    Object.defineProperty(grid, 'html', { get : () => grid.table });
+    Object.defineProperty(grid, 'html', { get : () => _table });
 
     grid.caption = {
         initialize : function(options) {
             if(!options) { return; }
-            let caption = grid.table.createCaption();
-            caption.id = grid.table.id + '-caption';
+            let caption = _table.createCaption();
+            caption.id = _table.id + '-caption';
             caption.options = options;
             grid.caption.onInitialized(caption);
         }
         , onInitialized : function(caption) {}
         , create : function() {
+            if(!_table.caption) { return ; }
 
+            grid.caption.onCreated(_table.caption);
         }
         , onCreated : function(caption) {
 
@@ -59,15 +72,16 @@ let Gridify = function(options = {}) {
     grid.header = {
         initialize : function(options) {
             if(!options) { return; }
-            let tHead = grid.table.createTHead();
-            tHead.id = grid.table.id + '-thead';
+            let tHead = _table.createTHead();
+            tHead.id = _table.id + '-thead';
             tHead.options = options;
-            grid.table.appendChild(tHead);
             grid.header.onInitialized(tHead);
         }
         , onInitialized(header) {}
         , create : function() {
+            if(!_table.tHead) { return; }
 
+            grid.header.onCreated(_table.tHead);
         }
         , onCreated : function(header) {
 
@@ -77,14 +91,16 @@ let Gridify = function(options = {}) {
     grid.body = {
         initialize : function(options) {
             if(!options) { return; }
-            let tBody = grid.table.createTBody();
-            tBody.id = grid.table.id + '-tbody';
+            let tBody = _table.createTBody();
+            tBody.id = _table.id + '-tbody';
             tBody.options = options;
             grid.body.onInitialized(tBody);
         }
         , onInitialized(body) {}
         , create : function() {
+            if(!_table.tBodies[0]) { return; }
 
+            grid.body.onCreated(_table.tBodies[0]);
         }
         , onCreated : function(body) {
 
@@ -94,14 +110,16 @@ let Gridify = function(options = {}) {
     grid.footer = { 
         initialize : function(options) {
             if(!options) { return; }
-            let tFoot = grid.table.createTFoot();
-            tFoot.id = grid.table.id + '-tfoot';
+            let tFoot = _table.createTFoot();
+            tFoot.id = _table.id + '-tfoot';
             tFoot.options = options;
             grid.footer.onInitialized(tFoot)
         }
         , onInitialized(footer) {}
         , create : function() {
+            if(!_table.tFoot) { return; }
 
+            grid.footer.onCreated(_table.tFoot);
         }
         , onCreated : function(footer) {
 
