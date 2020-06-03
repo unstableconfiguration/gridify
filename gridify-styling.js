@@ -28,18 +28,23 @@ Gridify.prototype.extensions.styling = function(div) {
 
     grid.styling = {
         defaults : { 
-            table : `border-collapse:collapse`,
-            tbody : {
-                tr : `` 
-                , td : `
-                    text-align:left;
-                    text-overflow:ellipses;
-                    white-space:nowrap`
-            }
-            , thead : {
+            table : `border-collapse:collapse`
+            , tHead : {
                 tr : ``
                 , th : `
                     text-align:center;` 
+            }
+            , tBody : {
+                tr : `` 
+                , td : `
+                    text-align:left;
+                    text-overflow:ellipsis;
+                    white-space:nowrap`
+            }
+            , tFoot : {
+                tr : ``
+                , td : `
+                    text-align:center;`
             }
         }
         , stylize : function(el, options) {
@@ -52,8 +57,12 @@ Gridify.prototype.extensions.styling = function(div) {
             let defaults = '';
             switch(el.tagName) {
                 case 'TABLE' : defaults = grid.styling.defaults.table; break;
-                case 'TH' : defaults = grid.styling.defaults.thead.th; break;
-                case 'TD' : defaults = grid.styling.defaults.tbody.td; break;
+                case 'TH' : defaults = grid.styling.defaults.tHead.th; break;
+                case 'TD' : 
+                    defaults = el.id.includes('tbody') 
+                        ? grid.styling.defaults.tBody.td 
+                        : grid.styling.defaults.tFoot.td;
+                    break;
             }
             grid.styling.setStyle(el, defaults);
         }

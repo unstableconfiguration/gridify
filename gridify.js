@@ -210,12 +210,12 @@ let Gridify = function(options = {}) {
 
             grid.onFooterCreated(tFoot, tFoot.options);
         }
-        , initialize : function(options) {
+        , initialize : function(footers) {
             if(_table.tFoot) { _table.removeChild(_table.tFoot); }
             let tFoot = _table.createTFoot();
             
             tFoot.id = _table.id + '-tfoot';
-            tFoot.options = grid.footer._parseFooters;
+            tFoot.options = grid.footer._parseFooters(footers);;
             
             return tFoot;
         }

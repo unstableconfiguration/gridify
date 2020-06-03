@@ -2,18 +2,12 @@
 describe('Table Creation', function() {
     let assert = chai.assert;
 
-    let div = function(id) {
-        let div = document.createElement('div');
-        div.id = id;
-        div.style.display = none;
-        document.body.appendChild(div);
-    }
-
     describe('Initialization', function() {
         it('Should create a <table> element accessible through the .html property', function() {
             let grid = new Gridify();
             assert.exists(grid.html);
         });
+        it('Should attach the html table to a container if one is provided');
     });
 
     describe('Caption', function() {
@@ -180,7 +174,6 @@ describe('Table Creation', function() {
             grid.data.set([
                 { fieldA : 4 }
             ]);
-            window.grid = grid;
             let data = grid.data.get();
             assert(data[0].fieldA == 4);
             
