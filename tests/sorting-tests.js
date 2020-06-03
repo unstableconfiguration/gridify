@@ -10,60 +10,45 @@ describe('Sorting', function(){
         return new Gridify(id);
     }
 
-    it('Appends a sort icon on sortable columns', function(){
-        let grid = newgrid('sorting_test_1');
-        grid.initialize({
-            columns : [{field : 'Col', sort : true }],
-            data : [{ Col : 'a' }]
+    it('Appends a sort icon on sortable columns', function() {
+        let grid = new Gridify({
+            headers : [ { text : 'Col', sort : true } ]
         });
-        assert.isTrue(grid.header.cells[0].children[1].className == 'sort');
+        assert.isTrue(grid.html.tHead.rows[0].cells[0].children[0].className == 'sort');
     });
 
-    it('Defaults to alphabetical sorting.', function(){
-        let grid = newgrid('sorting_test_2');
-        grid.initialize({
-            columns : [{ field : 'Col', sort : true }],
+    it('Defaults to alphabetical sorting.', function() {
+        let grid = new Gridify({
+            headers : [ { text : 'Col', sort : true } ],
+            columns : [{ field : 'Col' } ],
             data : [{ Col : 'b' }, { Col : 'c' }, { Col : 'a' }]
         });
-        assert.isTrue(grid.data.getCellValue(0, 'Col') == 'b');
-        assert.isTrue(grid.data.getCellValue(2, 'Col') == 'a');
+        let data = grid.data.get();
+        window.grid = grid;
+        assert(data[0].Col === 'b' && data[2].Col === 'a');
         grid.sorting.sort('Col');
-        assert.isTrue(grid.data.getCellValue(0, 'Col') == 'a');
-        assert.isTrue(grid.data.getCellValue(2, 'Col') == 'c');
+        data = grid.data.get();
+        assert(data[0].Col === 'a' && data[2].Col === 'c');
         grid.sorting.sort('Col'); // reverse
-        assert.isTrue(grid.data.getCellValue(0, 'Col') == 'c');
-        assert.isTrue(grid.data.getCellValue(2, 'Col') == 'a');  
+        data = grid.data.get();
+        assert(data[0].Col === 'c' && data[2].Col === 'a');
     });
 
-    let comparator = function(a, b) { 
+    let compare = function(a, b) { 
         return +a[1] <= +b[1] ? 1 : -1;
     }
 
-    it('Allows for custom sorting if sort options are provided with comparator function.', function(){
-        let grid = newgrid('sorting_test_3');      
-        grid.initialize({
-            columns : [{field : 'Col', sort : { comparator : comparator } }],
+    it('Allows for custom sorting if sort option is a comparer function', function(){
+        let grid = newgrid({
+            headers : [ { text : 'Col', sort : compare } ],
+            columns : [{field : 'Col' }],
             data : [{ Col : 'a3' }, { Col : 'b2' }, { Col : 'c1' }]
-        });
+        });      
         
-        // ascending: c1, b2, a3; descending: a3, b2, c1
-        grid.sorting.sort('Col', { comparator : comparator });   
-        assert.isTrue(grid.data.getCellValue(0, 'Col') == 'c1');
-        grid.sorting.sort('Col', { comparator : comparator });   
-        assert.isTrue(grid.data.getCellValue(0, 'Col') == 'a3');     
-    });
-
-    it('Allows for custom sorting if sort function is provided.', function(){
-        let grid = newgrid('sorting_test_3');      
-        grid.initialize({
-            columns : [{field : 'Col', sort : comparator }],
-            data : [{ Col : 'a3' }, { Col : 'b2' }, { Col : 'c1' }]
-        });
-        // ascending: c1, b2, a3; descending: a3, b2, c1
-        grid.sorting.sort('Col', { comparator : comparator });   
-        assert.isTrue(grid.data.getCellValue(0, 'Col') == 'c1');
-        grid.sorting.sort('Col', { comparator : comparator });   
-        assert.isTrue(grid.data.getCellValue(0, 'Col') == 'a3');     
+        grid.sorting.sort('Col');   
+        assert.isTrue(grid.data.get()[0].Col == 'c1');
+        grid.sorting.sort('Col');   
+        assert.isTrue(grid.data.get()[0].Col == 'a3');     
     });
 
 });

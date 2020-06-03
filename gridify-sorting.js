@@ -3,56 +3,74 @@
 Gridify.prototype.extensions.sorting = function(){
     let grid = this;
 
-    let onColumnAdded = grid.header.onColumnAdded;
-    grid.header.onColumnAdded = function(headerCell, columnDefinition){
-        onColumnAdded(headerCell, columnDefinition);
-        if(!columnDefinition.sort) { return; }
+    let onHeaderCellCreated = grid.onHeaderCellCreated;
+    grid.onHeaderCellCreated = function(th, headerDefinition) {
+        onHeaderCellCreated(th, headerDefinition);
 
-        grid.sorting._addSortIcon(headerCell);
-        let sortCallback = grid.sorting._getSortCallback(columnDefinition.field, columnDefinition.sort);
-        headerCell.addEventListener('click', sortCallback);
+        grid.sorting.initialize(th, headerDefinition);
     }
+
     grid.sorting = {
-        sort : function(property, options) {
-            options = grid.sorting._getSortOptions(property, options);
+        initialize : function(th, headerDefinition) { 
+            if(!headerDefinition.sort) { return; }
+
+            let options = grid.sorting._parseOptions(headerDefinition.sort);
+            let idx = Array.from(th.parentElement.children).indexOf(th);
+            options.idx = idx;
+            th.sort = options;
+
+            grid.sorting._addSortIcon(th);
             
-            let rows = grid.body.rows;
-            rows.sort((x,y) => {
-                let xv = grid.data.getCellValue(x, property);
-                let yv = grid.data.getCellValue(y, property);
-                let compared = options.comparator(xv, yv);
+            let sortCallback = grid.sorting._getSortCallback();
+            
+            th.addEventListener('click', sortCallback);    
+        }
+        , _parseOptions : function(sortOptions) { 
+            let options = { compare : grid.sorting.defaultCompare };
+            if(typeof(sortOptions) === 'function') { options.compare = sortOptions; }
+            else if(typeof(sortOptions) === 'object') {
+                for(let k in sortOptions) { options[k] = sortOptions[k]; }
+            }
+
+            return options;
+        }
+        , getSortOptionsByField : function(field) { 
+            let idx = grid.html.tBodies[0].options
+                .findIndex(colDef => colDef.field == field);
+
+            let th = grid.html.tHead.rows[0].cells[idx];
+            return th.sort;
+        }
+        , sort : function(options) {
+            if(typeof(options) === 'string') { 
+                options = grid.sorting.getSortOptionsByField(options); 
+            }
+
+            options.direction = options.direction === -1 ? 1 : -1;
+
+            let rows = Array.from(grid.html.tBodies[0].rows);            
+            rows.sort((x, y) => {
+                let xv = x.cells[options.idx].innerText;
+                let yv = y.cells[options.idx].innerText; 
+                let compared = options.compare(xv, yv);
                 return +compared * options.direction;
             });
             
             grid.sorting._redrawGrid(rows);
         }
-        , _addSortIcon : function(headerCell) { 
-            let sortIcon = headerCell.appendChild(document.createElement('span'));
-            sortIcon.className = 'sort'
-            headerCell.style.paddingRight = '30px';
+        , _addSortIcon : function(th) { 
+            let icon = th.appendChild(document.createElement('span'));
+            icon.className = 'sort'
+            th.style.paddingRight = '30px';
         }
-        , _getSortDirection : function(property) {
-            let sortSpan = grid.header.findCell(property).children[1];
-            sortSpan.direction = sortSpan.direction !== 'asc' ? 'asc' : 'desc';
-            return sortSpan.direction === 'asc' ? -1 : 1;
-        }
-        // , defaultComparator : Defined using defineProperty() below
-        , _getSortCallback : function(property, options) {
-            return () => { grid.sorting.sort(property, options); }
-        }
-        , _getSortOptions : function(property, options) { 
-            if(typeof(options) === 'function') { options = { comparator : options } };
-            if(typeof(options) !== 'object') { options = { comparator : grid.sorting.defaultComparator } };
-            if(!options.comparator) { options.comparator = grid.sorting.defaultComparator; }
-
-            options.direction = grid.sorting._getSortDirection(property);
-            return options;
+        , _getSortCallback : function() {
+            return (e) => { grid.sorting.sort(e.options); }
         }
         , _redrawGrid : function(rows) {
             grid.body.clear();
-            let tbody = grid.table.tBodies[0];
-            rows.forEach(r => tbody.appendChild(r));
+            let tBody = grid.html.tBodies[0];
+            rows.forEach(r => tBody.appendChild(r));
         }
     }
-    Object.defineProperty(grid.sorting, 'defaultComparator', { get : () => function(a, b) { if(a == b) { return 0; } return a < b ? 1 : -1; } });
+    Object.defineProperty(grid.sorting, 'defaultCompare', { get : () => function(a, b) { if(a == b) { return 0; } return a < b ? 1 : -1; } });
 }

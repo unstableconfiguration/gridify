@@ -1,29 +1,28 @@
-
 Gridify.prototype.extensions.styling = function(div) {
     let grid = this;
 
     let onTableCreated = grid.onTableCreated;
     grid.onTableCreated = function(table, options) {
-        grid.styling.stylize(table, options);
         onTableCreated(table, options);
+        grid.styling.stylize(table, options);
     }
 
     let onHeaderCellCreated = grid.onHeaderCellCreated;
     grid.onHeaderCellCreated = function(th, options) {
-        grid.styling.stylize(th, options);
         onHeaderCellCreated(th, options);
+        grid.styling.stylize(th, options);
     }
 
     let onTableCellCreated = grid.onTableCellCreated;
     grid.onTableCellCreated = function(td, options) { 
-        grid.styling.stylize(td, options);
         onTableCellCreated(td, options);
+        grid.styling.stylize(td, options);
     }
 
     let onFooterCellCreated = grid.onFooterCellCreated;
     grid.onFooterCellCreated = function(td, options) { 
-        grid.styling.stylize(td, options);
         onFooterCellCreated(td, options);
+        grid.styling.stylize(td, options);
     }
 
     grid.styling = {
@@ -72,5 +71,4 @@ Gridify.prototype.extensions.styling = function(div) {
                 .forEach(kv => el.style[kv[0]]=kv[1]);
         }
     }
-
 }
