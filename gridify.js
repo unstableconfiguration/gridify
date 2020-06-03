@@ -1,24 +1,4 @@
 
-/*
-    overriding events using options 
-
-    new Gridify({
-
-        onTableCellCreated : function(td, definition) {
-
-        }
-    });
-
-    our extensions rely on extending the prototype, but in action we'll want to 
-    be able to provide these events ourselves. 
-
-    next up: what does initialization get us that creation does not: 
-
-    initialization clears the container,
-    initialization creates the empty element 
-    initialization prepares options and sets them on the element
-*/
-
 
 let Gridify = function(options = {}) { 
     let grid = this;
@@ -26,16 +6,26 @@ let Gridify = function(options = {}) {
 
     grid.create = function(options) {
         if(grid.container) { _clear(grid.container); }
+        if(options.container) { grid.container = options.container; }
 
         grid.table.create(options);
         grid.caption.create(options.caption);
         grid.header.create(options.headers);
         grid.body.create(options.data, options.columns);
         grid.footer.create(options.footers);
+
+        if(grid.container) { grid.container.append(_table); }
     }
 
-    grid.onTableInitialized = function() { }
-    grid.onTableCreated = function(table, options) { }
+    grid.onTableCreated = function(table, options) { if(options.onTableCreated) { options.onTableCreated(table, options); } }
+    grid.onCaptionCreated = function(caption, captionDefinition) { if(options.onCaptionCreated) { options.onCaptionCreated(caption, captionDefinition); } }
+    grid.onHeaderCreated = function(tHead, headers) { if(options.onHeaderCreated) { options.onHeaderCreated(tHead, headers); } }
+    grid.onHeaderCellCreated = function(th, headerDefinition) { if(options.onHeaderCellCreated) { options.onHeaderCellCreated(th, headerDefinition); } }
+    grid.onTableBodyCreated = function(tBody, columns) { if(options.onTableBodyCreated) { options.onTableBodyCreated(tBody, columns); } }
+    grid.onTableRowCreated = function(tr, columns) { if(options.onTableRowCreated) { options.onTableRowCreated(tr, columns); } }
+    grid.onTableCellCreated = function(td, columnDefinition) { if(options.onTableCellCreated) { options.onTableCellCreated(td, columnDefinition); } }
+    grid.onFooterCreated = function(tFoot, footers) { if(options.onFooterCreated) { options.onFooterCreated(tFoot, footers); } }
+    grid.onFooterCellCreated = function(td, footerDefinition) { if(options.onFooterCellCreated) { options.onFooterCellCreated(td, footerDefinition); } }
 
     let _clear = function(container) {
         while(container && container.firstChild) { 
@@ -54,9 +44,8 @@ let Gridify = function(options = {}) {
         create : function(options) {
             _table = grid.table.initialize(options);
             _setAttributes(_table, options.attributes);
-            grid.table.onCreated(_table, _table.options);
+            grid.onTableCreated(_table, _table.options);
         }
-        , onCreated : function(table, options) { }
         , initialize : function(options) {
             _table = document.createElement('table');
             _table.id = grid.table._getTableId(options);
@@ -80,9 +69,8 @@ let Gridify = function(options = {}) {
             _setAttributes(caption, caption.options.attributes);
             caption.innerText = caption.options.text;
 
-            grid.caption.onCreated(caption, caption.options);
+            grid.onCaptionCreated(caption, caption.options);
         }
-        , onCreated : function(caption, captionOptions) { }
         , initialize : function(captionOptions) {
             let caption = _table.createCaption();
 
@@ -102,9 +90,8 @@ let Gridify = function(options = {}) {
 
             grid.header.addHeaderCells();
 
-            grid.header.onCreated(tHead, tHead.options);
+            grid.onHeaderCreated(tHead, tHead.options);
         }
-        , onCreated : function(header, headers) { }
         , initialize : function(headers) {
             if(_table.tHead) { _table.removeChild(_table.tHead); }
             let tHead = _table.createTHead();
@@ -132,9 +119,8 @@ let Gridify = function(options = {}) {
             th.innerText = headerDefinition.text;
             _setAttributes(th, headerDefinition.attributes);
 
-            grid.header.onHeaderCellAdded(th, headerDefinition); 
+            grid.onHeaderCellCreated(th, headerDefinition); 
         }
-        , onHeaderCellAdded : function(th, headerDefinition) { }
     }
 
     grid.body = {
@@ -145,9 +131,8 @@ let Gridify = function(options = {}) {
                 grid.body.addTableRow(tBody, idx, data[idx])
             }
 
-            grid.body.onCreated(tBody, tBody.options);
+            grid.onTableBodyCreated(tBody, tBody.options);
         }
-        , onCreated : function(body, columns) { }
         , initialize : function(columns) {  
             while(_table.tBodies.length) { _table.removeChild(_table.tBodies[0]); }
             let tBody = _table.createTBody();
@@ -183,9 +168,8 @@ let Gridify = function(options = {}) {
                 }
             }
 
-            grid.body.onTableRowAdded(tr);
+            grid.onTableRowCreated(tr);
         }
-        , onTableRowAdded : function(tr) { }
         , addTableCell : function(tr, field, value) {
             let td = tr.insertCell();
             td.id = tr.id + '-' + field;
@@ -196,9 +180,8 @@ let Gridify = function(options = {}) {
             let colDef = grid.body.getColumnDefinition(field);
             if(colDef && colDef.attributes) { _setAttributes(td, colDef.attributes); }
             
-            grid.body.onTableCellAdded(td, colDef);
+            grid.onTableCellCreated(td, colDef);
         }
-        , onTableCellAdded : function(td, colDef) { }
     }
 
     grid.data = { 
@@ -225,9 +208,8 @@ let Gridify = function(options = {}) {
 
             grid.footer.addFooterCells();
 
-            grid.footer.onCreated(tFoot, tFoot.options);
+            grid.onFooterCreated(tFoot, tFoot.options);
         }
-        , onCreated : function(tFoot, footers) { }
         , initialize : function(options) {
             if(_table.tFoot) { _table.removeChild(_table.tFoot); }
             let tFoot = _table.createTFoot();
@@ -255,9 +237,8 @@ let Gridify = function(options = {}) {
             td.innerText = footerDefinition.text;
             _setAttributes(td, footerDefinition.attributes);
 
-            grid.footer.onFooterCellAdded(td, footerDefinition);
+            grid.onFooterCellCreated(td, footerDefinition);
         }
-        , onFooterCellAdded : function(td, footerDefinition) { }
     }
 
     for(var k in grid.extensions) {

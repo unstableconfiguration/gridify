@@ -27,7 +27,6 @@ describe('Table Creation', function() {
         });
         it('Should set caption text if .caption is a string', function() { 
             let grid = new Gridify({ caption : 'test caption 1' });
-            window.grid = grid;
             assert(grid.html.caption.innerText === 'test caption 1');
         });
         it('Should set caption text if .caption.text is set', function() {
@@ -43,11 +42,13 @@ describe('Table Creation', function() {
             });
             assert(grid.html.caption.title === 'test caption');
         });
-        it('Should call onCreated after the caption has been created', function() {
-            let grid = new Gridify();
-            grid.caption.onCreated = (caption) => assert(caption.innerText === 'cap');
-            grid.create({
-                caption : 'cap'
+        it('Should call onCaptionCreated after the caption has been created', function(done) {
+            let grid = new Gridify({
+                caption : 'cap',
+                onCaptionCreated : function(caption, captionOptions) { 
+                    assert(caption.innerText === 'cap');
+                    done();
+                }
             });
         });
     });
@@ -77,22 +78,22 @@ describe('Table Creation', function() {
             });
             assert(grid.html.tHead.rows[0].cells[0].title === 'test three');
         });
-        it('Should call onHeaderCellAdded after each header cell has been added', function() {
-            let grid = new Gridify({});
-            grid.header.onHeaderCellAdded = (th) => assert(th.innerText === 'test');
-            grid.create({ 
-                headers : [
-                    { text : 'test' }
-                ]
+        it('Should call onHeaderCellCreated after each header cell has been added', function(done) {
+            let grid = new Gridify({
+                headers : [ { text : 'test' } ],
+                onHeaderCellCreated : function(th, definition) { 
+                    assert(th.innerText === 'test');
+                    done();
+                }
             });
         });
-        it('Should call onCreated after the header has been created', function(){
-            let grid = new Gridify({});
-            grid.header.onCreated = (head) => assert(head.rows[0].cells.length == 2);
-            grid.create({
-                headers : [
-                    { text : 'test1' }, { text : 'test2' } 
-                ]
+        it('Should call onHeaderCreated after the header has been created', function(done) {
+            let grid = new Gridify({
+                headers : [ { text : 'test 1' }, { text : 'test 2' } ],
+                onHeaderCreated : function(tHead, headers) { 
+                    assert(tHead.rows[0].cells.length === 2);
+                    done();
+                }
             });
         });
     });
@@ -133,20 +134,31 @@ describe('Table Creation', function() {
             });
             assert(grid.html.tBodies[0].rows[0].cells[0].title === 'one')
         });
-        it('Should call onCreated after the body has been created', function() {
-            let grid = new Gridify({});
-            grid.body.onCreated = (b) => assert(b.id === 'new-grid-tbody');
-            grid.create({});
+        it('Should call onTableBodyCreated after the body has been created', function(done) {
+            let grid = new Gridify({
+                onTableBodyCreated : function(tBody, columns) {
+                    assert(tBody.id === 'new-grid-tbody');
+                    done();
+                }
+            });
         });
-        it('Should call onTableRowAdded after a table row has been added', function() {
-            let grid = new Gridify({});
-            grid.body.onTableRowAdded = (tr) => assert(tr.cells[0].innerText === 'test 1');
-            grid.body.create([{ fieldA : 'test 1'}]);
+        it('Should call onTableRowCreated after a table row has been added', function(done) {
+            let grid = new Gridify({
+                data : [ { fieldA : 'test 1' } ],
+                onTableRowCreated : function(tr, colDef) { 
+                    assert(tr.cells[0].innerText === 'test 1');
+                    done();
+                }
+            });
         });
-        it('Should call onTableCellAdded after a table cell has been added', function() {
-            let grid = new Gridify({});
-            grid.body.onTableCellAdded = (td) => assert(td.innerText === 'test 2');
-            grid.body.create([{ fieldA : 'test 2'}]);
+        it('Should call onTableCellCreated after a table cell has been added', function(done) {
+            let grid = new Gridify({
+                data : [ { fieldA : 'test 2' } ],
+                onTableCellCreated : function(td, colDef) {
+                    assert(td.innerText === 'test 2');
+                    done();
+                }
+            });
         });
     });
 
