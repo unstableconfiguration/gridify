@@ -11,7 +11,6 @@ describe('Styling', function() {
             let grid = new Gridify({
                 headers : [ { text : 'test header' }]
             });
-            window.grid = grid;
             assert(grid.html.tHead.rows[0].cells[0].style.textAlign === 'center');
         });
         it('Should apply default stylings to the body <td> elements', function() { 

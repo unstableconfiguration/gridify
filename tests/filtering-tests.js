@@ -10,60 +10,74 @@ describe('Filtering', function(){
         return new Gridify(id);
     }
 
-    it('Adds a filter textbox on filterable columns', function(){
-        let grid = newgrid('filter_test_1');
-        grid.initialize({
-            columns : [{field : 'Col', filter : true }],
-            data : [{ Col : 'a' }]
+    it('Adds a filter textbox on filterable columns', function() {
+        let grid = new Gridify({
+            headers : [ { text : 'Col', filter : true } ],
+            columns : [ { field : 'Col' } ],
+            data : [ { Col : 'a' } ]
         });
-        assert.isTrue(grid.table.tHead.rows[1].cells[0].firstChild != undefined);
+        assert.isTrue(grid.html.tHead.rows[1].cells[0].firstChild != undefined);
     });
     it('Defaults to xyz% filtering function', function(){
-        let grid = newgrid('filter_test_2');
-        grid.initialize({
-            columns : [{field : 'Col', filter : true }],
+        let grid = new Gridify({
+            headers : [ { text : 'Col', filter : true } ],
+            columns : [ { field : 'Col' } ],
             data : [ { Col : 'aab' }, { Col : 'abc' }, { Col : 'bca'}]
         });
-        let filter_textbox = grid.table.tHead.rows[1].cells[0].firstChild;
-        filter_textbox.value = 'a';
+
+        let filterTextbox = grid.html.tHead.rows[1].cells[0].firstChild;
+        filterTextbox.value = 'a';
         grid.filtering.filter();
-        assert.isTrue(grid.body.rows.filter(r => r.style.display == 'none').length == 1);
-        filter_textbox.value = 'aa';
+        assert.isTrue(
+            Array.from(grid.html.tBodies[0].rows)
+                .filter(r => r.style.display == 'none').length == 1
+        );
+        filterTextbox.value = 'aa';
         grid.filtering.filter();
-        assert.isTrue(grid.body.rows.filter(r => r.style.display == 'none').length == 2);
+        assert.isTrue(
+            Array.from(grid.html.tBodies[0].rows)
+                .filter(r => r.style.display == 'none').length == 2
+        );
     });
-    it('Applies all filters to the data set', function(){
-        let grid = newgrid('filter_test_3');
-        grid.initialize({
-            columns : [{field : 'ColA', filter : true }, { field : 'ColB', filter : true}],
+    it('Applies all filters to the data set', function() {
+        let grid = new Gridify({
+            headers : [ { text : 'Col A', filter : true }, { text : 'Col B', filter : true} ],
+            columns : [ { field : 'ColA' }, { field : 'ColB' } ],
             data : [ 
                 { ColA : 'a', ColB : 'a' }, 
                 { ColA : 'a', ColB : 'b' }, 
                 { ColA : 'b', ColB : 'a' },
                 { ColA : 'b', ColB : 'b' } ]
         });
-        grid.table.tHead.rows[1].cells[0].firstChild.value = 'a';
-        grid.table.tHead.rows[1].cells[1].firstChild.value = 'b';
+
+
+        grid.html.tHead.rows[1].cells[0].firstChild.value = 'a';
+        grid.html.tHead.rows[1].cells[1].firstChild.value = 'b';
         grid.filtering.filter();
-        assert.isTrue(grid.body.rows.filter(r => r.style.display == 'none').length == 3);
+        assert.isTrue(
+            Array.from(grid.html.tBodies[0].rows)
+                .filter(r => r.style.display == 'none').length == 3
+        );
     });
-    it('Allows for custom filter logic', function(){
-        let grid = newgrid('filter_test_4');
-        grid.initialize({
-            columns : [{field : 'Col', filter : {
-                /* %value% search instead of value% search */
-                rule : (cell_value, filter_value) =>{
-                    return cell_value.includes(filter_value);
+    it('Allows for custom filter logic', function() {
+        let grid = new Gridify({
+            headers : [ { text : 'Col A', filter : { 
+                rule : (cellValue, filterValue) => {
+                    return cellValue.includes(filterValue);
                 }
-            } }],
-            data : [{ Col : 'abcd' }, { Col : 'dcba' }]
+            }}],
+            columns : [ { field : 'Col' } ],
+            data : [ { Col : 'abcd' }, { Col : 'dcba' } ]
         });
-        grid.table.tHead.rows[1].cells[0].firstChild.value = 'bc';
+
+        grid.html.tHead.rows[1].cells[0].firstChild.value = 'bc';
         grid.filtering.filter();
-        assert.isTrue(grid.body.rows.filter(r => r.style.display == 'none').length == 1);
+        assert.isTrue(
+            Array.from(grid.html.tBodies[0].rows)
+                .filter(r => r.style.display == 'none').length == 1
+        );
     });
-    it('Allows for custom filter control', function(){
-        let grid = newgrid('filter_test_5');
+    it('Allows for custom filter control', function() {
         let ddl = document.createElement('select');
         let s0 = document.createElement('option');
         s0.value = 0; s0.innerHTML = 'zero';
@@ -74,20 +88,27 @@ describe('Filtering', function(){
         let s2 = document.createElement('option');
         s2.value = 2; s2.innerHTML = 'two'
         ddl.appendChild(s2);
-        grid.initialize({
-            columns : [{field : 'Col', filter : {
-                control : ddl,
-                rule : function(cell_value, filter_value){
-                    if(+filter_value === 0) return true;
-                    return +filter_value === +cell_value;
-                },
-                event : 'change'
-            } }],
-            data : [{ Col : 1 }, { Col : 2 }, { Col : 3 }]
+        
+        let grid = new Gridify({
+            headers : [ { text : 'Col A', 
+                filter : {
+                    control : ddl,
+                    rule : function(cell_value, filter_value){
+                        if(+filter_value === 0) return true;
+                        return +filter_value === +cell_value;
+                    },
+                    event : 'change'
+                }
+            } ], 
+            columns : [ { field : 'Col' } ],
+            data : [ { Col : 1 }, { Col : 2 }, { Col : 3 } ]
         });
-        grid.table.tHead.rows[1].cells[0].firstChild.value = 1;
+
+        grid.html.tHead.rows[1].cells[0].firstChild.value = 1;
         grid.filtering.filter();
-        assert.isTrue(grid.body.rows.filter(r => r.style.display == 'none').length == 2);
+        assert.isTrue(
+            Array.from(grid.html.tBodies[0].rows)
+                .filter(r => r.style.display == 'none').length == 2);
     });
 });
 

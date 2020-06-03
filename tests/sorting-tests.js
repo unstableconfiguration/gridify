@@ -24,7 +24,6 @@ describe('Sorting', function(){
             data : [{ Col : 'b' }, { Col : 'c' }, { Col : 'a' }]
         });
         let data = grid.data.get();
-        window.grid = grid;
         assert(data[0].Col === 'b' && data[2].Col === 'a');
         grid.sorting.sort('Col');
         data = grid.data.get();
