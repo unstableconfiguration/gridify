@@ -31,10 +31,31 @@ describe('Styling', function() {
     });
 
     describe('Classes', function() { 
-        it('Should set the class of the table if .className is set in the grid options');
-        it('Should set the class of the header cells if .className is set in the header options');
-        it('Should set the class of the body cells if .className is set in the column options');
-        it('Should set the class of the footer cells if .className is set in the footer options');
+        it('Should set the class of the table if .className is set in the grid options', function() { 
+            let grid = new Gridify({
+                className : 'grid-class'
+            });
+            assert(grid.html.className === 'grid-class');
+        });
+        it('Should set the class of the header cells if .className is set in the header options', function() { 
+            let grid = new Gridify({
+                headers : [ { text : 'test header', className : 'header-class' } ]
+            });
+            assert(grid.html.tHead.rows[0].cells[0].className === 'header-class');
+        });
+        it('Should set the class of the body cells if .className is set in the column options', function() { 
+            let grid = new Gridify({
+                columns : [ { field : 'fieldA', className : 'body-class' } ],
+                data : [ { fieldA : 'test field' } ]
+            });
+            assert(grid.html.tBodies[0].rows[0].cells[0].className === 'body-class'); 
+        });
+        it('Should set the class of the footer cells if .className is set in the footer options', function() { 
+            let grid = new Gridify({
+                footers : [ { text : 'test footer', className : 'footer-class' } ]
+            });
+            assert(grid.html.tFoot.rows[0].cells[0].className === 'footer-class');
+        });
     });
 
     describe('Styles', function() { 
