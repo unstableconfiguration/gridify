@@ -59,10 +59,31 @@ describe('Styling', function() {
     });
 
     describe('Styles', function() { 
-        it('Should set the css style of the table if .style is set in the grid options');
-        it('Should set the css style of the header cells if .style is set in the header options');
-        it('Should set the css style of the body cells if .style is set in the column options');
-        it('Should set the css style of the footer cells if .className is set in the foote options');
+        it('Should set the css style of the table if .style is set in the grid options', function() { 
+            let grid = new Gridify({
+                style : 'border: thin'
+            });
+            assert(grid.html.style.borderWidth === 'thin')
+        });
+        it('Should set the css style of the header cells if .style is set in the header options', function() {
+            let grid = new Gridify({
+                headers : [ { text : 'test header', style : 'font-weight:bold' } ]
+            });
+            assert(grid.html.tHead.rows[0].cells[0].style.fontWeight === 'bold');
+        });
+        it('Should set the css style of the body cells if .style is set in the column options', function() { 
+            let grid = new Gridify({
+                columns : [ { field : 'fieldA', style : 'text-decoration:underline' } ],
+                data : [ { fieldA : 'test field' } ]
+            });
+            assert(grid.html.tBodies[0].rows[0].cells[0].style.textDecoration === 'underline');
+        });
+        it('Should set the css style of the footer cells if .className is set in the foote options', function() { 
+            let grid = new Gridify({
+                footers : [ { text : 'test footer', style : 'font-weight:bold' } ]
+            });
+            assert(grid.html.tFoot.rows[0].cells[0].style.fontWeight === 'bold');
+        });
     });
 
 
