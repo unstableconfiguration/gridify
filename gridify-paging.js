@@ -1,34 +1,35 @@
 Gridify.prototype.extensions.paging = function(div){
     let grid = this;
 
-    let onGridInitialized = grid.onInitialized;
-    grid.onInitialized = function(options){
-        onGridInitialized(options);
-        grid.paging.initialize(options.paging);
+    let onFooterCreated = grid.onFooterCreated;
+    grid.onFooterCreated = function(footer, footers) { 
+        onFooterCreated(footer, footers); 
+
+        grid.paging.initialize(grid.html.options.paging);
     }
 
     grid.footer.pager = {
         initialize : function(options){
-            let pagingRow = grid.table.tFoot.insertRow();
-            pagingRow.id = grid.table.id + '_paging';
-            pagingRow.options = JSON.stringify(options); 
+            let pagingRow = grid.html.tFoot.insertRow();
+            pagingRow.id = grid.html.id + '-paging';
+            pagingRow.options = options; 
 
             let leftCell = pagingRow.insertCell();
-            leftCell.id = grid.table.id + '_paging_left';
+            leftCell.id = grid.html.id + '-paging-left';
             leftCell.style = 'width:33%;';
 
             let centerCell = pagingRow.insertCell();
-            centerCell.id = grid.table.id + '_paging_center';
+            centerCell.id = grid.html.id + '-paging-center';
             centerCell.style = 'width:33%;';
             centerCell.appendChild(grid.footer.pager.centerCell_control(options));
 
             let rightCell = pagingRow.insertCell();
-            rightCell.id = grid.table.id + '_paging_right';
+            rightCell.id = grid.html.id + '-paging-right';
             rightCell.style = 'width:33%;'    
         }
         , setPage : function(pageNumber){
-            let textbox = document.getElementById(grid.table.id + '_paging_center_textbox');
-            if(textbox) textbox.value = pageNumber;
+            let textbox = document.getElementById(grid.html.id + '-paging-center-textbox');
+            if(textbox) { textbox.value = pageNumber; }
             // set row counter when up
         }
         , centerCell_control : function(options){
@@ -36,8 +37,8 @@ Gridify.prototype.extensions.paging = function(div){
             container.style = 'width:120px'
 
             let textbox = document.createElement('input');
-            textbox.id = grid.table.id + '_paging_center_textbox';
-            textbox.className = 'pager_textbox';
+            textbox.id = grid.html.id + '-paging-center-textbox';
+            textbox.className = 'pager-textbox';
             textbox.value = options.currentPage || 1;
 
             let label = document.createElement('span');
@@ -45,12 +46,12 @@ Gridify.prototype.extensions.paging = function(div){
             label.innerText = ' of ' + options.totalPages || 1;
 
             let leftArrow = document.createElement('div');
-            leftArrow.className = 'pager_left';
+            leftArrow.className = 'pager-left';
             leftArrow.onclick = () => 
                 grid.paging.page(textbox.value > 1 ? +textbox.value -1 : 1);
             
             let rightArrow = document.createElement('div');
-            rightArrow.className = 'pager_right';
+            rightArrow.className = 'pager-right';
             rightArrow.onclick = () => 
                 grid.paging.page(textbox.value < options.totalPages ? +textbox.value+1 : options.totalPages); 
 
@@ -65,11 +66,13 @@ Gridify.prototype.extensions.paging = function(div){
 
     grid.paging = { 
         initialize : function(options){
-            if(!options) return;
+            if(!options) { return; }
+
             grid.paging.extendSorting();
             grid.paging.extendFiltering();
+
             options = grid.paging._defaultOptions(options);
-            grid.table.options.paging = options;
+            grid.html.options.paging = options;
             grid.footer.pager.initialize(options); 
             grid.paging.page(options.currentPage);
         }
@@ -81,7 +84,7 @@ Gridify.prototype.extensions.paging = function(div){
                 grid.sorting.sort = function(field, options = {}){
                     grid.paging.clear();
                     sort(field, options);
-                    let currentPage = grid.table.options.paging.currentPage;    
+                    let currentPage = grid.html.options.paging.currentPage;    
                     grid.paging.page(currentPage);
                 }
             }
@@ -96,18 +99,19 @@ Gridify.prototype.extensions.paging = function(div){
                 }
             }
         }
-        , page : function(pageNumber = 1){
-            grid.options.paging.currentPage = pageNumber;
+        , page : function(pageNumber = 1) {
+            console.log(pageNumber, grid.html.options.paging)
+            grid.html.options.paging.currentPage = pageNumber;
             grid.paging._setFooterValues(pageNumber);
             grid.paging._setRowVisibility(pageNumber);
         }
         , clear : function() { 
-            let rows = grid.body.rows;
+            let rows = Array.from(grid.html.tBodies[0].rows);
             rows.forEach(r => { if(r.paged) { r.paged = undefined; r.style.display = ''; } });
         }
         , _setRowVisibility : function(pageNumber){
-            let rows = grid.body.rows;
-            let options = grid.options.paging;
+            let rows = Array.from(grid.html.tBodies[0].rows);
+            let options = grid.html.options.paging;
             
             grid.paging.clear();
 

@@ -21,7 +21,7 @@
 
 /* Pager */
 
-.pager_left {	
+.pager-left {	
 	border-right: 9px solid #666;
 	border-bottom : 9px solid transparent;
 	border-left : 9px solid transparent;
@@ -34,13 +34,13 @@
 	height : 0;
 }
 
-.pager_textbox {
+.pager-textbox {
 	width:20px;
 	vertical-align:top;
 	text-align:center
 }
 
-.pager_right {	
+.pager-right {	
 	border-right: 9px solid transparent;
 	border-bottom : 9px solid transparent;
 	border-left : 9px solid #666;

@@ -50,7 +50,6 @@ describe('Filtering', function(){
                 { ColA : 'b', ColB : 'b' } ]
         });
 
-
         grid.html.tHead.rows[1].cells[0].firstChild.value = 'a';
         grid.html.tHead.rows[1].cells[1].firstChild.value = 'b';
         grid.filtering.filter();
@@ -93,9 +92,9 @@ describe('Filtering', function(){
             headers : [ { text : 'Col A', 
                 filter : {
                     control : ddl,
-                    rule : function(cell_value, filter_value){
-                        if(+filter_value === 0) return true;
-                        return +filter_value === +cell_value;
+                    rule : function(cellValue, filterValue) {
+                        if(+filterValue === 0) { return true; }
+                        return +filterValue === +cellValue;
                     },
                     event : 'change'
                 }

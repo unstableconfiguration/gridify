@@ -202,8 +202,8 @@ let Gridify = function(options = {}) {
     }
 
     grid.footer = { 
-        create : function(footers) {
-            if(!footers) { return; }
+        create : function(footers = []) {
+ //           if(!footers) { return; }
             let tFoot = grid.footer.initialize(footers);
 
             grid.footer.addFooterCells();
