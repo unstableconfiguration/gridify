@@ -1,14 +1,16 @@
 describe('Paging', function(){
     let assert = chai.assert;
     
+    // Running slow. 
+
     it('Limits visible results when paging is true', function() {
         let grid = new Gridify({
-            headers : [ { text : 'Col' }],
+            headers : [ { text : 'Col' } ],
             columns : [ { field : 'Col' } ],
-            data : [ { Col : '1' }, { Col : '2' }, { Col : '3' }, { Col : 4 }, { Col : 5 } ],
+            data : [ { Col : '1' }, { Col : '2' }, { Col : '3' } ],
             paging : { rows : 2 }
         });
-        
+
         let rows = Array.from(grid.html.tBodies[0].rows);
         rows = rows.filter(r => r.style.display === '');
         assert.isTrue(rows.length === 2);

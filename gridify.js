@@ -3,10 +3,12 @@
 let Gridify = function(options = {}) { 
     let grid = this;
     grid.container = options.container;
+    if(typeof(grid.container) === 'string') {
+        grid.container = document.getElementById(grid.container);
+    }
 
     grid.create = function(options) {
         if(grid.container) { _clear(grid.container); }
-        if(options.container) { grid.container = options.container; }
 
         grid.table.create(options);
         grid.caption.create(options.caption);
@@ -14,7 +16,10 @@ let Gridify = function(options = {}) {
         grid.body.create(options.data, options.columns);
         grid.footer.create(options.footers);
 
-        if(grid.container) { grid.container.append(_table); }
+
+        if(grid.container) {
+            grid.container.appendChild(_table); 
+        }
     }
 
     grid.onTableCreated = function(table, options) { if(options.onTableCreated) { options.onTableCreated(table, options); } }

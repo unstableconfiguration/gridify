@@ -21,8 +21,7 @@ Gridify.prototype.extensions.sorting = function(){
 
             grid.sorting._addSortIcon(th);
             
-            let sortCallback = grid.sorting._getSortCallback();
-            
+            let sortCallback = grid.sorting._getSortCallback();  
             th.addEventListener('click', sortCallback);    
         }
         , _parseOptions : function(sortOptions) { 
@@ -64,7 +63,7 @@ Gridify.prototype.extensions.sorting = function(){
             th.style.paddingRight = '30px';
         }
         , _getSortCallback : function() {
-            return (e) => { grid.sorting.sort(e.options); }
+            return (e) => { grid.sorting.sort(e.target.sort); }
         }
         , _redrawGrid : function(rows) {
             grid.body.clear();

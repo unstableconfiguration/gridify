@@ -41,13 +41,12 @@ Gridify.prototype.extensions.filtering = function(div){
             let control = options.control;
             control.idx = idx;
             control.rule = options.rule;
-            control.addEventListener(options.event, filterDelay(grid.filtering.filter));
+            control.addEventListener(options.event, () => { grid.filtering.filter(); });
             th.appendChild(control);
         }
         , cells : function() { return Array.from(grid.html.tHead.rows[1].cells); }
-        , filter : function(){
+        , filter : function() {
             let filterControls = grid.filtering.getControls();
-            
             Array.from(grid.html.tBodies[0].rows).forEach((row, i)=>{
                 let filteredOut = filterControls.some((filterControl)=>{
                     let cellValue = row.cells[filterControl.idx].innerText;
@@ -56,7 +55,9 @@ Gridify.prototype.extensions.filtering = function(div){
                 row.filtered = filteredOut;
                 row.style.display = filteredOut ? 'none' : ''
             }); 
+            grid.filtering.onFiltered();
         }
+        , onFiltered : function() { }
         , getControls : function(){
             return grid.filtering.cells().map(cell => cell.firstChild).filter(x => !!x);
         }
