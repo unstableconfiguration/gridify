@@ -47,35 +47,38 @@ describe('Table Creation', function() {
         });
     });
 
-    describe('Header', function() {
-        it('Should create an empty <thead> if .headers array is provided', function() {
-            let grid = new Gridify({ headers : [{}, {}]});
-            assert.exists(grid.html.tHead);
+    describe('Headers', function() {
+        it('Should create an textless th if the column does not have a .header', function() { 
+            let grid = new Gridify({
+                columns : [ { field : 'a' } ],
+                data : [ { a : 1 } ]
+            });
+            assert(grid.html.tHead.rows[0].cells[0].innerText === '');
         });
-        it('Should not create a <thead> if no .headers array is provided', function() {
-            let grid = new Gridify();
-            assert(!grid.html.tHead)
+        it('Should create a th element with text if the column .header is a string', function() {
+            let grid = new Gridify({
+                columns : [ { field : 'a' }, { field : 'b', header : 'B' } ],
+                data : [ { a : 1, b : 2 } ] 
+            });
+            assert(grid.html.tHead.rows[0].cells[1].innerHTML === 'B');
         });
-        it('Should create a th with text if .headers array contains a string', function() {
-            let grid = new Gridify({  headers : ['test 1'] });
-            assert(grid.html.tHead.rows[0].cells[0].innerHTML === 'test 1');
-        });
-        it('Should create a th with text if .headers array contains an object', function() {
-            let grid = new Gridify({ headers : ['test 1', { text : 'test 2' }] });
-            assert(grid.html.tHead.rows[0].cells[1].innerHTML === 'test 2');
+        it('Should create a th with text if the column has a .header object with a .text property', function() {
+            let grid = new Gridify({
+                columns : [ { field : 'a' }, { field : 'b', header : 'B' }, { field : 'c', header : { text : 'C' } } ],
+                data : [ { a : 1, b : 2, c : 3 } ] 
+            });
+            assert(grid.html.tHead.rows[0].cells[2].innerHTML === 'C');
         });
         it('Should set attributes on th if header definition contains .attributes', function() {
             let grid = new Gridify({ 
-                headers : [
-                    { text : 'test 3', attributes : { title : 'test three' } }
-                ] 
+                columns : [ { header : { text : 'A', attributes : { title : 'test three' } } } ] 
             });
             assert(grid.html.tHead.rows[0].cells[0].title === 'test three');
         });
         it('Should call onHeaderCellCreated after each header cell has been added', function(done) {
             let grid = new Gridify({
-                headers : [ { text : 'test' } ],
-                onHeaderCellCreated : function(th, definition) { 
+                columns : [ { header : 'test' } ]
+                , onHeaderCellCreated : function(th, definition) { 
                     assert(th.innerText === 'test');
                     done();
                 }
@@ -83,7 +86,7 @@ describe('Table Creation', function() {
         });
         it('Should call onHeaderCreated after the header has been created', function(done) {
             let grid = new Gridify({
-                headers : [ { text : 'test 1' }, { text : 'test 2' } ],
+                columns : [ { header : 'test 1' }, { header : { text : 'test 2' } } ],
                 onHeaderCreated : function(tHead, headers) { 
                     assert(tHead.rows[0].cells.length === 2);
                     done();
@@ -108,23 +111,15 @@ describe('Table Creation', function() {
         });
         it('Should populate based on column definitions is .columns is provided', function() {
             let grid = new Gridify({
-                data : [
-                    { fieldA : 1, fieldB : 'b' }
-                ],
-                columns : [
-                    { field : 'fieldB' }
-                ]
+                data : [ { fieldA : 1, fieldB : 'b' } ],
+                columns : [ { field : 'fieldB' } ]
             });
             assert(grid.html.tBodies[0].rows[0].cells[0].innerText === 'b')
         });
         it('Should set attributes on cells if .columns[x].attributes is set', function() {
             let grid = new Gridify({
-                data : [
-                    { fieldA : 1 }
-                ],
-                columns : [
-                    { field : 'fieldA', attributes : { title : 'one' } }
-                ]
+                data : [ { fieldA : 1 } ],
+                columns : [ { field : 'fieldA', attributes : { title : 'one' } } ]
             });
             assert(grid.html.tBodies[0].rows[0].cells[0].title === 'one')
         });
@@ -189,5 +184,8 @@ describe('Table Creation', function() {
         });
     });
 
+    describe('Footers', function() { 
+        it('should contain some footer tests');
+    });
 });
 

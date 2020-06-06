@@ -12,16 +12,14 @@ describe('Filtering', function(){
 
     it('Adds a filter textbox on filterable columns', function() {
         let grid = new Gridify({
-            headers : [ { text : 'Col', filter : true } ],
-            columns : [ { field : 'Col' } ],
+            columns : [ { field : 'Col', header : { text : 'Col', filter : true }  } ],
             data : [ { Col : 'a' } ]
         });
         assert.isTrue(grid.html.tHead.rows[1].cells[0].firstChild != undefined);
     });
     it('Defaults to xyz% filtering function', function(){
         let grid = new Gridify({
-            headers : [ { text : 'Col', filter : true } ],
-            columns : [ { field : 'Col' } ],
+            columns : [ { field : 'Col', header : { text : 'Col', filter : true }  } ],
             data : [ { Col : 'aab' }, { Col : 'abc' }, { Col : 'bca'}]
         });
 
@@ -41,8 +39,10 @@ describe('Filtering', function(){
     });
     it('Applies all filters to the data set', function() {
         let grid = new Gridify({
-            headers : [ { text : 'Col A', filter : true }, { text : 'Col B', filter : true} ],
-            columns : [ { field : 'ColA' }, { field : 'ColB' } ],
+            columns : [ 
+                { field : 'ColA', header : { text : 'Col A', filter : true } }, 
+                { field : 'ColB', header : { text : 'Col B', filter : true } } 
+            ],
             data : [ 
                 { ColA : 'a', ColB : 'a' }, 
                 { ColA : 'a', ColB : 'b' }, 
@@ -60,12 +60,16 @@ describe('Filtering', function(){
     });
     it('Allows for custom filter logic', function() {
         let grid = new Gridify({
-            headers : [ { text : 'Col A', filter : { 
-                rule : (cellValue, filterValue) => {
-                    return cellValue.includes(filterValue);
-                }
-            }}],
-            columns : [ { field : 'Col' } ],
+            columns : [ 
+                { field : 'Col', header : { 
+                    text : 'Col A', filter : { 
+                        rule : (cellValue, filterValue) => {
+                            return cellValue.includes(filterValue);
+                        }
+                    }
+                } 
+            } 
+        ],
             data : [ { Col : 'abcd' }, { Col : 'dcba' } ]
         });
 
@@ -88,18 +92,23 @@ describe('Filtering', function(){
         s2.value = 2; s2.innerHTML = 'two'
         ddl.appendChild(s2);
         
-        let grid = new Gridify({
-            headers : [ { text : 'Col A', 
-                filter : {
-                    control : ddl,
-                    rule : function(cellValue, filterValue) {
-                        if(+filterValue === 0) { return true; }
-                        return +filterValue === +cellValue;
-                    },
-                    event : 'change'
-                }
-            } ], 
-            columns : [ { field : 'Col' } ],
+        let grid = new Gridify({ 
+            columns : [ 
+                { 
+                    field : 'Col', 
+                    header : {
+                        text : 'Col A',
+                        filter : {
+                            control : ddl,
+                            rule : function(cellValue, filterValue) {
+                                if(+filterValue === 0) { return true; }
+                                return +filterValue === +cellValue;
+                            },
+                            event : 'change'
+                        }
+                    }  
+                } 
+            ],
             data : [ { Col : 1 }, { Col : 2 }, { Col : 3 } ]
         });
 

@@ -9,6 +9,7 @@ let Gridify = function(options = {}) {
 
     grid.create = function(options) {
         if(grid.container) { _clear(grid.container); }
+        options = _parseOptions(options);
 
         grid.table.create(options);
         grid.caption.create(options.caption);
@@ -16,10 +17,18 @@ let Gridify = function(options = {}) {
         grid.body.create(options.data, options.columns);
         grid.footer.create(options.footers);
 
-
         if(grid.container) {
             grid.container.appendChild(_table); 
         }
+    }
+
+    let _parseOptions = function(options) {
+        if(options.columns) {
+            options.headers = options.columns.map(col => col.header || {});
+            options.footers = options.columns.map(col => col.footer || {});    
+        }
+  
+        return options;  
     }
 
     grid.onTableCreated = function(table, options) { if(options.onTableCreated) { options.onTableCreated(table, options); } }
@@ -121,7 +130,7 @@ let Gridify = function(options = {}) {
             let th = headerRow.insertCell();
             th.id = _table.tHead.id + '-' + headerDefinition.text || headerRow.cells.length;
 
-            th.innerText = headerDefinition.text;
+            th.innerText = headerDefinition.text || '';
             _setAttributes(th, headerDefinition.attributes);
 
             grid.onHeaderCellCreated(th, headerDefinition); 
@@ -239,7 +248,7 @@ let Gridify = function(options = {}) {
             let td = footerRow.insertCell();
             td.id = _table.tFoot.id + '-' + footerDefinition.text;
 
-            td.innerText = footerDefinition.text;
+            td.innerText = footerDefinition.text || '';
             _setAttributes(td, footerDefinition.attributes);
 
             grid.onFooterCellCreated(td, footerDefinition);

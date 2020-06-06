@@ -75,13 +75,9 @@
             can be applied to the <table> element, the <th> header cells, and the <td> data cells`,
         initialize : function() {
             let grid = new Gridify({
-                headers : [ 
-                    { text : 'Styled Header', style : 'text-decoration:underline;' }, 
-                    { text : 'Classed Header', className : 'blue' } 
-                ],
                 columns : [ 
-                    { field : 'a', style : 'background-color:khaki;' }, 
-                    { field : 'b', className : 'italic' } 
+                    { field : 'a', style : 'background-color:khaki;', header : { text : 'Styled Header', style : 'text-decoration:underline;' } }, 
+                    { field : 'b', className : 'italic', header : { text : 'Classed Header', className : 'blue' } } 
                 ],
                 data : [
                     { a : 1, b : 'a' }, { a : 2, b : 'b' }, { a : 3, b : 'c' }
@@ -106,13 +102,9 @@
 
             let grid = new Gridify({
                 container : 'sorting-demo-container',
-                headers : [ 
-                    { text : 'Default Sort', sort : true },
-                    { text : 'Custom Sort', sort : comparer }
-                ],
                 columns : [
-                    { field : 'Default' },
-                    { field : 'Custom' }
+                    { field : 'Default', header : { text : 'Default Sort', sort : true } },
+                    { field : 'Custom', header : { text : 'Custom Sort', sort : comparer } }
                 ],
                 data : [
                     { Default : 'alpha', Custom : 'W:Delta' },
@@ -145,21 +137,19 @@
 
             new Gridify({
                 container : 'filter-demo-container',
-                headers : [
-                    { text : 'Default', filter : true },
-                    { text : 'Custom Filter', filter : customFilter },
-                    { text : 'Custom Control', filter : {
-                        control : chk,
-                        rule : function(bitValue, isChecked) { 
-                            return isChecked == 'true' ? !!+bitValue : true;
-                        },
-                        event : 'click'
-                    } }
-                ],
                 columns : [
-                    { field : 'Default' },
-                    { field : 'Custom' },
-                    { field : 'Bit' }
+                    { field : 'Default', header : { text : 'Default', filter : true } },
+                    { field : 'Custom', header : { text : 'Custom Filter', filter : customFilter } },
+                    { 
+                        field : 'Bit', 
+                        header : {
+                            control : chk,
+                            rule : function(bitValue, isChecked) {
+                                return isChecked == 'true' ? !!+bitValue : true;
+                            },
+                            event : 'click'
+                        } 
+                    }
                 ],
                 data : [
                     { Default : '0001', Custom : 'alpha', Bit : 1 },
@@ -202,8 +192,7 @@
         initialize : function() {
             new Gridify({
                 container : 'integration-demo-container',
-                headers : [ { text : 'Nybble' , filter : true, sort : true } ],
-                columns : [ { field : 'bin' } ],
+                columns : [ { field : 'bin', header : { text : 'Nybble', filter : true, sort : true } } ],
                 data : [
                     { bin : '0001' },{ bin : '0010' },{ bin : '0011' },
                     { bin : '0100' },{ bin : '0101' },{ bin : '0110' },
@@ -215,10 +204,6 @@
             });
         }
     });
-
-    // integration fail
-    // paging is not iterating the pager number
-    // the filter is removing the pagination
 
 })();
 
