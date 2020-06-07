@@ -12,14 +12,14 @@ describe('Filtering', function(){
 
     it('Adds a filter textbox on filterable columns', function() {
         let grid = new Gridify({
-            columns : [ { field : 'Col', header : { text : 'Col', filter : true }  } ],
+            columns : [ { field : 'Col', header : 'Col', filter : true } ],
             data : [ { Col : 'a' } ]
         });
         assert.isTrue(grid.html.tHead.rows[1].cells[0].firstChild != undefined);
     });
     it('Defaults to xyz% filtering function', function(){
         let grid = new Gridify({
-            columns : [ { field : 'Col', header : { text : 'Col', filter : true }  } ],
+            columns : [ { field : 'Col', header : 'Col', filter : true } ],
             data : [ { Col : 'aab' }, { Col : 'abc' }, { Col : 'bca'}]
         });
 
@@ -40,8 +40,8 @@ describe('Filtering', function(){
     it('Applies all filters to the data set', function() {
         let grid = new Gridify({
             columns : [ 
-                { field : 'ColA', header : { text : 'Col A', filter : true } }, 
-                { field : 'ColB', header : { text : 'Col B', filter : true } } 
+                { field : 'ColA', header : 'Col A', filter : true }, 
+                { field : 'ColB', header : 'Col B', filter : true } 
             ],
             data : [ 
                 { ColA : 'a', ColB : 'a' }, 
@@ -61,15 +61,16 @@ describe('Filtering', function(){
     it('Allows for custom filter logic', function() {
         let grid = new Gridify({
             columns : [ 
-                { field : 'Col', header : { 
-                    text : 'Col A', filter : { 
+                { 
+                    field : 'Col', 
+                    header : 'Col A',
+                    filter : { 
                         rule : (cellValue, filterValue) => {
                             return cellValue.includes(filterValue);
                         }
                     }
                 } 
-            } 
-        ],
+            ],
             data : [ { Col : 'abcd' }, { Col : 'dcba' } ]
         });
 
@@ -96,9 +97,8 @@ describe('Filtering', function(){
             columns : [ 
                 { 
                     field : 'Col', 
-                    header : {
-                        text : 'Col A',
-                        filter : {
+                    header : 'Col A',
+                    filter : {
                             control : ddl,
                             rule : function(cellValue, filterValue) {
                                 if(+filterValue === 0) { return true; }
@@ -107,8 +107,7 @@ describe('Filtering', function(){
                             event : 'change'
                         }
                     }  
-                } 
-            ],
+                ],
             data : [ { Col : 1 }, { Col : 2 }, { Col : 3 } ]
         });
 

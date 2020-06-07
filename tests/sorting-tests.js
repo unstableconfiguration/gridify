@@ -12,14 +12,14 @@ describe('Sorting', function(){
 
     it('Appends a sort icon on sortable columns', function() {
         let grid = new Gridify({
-            columns : [ { header : { text : 'Col', sort : true } } ]
+            columns : [ { sort : true, header : 'Col' } ]
         });
         assert.isTrue(grid.html.tHead.rows[0].cells[0].children[0].className == 'sort');
     });
 
     it('Defaults to alphabetical sorting.', function() {
         let grid = new Gridify({
-            columns : [{ field : 'Col', header : { text : 'Col', sort : true } } ],
+            columns : [ { field : 'Col', sort : true, header : 'col' } ],
             data : [{ Col : 'b' }, { Col : 'c' }, { Col : 'a' }]
         });
         let data = grid.data.get();
@@ -38,7 +38,7 @@ describe('Sorting', function(){
 
     it('Allows for custom sorting if sort option is a comparer function', function(){
         let grid = newgrid({
-            columns : [ { field : 'Col', header : { text : 'Col', sort : compare } } ],
+            columns : [ { field : 'Col', header : 'Col', sort : compare } ],
             data : [ { Col : 'a3' }, { Col : 'b2' }, { Col : 'c1' } ]
         });      
         

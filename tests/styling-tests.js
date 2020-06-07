@@ -9,7 +9,7 @@ describe('Styling', function() {
         });
         it('Should apply default stylings to the <th> elements', function() {
             let grid = new Gridify({
-                headers : [ { text : 'test header' }]
+                columns : [ { header : 'test header' } ]
             });
             assert(grid.html.tHead.rows[0].cells[0].style.textAlign === 'center');
         });
@@ -23,7 +23,7 @@ describe('Styling', function() {
         });
         it('Should apply default stylings to the footer <td> elements', function() { 
             let grid = new Gridify({
-                footers : [ { text : 'test footer' } ]
+                columns : [ { footer : 'test footer' } ]
             });
             assert(grid.html.tFoot.rows[0].cells[0].style.textAlign === 'center');
         });
@@ -38,7 +38,7 @@ describe('Styling', function() {
         });
         it('Should set the class of the header cells if .className is set in the header options', function() { 
             let grid = new Gridify({
-                headers : [ { text : 'test header', className : 'header-class' } ]
+                columns : [ { header : { text : 'test header', className : 'header-class' } } ]
             });
             assert(grid.html.tHead.rows[0].cells[0].className === 'header-class');
         });
@@ -51,7 +51,7 @@ describe('Styling', function() {
         });
         it('Should set the class of the footer cells if .className is set in the footer options', function() { 
             let grid = new Gridify({
-                footers : [ { text : 'test footer', className : 'footer-class' } ]
+                columns : [ { footer : { text : 'test footer', className : 'footer-class' } } ]
             });
             assert(grid.html.tFoot.rows[0].cells[0].className === 'footer-class');
         });
@@ -66,7 +66,7 @@ describe('Styling', function() {
         });
         it('Should set the css style of the header cells if .style is set in the header options', function() {
             let grid = new Gridify({
-                headers : [ { text : 'test header', style : 'font-weight:bold' } ]
+                columns : [ { header : { text : 'test header', style : 'font-weight:bold' } } ]
             });
             assert(grid.html.tHead.rows[0].cells[0].style.fontWeight === 'bold');
         });
@@ -79,7 +79,7 @@ describe('Styling', function() {
         });
         it('Should set the css style of the footer cells if .className is set in the foote options', function() { 
             let grid = new Gridify({
-                footers : [ { text : 'test footer', style : 'font-weight:bold' } ]
+                columns : [ { footer : { text : 'test footer', style : 'font-weight:bold' } } ]
             });
             assert(grid.html.tFoot.rows[0].cells[0].style.fontWeight === 'bold');
         });

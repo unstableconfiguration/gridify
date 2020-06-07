@@ -10,7 +10,7 @@ Gridify.prototype.extensions.styling = function(div) {
     let onHeaderCellCreated = grid.onHeaderCellCreated;
     grid.onHeaderCellCreated = function(th, options) {
         onHeaderCellCreated(th, options);
-        grid.styling.stylize(th, options);
+        grid.styling.stylize(th, options.header);
     }
 
     let onTableCellCreated = grid.onTableCellCreated;
@@ -22,7 +22,7 @@ Gridify.prototype.extensions.styling = function(div) {
     let onFooterCellCreated = grid.onFooterCellCreated;
     grid.onFooterCellCreated = function(td, options) { 
         onFooterCellCreated(td, options);
-        grid.styling.stylize(td, options);
+        grid.styling.stylize(td, options.footer);
     }
 
     grid.styling = {

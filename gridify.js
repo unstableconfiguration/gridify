@@ -9,27 +9,18 @@ let Gridify = function(options = {}) {
 
     grid.create = function(options) {
         if(grid.container) { _clear(grid.container); }
-        options = _parseOptions(options);
 
         grid.table.create(options);
         grid.caption.create(options.caption);
-        grid.header.create(options.headers);
+        grid.header.create(options.columns);
         grid.body.create(options.data, options.columns);
-        grid.footer.create(options.footers);
+        grid.footer.create(options.columns);
 
         if(grid.container) {
             grid.container.appendChild(_table); 
         }
     }
 
-    let _parseOptions = function(options) {
-        if(options.columns) {
-            options.headers = options.columns.map(col => col.header || {});
-            options.footers = options.columns.map(col => col.footer || {});    
-        }
-  
-        return options;  
-    }
 
     grid.onTableCreated = function(table, options) { if(options.onTableCreated) { options.onTableCreated(table, options); } }
     grid.onCaptionCreated = function(caption, captionDefinition) { if(options.onCaptionCreated) { options.onCaptionCreated(caption, captionDefinition); } }
@@ -98,42 +89,46 @@ let Gridify = function(options = {}) {
     }
 
     grid.header = {
-        create : function(headers) {
-            if(!headers) { return; }
-            let tHead = grid.header.initialize(headers);
+        create : function(columns) {
+            if(!columns) { return ; }
+            let tHead = grid.header.initialize(columns);
 
             grid.header.addHeaderCells();
 
             grid.onHeaderCreated(tHead, tHead.options);
         }
-        , initialize : function(headers) {
+        , initialize : function(columns) {
             if(_table.tHead) { _table.removeChild(_table.tHead); }
             let tHead = _table.createTHead();
 
             tHead.id = _table.id + '-thead';
-            tHead.options = grid.header._parseHeaders(headers);
+            tHead.options = grid.header._parseOptions(columns);
             
             return tHead;
         }
-        , _parseHeaders : function(headers) {
-            return headers.map(opt => {
-                if(typeof(opt) === 'string') { opt = { text : opt } }
+        , _parseOptions : function(columns) {
+            return columns.map(opt => {
+                if(typeof(opt.header) === 'string') { 
+                    opt.header = { text : opt.header } 
+                }
                 return opt;
-            })
+            });
         }
         , addHeaderCells : function() {
             let hr = _table.tHead.insertRow();
-            let options = _table.tHead.options;
-            options.forEach(o => { grid.header.addHeaderCell(hr, o); });
+            _table.tHead.options
+                .forEach(o => { grid.header.addHeaderCell(hr, o); });
         }
-        , addHeaderCell : function(headerRow, headerDefinition) {
+        , addHeaderCell : function(headerRow, columnDefinition) {
             let th = headerRow.insertCell();
-            th.id = _table.tHead.id + '-' + headerDefinition.text || headerRow.cells.length;
+            th.id = _table.tHead.id + '-' + columnDefinition.field || headerRow.cells.length;
 
-            th.innerText = headerDefinition.text || '';
-            _setAttributes(th, headerDefinition.attributes);
+            if(columnDefinition.header) {
+                th.innerText = columnDefinition.header.text || '';
+                _setAttributes(th, columnDefinition.header.attributes);
+            }
 
-            grid.onHeaderCellCreated(th, headerDefinition); 
+            grid.onHeaderCellCreated(th, columnDefinition); 
         }
     }
 
@@ -142,7 +137,7 @@ let Gridify = function(options = {}) {
             let tBody = grid.body.initialize(columns);
 
             for(let idx in data) {
-                grid.body.addTableRow(tBody, idx, data[idx])
+                grid.body.addTableRow(tBody, idx, data[idx]);
             }
 
             grid.onTableBodyCreated(tBody, tBody.options);
@@ -156,8 +151,8 @@ let Gridify = function(options = {}) {
         }
         , _parseColumns : function(columns) {
             return columns.map(col => {
-                if(typeof(col) === 'string') { col = { text : col }}
-            })
+                if(typeof(col) === 'string') { col = { text : col }; }
+            });
         }
         , clear : function() { _clear(_table.tBodies[0]); }
         , getColumnDefinition : function(field) {
@@ -216,42 +211,46 @@ let Gridify = function(options = {}) {
     }
 
     grid.footer = { 
-        create : function(footers = []) {
- //           if(!footers) { return; }
-            let tFoot = grid.footer.initialize(footers);
+        create : function(columns) {
+            if(!columns) { return ; }
+            let tFoot = grid.footer.initialize(columns);
 
             grid.footer.addFooterCells();
 
             grid.onFooterCreated(tFoot, tFoot.options);
         }
-        , initialize : function(footers) {
+        , initialize : function(columns) {
             if(_table.tFoot) { _table.removeChild(_table.tFoot); }
             let tFoot = _table.createTFoot();
             
             tFoot.id = _table.id + '-tfoot';
-            tFoot.options = grid.footer._parseFooters(footers);;
+            tFoot.options = grid.footer._parseOptions(columns);;
             
             return tFoot;
         }
-        , _parseFooters : function(footers) {
-            return footers.map(opt => { 
-                if(typeof(opt) === 'string') { opt = { text : opt } }
+        , _parseOptions : function(columns) {
+            return columns.map(opt => { 
+                if(typeof(opt.footer) === 'string') {
+                    opt.footer = { text : opt.footer };
+                }
                 return opt;
             });
         }
         , addFooterCells : function() {
             let fr = _table.tFoot.insertRow();
-            let options = _table.tFoot.options;
-            options.forEach(o => { grid.footer.addFooterCell(fr, o)});
+            _table.tFoot.options
+                .forEach(o => { grid.footer.addFooterCell(fr, o); });
         }
-        , addFooterCell : function(footerRow, footerDefinition) {
+        , addFooterCell : function(footerRow, columnDefinition) {
             let td = footerRow.insertCell();
-            td.id = _table.tFoot.id + '-' + footerDefinition.text;
+            td.id = _table.tFoot.id + '-' + columnDefinition.field || footerRow.cells.length;
 
-            td.innerText = footerDefinition.text || '';
-            _setAttributes(td, footerDefinition.attributes);
+            if(columnDefinition.footer) {
+                td.innerText = columnDefinition.footer.text || '';
+                _setAttributes(td, columnDefinition.footer.attributes);
+            }
 
-            grid.onFooterCellCreated(td, footerDefinition);
+            grid.onFooterCellCreated(td, columnDefinition);
         }
     }
 
