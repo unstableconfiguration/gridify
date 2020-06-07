@@ -5,7 +5,6 @@ describe('Paging', function(){
 
     it('Limits visible results when paging is true', function() {
         let grid = new Gridify({
-            headers : [ { text : 'Col' } ],
             columns : [ { field : 'Col' } ],
             data : [ { Col : '1' }, { Col : '2' }, { Col : '3' } ],
             paging : { rows : 2 }
@@ -18,7 +17,6 @@ describe('Paging', function(){
     it('Allows displayed total pages/rows to be overriden');
     it('Can have the page be set programmatically', function() {
         let grid = new Gridify({
-            headers : [ { text : 'col' }],
             columns : [ { field : 'Col' } ],
             data : [ { Col : '1' }, { Col : '2' }, { Col : '3' } ],
             paging : { rows : 2, currentPage : 1 }

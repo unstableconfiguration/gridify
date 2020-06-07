@@ -58,8 +58,10 @@
         initialize : function() {
             new Gridify({
                 container : 'basic-demo-container',
-                headers : [ { text : 'Header 1' }, 'Header 2'],
-                columns : [ { field : 'a' }, { field : 'b'} ],
+                columns : [ 
+                    { field : 'a', header : 'Header 1' }, 
+                    { field : 'b', header : { text : 'Header 2' } } 
+                ],
                 data : [
                     { a : 'a', b : 1 },
                     { a : 'b', b : 2 },
@@ -103,8 +105,8 @@
             let grid = new Gridify({
                 container : 'sorting-demo-container',
                 columns : [
-                    { field : 'Default', header : { text : 'Default Sort', sort : true } },
-                    { field : 'Custom', header : { text : 'Custom Sort', sort : comparer } }
+                    { field : 'Default', header : 'Default Sort', sort : true },
+                    { field : 'Custom', header : 'Custom Sort', sort : comparer }
                 ],
                 data : [
                     { Default : 'alpha', Custom : 'W:Delta' },
@@ -138,11 +140,12 @@
             new Gridify({
                 container : 'filter-demo-container',
                 columns : [
-                    { field : 'Default', header : { text : 'Default', filter : true } },
-                    { field : 'Custom', header : { text : 'Custom Filter', filter : customFilter } },
+                    { field : 'Default', header : 'Default', filter : true },
+                    { field : 'Custom', header : 'Custom Filter', filter : customFilter },
                     { 
                         field : 'Bit', 
-                        header : {
+                        header : 'Bit',
+                        filter : {
                             control : chk,
                             rule : function(bitValue, isChecked) {
                                 return isChecked == 'true' ? !!+bitValue : true;
@@ -169,6 +172,7 @@
         initialize : function() {
             new Gridify({
                 container : 'paging-demo-container',
+                columns : [ { field : 'n' } ],
                 data : [
                     { n : 1 }, { n : 2 }, { n : 3 }, { n : 4 },
                     { n : 5 }, { n : 6 }, { n : 7 }, { n : 8 },
@@ -192,7 +196,7 @@
         initialize : function() {
             new Gridify({
                 container : 'integration-demo-container',
-                columns : [ { field : 'bin', header : { text : 'Nybble', filter : true, sort : true } } ],
+                columns : [ { field : 'bin', header : 'Nybble', filter : true, sort : true } ],
                 data : [
                     { bin : '0001' },{ bin : '0010' },{ bin : '0011' },
                     { bin : '0100' },{ bin : '0101' },{ bin : '0110' },
