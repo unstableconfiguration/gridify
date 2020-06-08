@@ -149,6 +149,15 @@ describe('Table Creation', function() {
                 }
             });
         });
+        it('Should execute a click event if .click is set on the column definition', function(done) { 
+            let grid = new Gridify({
+                columns : [
+                    { field : 'a', header : 'A', click : () => { done(); }}
+                ],
+                data : [ { a : 1 } ]
+            });
+            grid.html.tBodies[0].rows[0].cells[0].click();
+        });
     });
 
     describe('Data', function() {

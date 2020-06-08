@@ -120,8 +120,9 @@ let Gridify = function(options = {}) {
                 .forEach(o => { grid.header.addHeaderCell(hr, o); });
         }
         , addHeaderCell : function(headerRow, columnDefinition) {
-            let th = headerRow.insertCell();
+            let th = document.createElement('th');
             th.id = _table.tHead.id + '-' + columnDefinition.field || headerRow.cells.length;
+            headerRow.appendChild(th);
 
             if(columnDefinition.header) {
                 th.innerText = columnDefinition.header.text || '';
@@ -188,7 +189,8 @@ let Gridify = function(options = {}) {
 
             let colDef = grid.body.getColumnDefinition(field);
             if(colDef && colDef.attributes) { _setAttributes(td, colDef.attributes); }
-            
+            if(colDef && colDef.click) { td.onclick = colDef.click; }
+
             grid.onTableCellCreated(td, colDef);
         }
     }
