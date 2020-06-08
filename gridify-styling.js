@@ -3,28 +3,28 @@ Gridify.prototype.extensions.styling = function(div) {
 
     let onTableCreated = grid.onTableCreated;
     grid.onTableCreated = function(table, options) {
-        onTableCreated(table, options);
         grid.styling.stylize(table, options);
+        onTableCreated(table, options);
     }
 
     let onHeaderCellCreated = grid.onHeaderCellCreated;
-    grid.onHeaderCellCreated = function(th, options) {
-        onHeaderCellCreated(th, options);
-        
+    grid.onHeaderCellCreated = function(th, options) {        
         if(options.style) { grid.styling.setStyle(th, options.style); }
         grid.styling.stylize(th, options.header);
+
+        onHeaderCellCreated(th, options);
     }
 
     let onTableCellCreated = grid.onTableCellCreated;
     grid.onTableCellCreated = function(td, options) { 
-        onTableCellCreated(td, options);
         grid.styling.stylize(td, options);
+        onTableCellCreated(td, options);
     }
 
     let onFooterCellCreated = grid.onFooterCellCreated;
     grid.onFooterCellCreated = function(td, options) { 
-        onFooterCellCreated(td, options);
         grid.styling.stylize(td, options.footer);
+        onFooterCellCreated(td, options);
     }
 
     grid.styling = {

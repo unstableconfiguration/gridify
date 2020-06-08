@@ -3,9 +3,8 @@ Gridify.prototype.extensions.paging = function(div){
 
     let onFooterCreated = grid.onFooterCreated;
     grid.onFooterCreated = function(footer, footers) { 
-        onFooterCreated(footer, footers); 
-
         grid.paging.initialize(grid.html.options.paging);
+        onFooterCreated(footer, footers); 
     }
 
     grid.footer.pager = {

@@ -5,9 +5,9 @@ Gridify.prototype.extensions.sorting = function(){
 
     let onHeaderCellCreated = grid.onHeaderCellCreated;
     grid.onHeaderCellCreated = function(th, headerDefinition) {
-        onHeaderCellCreated(th, headerDefinition);
-
         grid.sorting.initialize(th, headerDefinition);
+
+        onHeaderCellCreated(th, headerDefinition);
     }
 
     grid.sorting = {

@@ -4,12 +4,10 @@ Gridify.prototype.extensions.filtering = function(div){
 
     let onHeaderCreated = grid.onHeaderCreated;
     grid.onHeaderCreated = function(header, headers) {
-        onHeaderCreated(header, headers);
-
         let hasFilters = headers.some(h => h.filter);
-        if(!hasFilters) { return; }
-
-        grid.filtering.addFilters(headers);
+        if(hasFilters) { grid.filtering.addFilters(headers); }
+        
+        onHeaderCreated(header, headers);
     }
 
 
