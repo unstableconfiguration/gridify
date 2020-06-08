@@ -83,20 +83,19 @@ describe('Styling', function() {
             });
             assert(grid.html.tFoot.rows[0].cells[0].style.fontWeight === 'bold');
         });
-        it('Should set the width of the column when .style contains a width option', function() { 
+        it('Should apply the column style to the header before applying the header style', function() { 
             let grid = new Gridify({
                 columns : [ 
                     {
-                        header: 'Test', 
+                        header: { text : 'Test', style : 'padding:4px;' }, 
                         field : 'test',
-                        style : 'width:100px;'
+                        style : 'width:100px; padding:2px;'
                     }
                 ],
                 data : [ { test : 1 }, { test : 2 } ]
             });
-            window.grid = grid;
             assert(grid.html.tHead.rows[0].cells[0].style.width == '100px');
-
+            assert(grid.html.tHead.rows[0].cells[0].style.padding == '4px');
         });
     });
 
