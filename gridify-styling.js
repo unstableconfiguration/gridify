@@ -10,7 +10,13 @@ Gridify.prototype.extensions.styling = function(div) {
     let onHeaderCellCreated = grid.onHeaderCellCreated;
     grid.onHeaderCellCreated = function(th, options) {
         onHeaderCellCreated(th, options);
+        
         grid.styling.stylize(th, options.header);
+
+        let rgxWidth = /width:[\d]+.+;/;
+        if(rgxWidth.test(options.style)) { 
+            grid.styling.setStyle(th, rgxWidth.exec(options.style)[0]);
+        }
     }
 
     let onTableCellCreated = grid.onTableCellCreated;
