@@ -185,6 +185,7 @@ let Gridify = function(options = {}) {
             td.id = tr.id + '-' + field;
 
             td.field = field;
+            td.value = value;
             td.innerText = value;
 
             let colDef = grid.body.getColumnDefinition(field);
@@ -206,7 +207,7 @@ let Gridify = function(options = {}) {
         , getRowData : function(tr) {
             let rowData = {};
             Array.from(tr.cells).forEach(td => {
-                rowData[td.field] = td.innerText;
+                rowData[td.field] = td.value;
             });
             return rowData;
         }
