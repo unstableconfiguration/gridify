@@ -47,7 +47,7 @@ Gridify.prototype.extensions.filtering = function(div){
             let filterControls = grid.filtering.getControls();
             Array.from(grid.html.tBodies[0].rows).forEach((row, i)=>{
                 let filteredOut = filterControls.some((filterControl)=>{
-                    let cellValue = row.cells[filterControl.idx].innerText;
+                    let cellValue = row.cells[filterControl.idx].value;
                     return !filterControl.rule(cellValue, filterControl.value);
                 });
                 row.filtered = filteredOut;

@@ -49,8 +49,8 @@ Gridify.prototype.extensions.sorting = function(){
 
             let rows = Array.from(grid.html.tBodies[0].rows);            
             rows.sort((x, y) => {
-                let xv = x.cells[options.idx].innerText;
-                let yv = y.cells[options.idx].innerText; 
+                let xv = x.cells[options.idx].value;
+                let yv = y.cells[options.idx].value; 
                 let compared = options.compare(xv, yv);
                 return +compared * options.direction;
             });
