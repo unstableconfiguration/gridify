@@ -40,6 +40,8 @@
 .site-content code {
     display:block;
     height: 200px;
+    /* Override prism default 1em*/
+    font-size:.8em !important;
     overflow-x:hidden;
     overflow-y:scroll;
     resize:vertical;
