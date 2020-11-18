@@ -1,0 +1,75 @@
+
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <link href='css/site.css' rel='stylesheet' />
+
+    <link href='css/vendor/prism.css' rel='stylesheet'/>
+    <script src='scripts/vendor/prism.js'></script>
+
+</head>
+<body>
+    <div class='site-header'>
+        <a href='../index.html'>gridify</a>
+    </div>
+    <div class='site-content'>
+        <p><h3>main code</h3></p>
+        <p></p>
+        <pre class='language-javascript'><code id='gridifyCode'></code></pre>
+
+        <p><h3>styling code</h3></p>
+        <p></p>
+        <pre class='language-javascript'><code id='stylingCode'></code></pre>
+
+        <p><h3>sorting code</h3></p>
+        <p></p>
+        <pre class='language-javascript'><code id='sortingCode'></code></pre>
+
+        <p><h3>filtering code</h3></p>
+        <p></p>
+        <pre class='language-javascript'><code id='filteringCode'></code></pre>
+
+        <p><h3>paging code</h3></p>
+        <p></p>
+        <pre class='language-javascript'><code id='pagingCode'></code></pre>
+
+        <div id='filler' style='height:250px'></div>
+    </div>
+</body>
+<script>
+
+    (()=>{
+        let fetchCode = function(filePath, onLoaded) {
+            fetch(filePath).then(response => {
+                response.text().then(text => onLoaded(text));
+            })
+        }
+
+        fetchCode('../gridify.js', (text) => {
+            document.getElementById('gridifyCode').innerHTML = 
+                Prism.highlight(text, Prism.languages.javascript, 'javascript');
+        });
+
+        fetchCode('../gridify-styling.js', (text) => {
+            document.getElementById('stylingCode').innerHTML = 
+                Prism.highlight(text, Prism.languages.javascript, 'javascript');
+        });
+
+        fetchCode('../gridify-sorting.js', (text) => {
+            document.getElementById('sortingCode').innerHTML = 
+                Prism.highlight(text, Prism.languages.javascript, 'javascript');
+        });
+
+        fetchCode('../gridify-filtering.js', (text) => {
+            document.getElementById('filteringCode').innerHTML = 
+                Prism.highlight(text, Prism.languages.javascript, 'javascript');
+        });
+
+        fetchCode('../gridify-paging.js', (text) => {
+            document.getElementById('pagingCode').innerHTML = 
+                Prism.highlight(text, Prism.languages.javascript, 'javascript');
+        });
+
+
+    })();
+</script>
