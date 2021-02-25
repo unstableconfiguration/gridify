@@ -4,7 +4,7 @@ import { sorting } from './modules/gridify-sorting';
 import { styling } from './modules/gridify-styling';
 
 
-let Gridify = function(options = {}) { 
+export const Gridify = function(options = {}) { 
     let grid = this;
     grid.container = options.container;
     if(typeof(grid.container) === 'string') {

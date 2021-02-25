@@ -1,24 +1,27 @@
 {
-  "name": "gridify",
-  "version": "1.0.0",
-  "description": "HTML Table generation utility.",
-  "main": "index.js",
-  "private": true,
-  "directories": {
-    "test": "tests"
-  },
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/unstableconfiguration/Gridify.git"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "bugs": {
-    "url": "https://github.com/unstableconfiguration/Gridify/issues"
-  },
-  "homepage": "https://github.com/unstableconfiguration/Gridify#readme"
+    "name": "gridify",
+    "version": "1.0.0",
+    "description": "HTML Table generation utility.",
+    "main": "index.js",
+    "private": true,
+    "directories": {
+        "test": "tests"
+    },
+    "scripts": {
+        "build" : "rollup --config rollup.config.js"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/unstableconfiguration/Gridify.git"
+    },
+    "keywords": [],
+    "author": "",
+    "license": "ISC",
+    "bugs": {
+        "url": "https://github.com/unstableconfiguration/Gridify/issues"
+    },
+    "homepage": "https://github.com/unstableconfiguration/Gridify#readme",
+    "devDependencies": {
+        "rollup": "^2.39.1"
+    }
 }

@@ -1,6 +1,5 @@
+import { Gridify } from '../../dist/gridify.js';
 
-
-(() => {
 
     let demo = function(options) {
         let demo = this;
@@ -35,7 +34,7 @@
         return demo;
     }
 
-    demo({
+    new demo({
         name : 'minimal-demo',
         description : `Bare minimum grid databinding. With nothing but a data source, 
             it creates a basic table.`,
@@ -52,7 +51,7 @@
         }
     });
 
-    demo({
+    new demo({
         name : 'basic-demo',
         description : `Basic grid databinding with headers and column definitions.
             The column definitions define which data to bind.`,
@@ -72,7 +71,7 @@
         }
     });
 
-    demo({
+    new demo({
         name : 'style-demo',
         description : `Setting .classname and .style of elements. CSS classes and .style attributes
             can be applied to the <table> element, the <th> header cells, and the <td> data cells`,
@@ -93,7 +92,7 @@
         }
     });
 
-    demo({
+    new demo({
         name : 'sorting-demo',
         description : `Demonstration of sorting. Default sorting is alphabetical/unicode sorting. 
             A custom sort comparison function can be provided to have more refined behavior.`,
@@ -119,7 +118,7 @@
         }
     });
 
-    demo({
+    new demo({
         name : 'filter-demo',
         description : `Demonstration of filters. 
             <br>Default filtering is value% wildcard. So typing in 00 will filter to 3 items, while typing 
@@ -165,7 +164,7 @@
         }
     });
 
-    demo({
+    new demo({
         name : 'paging-demo', 
         description : `Demonstration of paging.
             It defaults to paging 20 rows at a time, which can be overridden 
@@ -188,7 +187,7 @@
         }
     });
 
-    demo({
+    new demo({
         name : 'integration-demo',
         description : `Integration of sorting, paging, and filtering. 
             <br>Sorting needs to trigger the pager to refresh while maintaining the current page.
@@ -210,6 +209,5 @@
         }
     });
 
-})();
 
 
