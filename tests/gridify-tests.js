@@ -1,3 +1,5 @@
+import { Gridify } from '../src/gridify.js';
+
 
 export const GridifyTests = function() {
     describe('Table Creation', function() {

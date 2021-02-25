@@ -1,3 +1,5 @@
+import { Gridify } from '../src/gridify.js';
+
 export const FilteringTests = function() {
     describe('Filtering', function(){
         let assert = chai.assert;

@@ -1,4 +1,6 @@
 
+import { Gridify } from '../src/gridify.js';
+
 export const StylingTests = function() {
     describe('Styling', function() {
         let assert = chai.assert;

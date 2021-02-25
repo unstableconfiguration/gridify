@@ -1,4 +1,6 @@
 
+import { Gridify } from '../src/gridify.js';
+
 export const SortingTests = function() {
     describe('Sorting', function(){
         let assert = chai.assert;

@@ -1,3 +1,5 @@
+import { Gridify } from '../src/gridify.js';
+
 export const PagingTests = function() {
     describe('Paging', function(){
         let assert = chai.assert;
