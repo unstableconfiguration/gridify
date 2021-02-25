@@ -1,32 +1,82 @@
 
-<!DOCTYPE html>
+<!doctype html>
 <head>
     <meta charset="UTF-8">
     <link href='../css/site.css' rel='stylesheet' />
-
-    <link rel='stylesheet' href='../css/gridify.css'>
-    <link rel='stylesheet' href='../css/style-demo.css'>
-    
-    <link rel='stylesheet' href='../css/vendor/prism.css'>
-    <script src='../scripts/vendor/prism.js'></script>
-
 </head>
 <body>
     <div class='site-header'>
-        <a href='../index.html'>gridify</a>
+        <a href=../index.html>dice.js</a>
     </div>
     <div class='top-nav'>
-        <a href='./demo.html'>demo</a>
-        <a href='./code.html'>code</a>
-        <a href='./tests.html'>tests</a>
+        <a href='demo.html'>demo</a>
+        <a href='code.html'>code</a>
+        <a href='tests.html'>tests</a>
     </div>
-    <div id='content' class='site-content'>
+    <div class='site-content'>
+        <p><h3>demo</h3></p>
+        <input id='diceInput' placeHolder='example:2d6+4'>
+        <span id='diceOutput'>Output: </span>
+        <p>Example inputs: </p>
+        <ul class='text-small'>
+            <li>Dice Rolls: 2d6 : die rolls with 'd' operator. this rolls two six-sided die and returns the sum of the results</li>
+            <li>Addition: 1+2+3 : addition with + operator</li>
+            <li>Subtraction: 5-4-1 : subtraction with - operator</li>
+            <li>Multiplication: 10*10 : multiplication with * operator</li>
+            <li>Division: 10/10 : division with / operator</li>
+            <li>Parentheses: (1+2)/3 : Force priority of operations with (parentheses).</li>
+            <li>Exponents: 2^8 : Exponents with ^ operator</li>
+            <li>Separation: 2xd20+5 : Keep rolls separate with 'x' operator.</li>
+        </ul>
+         
+        <p><h3>functionality</h3></p>
+        <p>The dice roller is modular. With no modules loaded, it is a simple random number generator. Each module extends its functionality. The idea behind this is that it can be tailored for different games where different types of dice rolls need to be made. </p>
+        <p>The math module extends the dice roller with the ability to handle PEMDAS operations using the symbols ()^*/+-. </p>
+        <p>Broadly speaking, it works by setting up a queue of processes. Each process scans the input to see if it is a valid target (the addition function looks for numbers surrounding a + sign). It then strips out the operators and operands, performs its operation, and inserts the results back into the ongoing equation. So the input equation gets examined and mutated by each process in order until they are all done leaving the result.</p>
 
-    </div>
+        <p><h3>logging demo</h3></p>
+        <input id='loggingInput'>
+        <div><span>Log: </span></div>
+        <pre><code id='loggingOutput'></code></pre>
+        <p></p>
 </body>
 
-<script>
+<script type='module'>
+    import { DiceRoller, MathModule, DnDModule, LoggingModule } from '../scripts/dice.js'
+    
+    (() => {
+        let dice = new DiceRoller({ modules : [MathModule, DnDModule]})
+    
+        let input = document.getElementById('diceInput');
+        let output = document.getElementById('diceOutput');
+        input.addEventListener('keypress', (ev) => { 
+            if(ev.key === 'Enter') {
+                let solution = dice.solve(ev.target.value); 
+                output.innerHTML = 'Output: ' + solution;
+            }
+
+            let validKeys = /[d\d()^*/+-x]/g;
+            if(!validKeys.test(ev.key)) { return ev.preventDefault(); }
+        });
+
+        let logger = new DiceRoller({ modules : [MathModule, DnDModule, LoggingModule ]});
+
+        let logInput = document.getElementById('loggingInput');
+        let logOutput = document.getElementById('loggingOutput');
+        logInput.addEventListener('keypress', (ev) => {
+            if(ev.key === 'Enter') {
+                let solution = logger.solve(ev.target.value);
+                let log = logger.log[logger.log.length-1];
+
+                console.log(log)
+
+                logOutput.innerHTML = JSON.stringify(log, null, " ");
+            }
+
+            let validKeys = /[d\d()^*/+-x]/g;
+            if(!validKeys.test(ev.key)) { return ev.preventDefault(); }
+        });
+    })()
 
 </script>
 
-<script type='module' src='../scripts/gridify-demo.js'></script>
