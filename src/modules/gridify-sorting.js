@@ -1,6 +1,7 @@
 
 
-Gridify.prototype.extensions.sorting = function(){
+//Gridify.prototype.extensions.sorting = function(){
+export const sorting = function() {
     let grid = this;
 
     let onHeaderCellCreated = grid.onHeaderCellCreated;

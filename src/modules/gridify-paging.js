@@ -1,4 +1,5 @@
-Gridify.prototype.extensions.paging = function(div){
+//Gridify.prototype.extensions.paging = function(){
+export const paging = function() {
     let grid = this;
 
     let onFooterCreated = grid.onFooterCreated;

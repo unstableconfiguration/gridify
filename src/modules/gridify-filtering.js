@@ -1,5 +1,7 @@
 
-Gridify.prototype.extensions.filtering = function(div){
+
+//Gridify.prototype.extensions.filtering = filtering
+export const filtering = function() { 
     let grid = this;
 
     let onHeaderCreated = grid.onHeaderCreated;

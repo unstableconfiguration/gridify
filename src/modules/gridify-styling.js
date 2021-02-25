@@ -1,4 +1,5 @@
-Gridify.prototype.extensions.styling = function(div) {
+//Gridify.prototype.extensions.styling = function() {
+export const styling = function() {
     let grid = this;
 
     let onTableCreated = grid.onTableCreated;
