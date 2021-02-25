@@ -50,27 +50,29 @@
             })
         }
 
-        fetchCode('../gridify.js', (text) => {
+        let raws = 'https://raw.githubusercontent.com/unstableconfiguration/Gridify/master/'
+
+        fetchCode(raws + 'src/gridify.js', (text) => {
             document.getElementById('gridifyCode').innerHTML = 
                 Prism.highlight(text, Prism.languages.javascript, 'javascript');
         });
 
-        fetchCode('../gridify-styling.js', (text) => {
+        fetchCode(raws + 'src/modules/gridify-styling.js', (text) => {
             document.getElementById('stylingCode').innerHTML = 
                 Prism.highlight(text, Prism.languages.javascript, 'javascript');
         });
 
-        fetchCode('../gridify-sorting.js', (text) => {
+        fetchCode(raws + 'src/modules/gridify-sorting.js', (text) => {
             document.getElementById('sortingCode').innerHTML = 
                 Prism.highlight(text, Prism.languages.javascript, 'javascript');
         });
 
-        fetchCode('../gridify-filtering.js', (text) => {
+        fetchCode(raws + 'src/modules/gridify-filtering.js', (text) => {
             document.getElementById('filteringCode').innerHTML = 
                 Prism.highlight(text, Prism.languages.javascript, 'javascript');
         });
 
-        fetchCode('../gridify-paging.js', (text) => {
+        fetchCode(raws + 'src/modules/gridify-paging.js', (text) => {
             document.getElementById('pagingCode').innerHTML = 
                 Prism.highlight(text, Prism.languages.javascript, 'javascript');
         });

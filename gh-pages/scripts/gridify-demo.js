@@ -1,4 +1,4 @@
-import { Gridify } from '../../dist/gridify.js';
+import { Gridify } from './gridify.js';
 
 
     let demo = function(options) {
