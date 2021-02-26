@@ -1,0 +1,18 @@
+
+
+.style-demo tr:hover {
+    font-style:italic
+}
+
+.style-demo thead { 
+    border-bottom: solid thin black
+}
+
+.blue { 
+    color : blue;
+    font-weight:bold;
+}
+
+.italic { 
+    font-style:italic;
+}
