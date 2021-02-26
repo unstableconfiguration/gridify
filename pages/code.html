@@ -1,83 +1,81 @@
 
-<!doctype html>
+<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <link href='../css/site.css' rel='stylesheet' />
-    <!-- prism.js syntax highlighting -->
+
     <link href='../css/vendor/prism.css' rel='stylesheet'/>
-    <script src='../scripts/vendor/prism.js' data-manual></script>
+    <script src='../scripts/vendor/prism.js'></script>
+
 </head>
 <body>
     <div class='site-header'>
-        <a href=../index.html>dice.js</a>
+        <a href='../index.html'>gridify</a>
     </div>
     <div class='top-nav'>
-        <a href='demo.html'>demo</a>
-        <a href='code.html'>code</a>
-        <a href='tests.html'>tests</a>
+        <a href='./demo.html'>demo</a>
+        <a href='./code.html'>code</a>
+        <a href='./tests.html'>tests</a>
     </div>
     <div class='site-content'>
         <p><h3>main code</h3></p>
-        <p>The main DiceRoller object is a collection of operations. When .colve(input) is called, 
-            it executes the operations in order. Each operation evaluates and potentially modifies the input, 
-            gradually reducing it to a single value.</p>
-        <pre class='language-javascript'><code id='diceCode'></code></pre>
+        <p>Builds a plain HTML table from a set of data and configuration options.</p>
+        <pre class='language-javascript'><code id='gridifyCode'></code></pre>
 
-        <p><h3>operation</h3></p>
-        <p>An operation performs three tasks. First, it calls .search() on an input equation to look for any 
-            appropriate expressions it can act on. For example, an addition operation will look for a pair of 
-            numbers separated by a + symbol. Then it calls .parse() to extract the operands. Finally it will 
-            evaluate the operands into a value and insert that into the equation. 
-        </p>
-        <pre class='language-javascript'><code id='operationCode'></code></pre>
+        <p><h3>styling code</h3></p>
+        <p>Injects style rules and css classes into the table.</p>
+        <pre class='language-javascript'><code id='stylingCode'></code></pre>
 
-        <p><h3>example module</h3></p>
-        <p>A module is a collection of operations. The math module adds basic PEMDAS operations so that 
-            the roller can serve as a simple calculator. The module contains both the operation array, 
-            as well as an apply() function that adds them to the oprations of a parent roller. 
-        </p>
-        <pre class='language-javascript'><code id='mathCode'></code></pre>
+        <p><h3>sorting code</h3></p>
+        <p>Allows for columns to be flagged as sortable with default or custom sort rules.</p>
+        <pre class='language-javascript'><code id='sortingCode'></code></pre>
 
-        <p><h3>logging module and using hooks</h3></p>
-        <p>There are event hooks that fire before and after most events and allow for extenion. The logging 
-            module takes advantage of these hooks to log the input and output of each operation.
-        </p>
-        <pre class='language-javascript'><code id='loggingCode'></code></pre>
+        <p><h3>filtering code</h3></p>
+        <p>Allows for columns to have filters attached as default text filters or custom filters.</p>
+        <pre class='language-javascript'><code id='filteringCode'></code></pre>
+
+        <p><h3>paging code</h3></p>
+        <p>Adds paging to the table to set maximum visible rows.</p>
+        <pre class='language-javascript'><code id='pagingCode'></code></pre>
+
+        <div id='filler' style='height:250px'></div>
     </div>
-    <div id='filler' style='height:200px;'></div>
-
 </body>
-
 <script>
-    (() => {
+
+    (()=>{
         let fetchCode = function(filePath, onLoaded) {
             fetch(filePath).then(response => {
                 response.text().then(text => onLoaded(text));
             })
         }
+        
+        let raws = 'https://raw.githubusercontent.com/unstableconfiguration/Gridify/master/'
 
-        let raws = 'https://raw.githubusercontent.com/unstableconfiguration/Dice/master/';
-
-        fetchCode(raws + 'src/dice.js', (text) => {
-            document.getElementById('diceCode').innerHTML = 
+        fetchCode(raws + 'src/gridify.js', (text) => {
+            document.getElementById('gridifyCode').innerHTML = 
                 Prism.highlight(text, Prism.languages.javascript, 'javascript');
         });
 
-        fetchCode(raws + 'src/dice-operation.js', (text) => { 
-            document.getElementById('operationCode').innerHTML = 
+        fetchCode(raws + 'src/gridify-styling.js', (text) => {
+            document.getElementById('stylingCode').innerHTML = 
                 Prism.highlight(text, Prism.languages.javascript, 'javascript');
         });
 
-        fetchCode(raws + 'src/modules/math-module.js', (text) => { 
-            document.getElementById('mathCode').innerHTML = 
+        fetchCode(raws + 'src/gridify-sorting.js', (text) => {
+            document.getElementById('sortingCode').innerHTML = 
                 Prism.highlight(text, Prism.languages.javascript, 'javascript');
         });
 
-        fetchCode(raws + 'src/modules/logging-module.js', (text) => {
-            document.getElementById('loggingCode').innerHTML = 
+        fetchCode(raws + 'src/gridify-filtering.js', (text) => {
+            document.getElementById('filteringCode').innerHTML = 
+                Prism.highlight(text, Prism.languages.javascript, 'javascript');
+        });
+
+        fetchCode(raws + 'src/gridify-paging.js', (text) => {
+            document.getElementById('pagingCode').innerHTML = 
                 Prism.highlight(text, Prism.languages.javascript, 'javascript');
         });
 
     })();
-
 </script>
