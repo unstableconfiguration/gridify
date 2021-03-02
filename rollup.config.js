@@ -1,3 +1,4 @@
+import babel from '@rollup/plugin-babel';
 import copy from 'rollup-plugin-copy'
 import del from 'rollup-plugin-delete';
 
@@ -10,6 +11,7 @@ export default [
         },
         plugins :[
             del({ targets: 'dist/*' }),
+            babel({ babelHelpers: 'bundled' }),
             copy({
                 targets : [
                     { src : 'dist/gridify.js', dest: 'gh-pages/scripts' },
