@@ -1,4 +1,5 @@
 import copy from 'rollup-plugin-copy'
+import del from 'rollup-plugin-delete';
 
 export default [
     {
@@ -8,6 +9,7 @@ export default [
             format: 'es'
         },
         plugins :[
+            del({ targets: 'dist/*' }),
             copy({
                 targets : [
                     { src : 'dist/gridify.js', dest: 'gh-pages/scripts' },
