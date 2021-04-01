@@ -1,5 +1,3 @@
-
-
 //Gridify.prototype.extensions.filtering = filtering
 export const filtering = function() { 
     let grid = this;

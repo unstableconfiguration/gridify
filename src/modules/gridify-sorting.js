@@ -1,5 +1,3 @@
-
-
 //Gridify.prototype.extensions.sorting = function(){
 export const sorting = function() {
     let grid = this;
