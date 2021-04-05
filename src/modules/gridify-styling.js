@@ -71,7 +71,12 @@ export const styling = function() {
         , setStyle : function(el, style) {
             (style||'').split(';')
                 .map(x => x.trim().split(':'))
-                .forEach(kv => el.style[kv[0]]=kv[1]);
+                .forEach(kv => {
+                    if(!kv || kv.length !== 2) { return; }
+                    let key = kv[0].trim(), value = kv[1].trim();
+                    el.style[key] = value;
+                });
+
         }
     }
 }
