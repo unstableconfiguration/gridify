@@ -10,7 +10,11 @@ export default [
             format: 'es'
         },
         plugins :[
-            del({ targets: 'dist/*' }),
+            del({ targets: [
+                'dist/*', 
+                'gh-pages/scripts/gridify.js',
+                'gh-pages/css/gridify.css'
+            ] }),
             babel({ babelHelpers: 'bundled' }),
             copy({
                 targets : [
