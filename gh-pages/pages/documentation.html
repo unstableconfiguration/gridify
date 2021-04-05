@@ -3,12 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <link href='../css/site.css' rel='stylesheet' />
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <link href='../css/docs.css' rel='stylesheet' />
+
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+    <script src='../scripts/vendor/prism.js'></script>
+    <link href='../css/vendor/prism.css' rel='stylesheet' />    
+
 </head>
 <body>
     <div class='site-header'>
-        <a href=../index.html>dice.js</a>
+        <a href=../index.html>gridify</a>
         <div class='top-nav'>
             <a href='demo.html'>demo</a>
             <a href='code.html'>code</a>
@@ -27,35 +32,54 @@
 </body>
 
 <script type='module'>
-    let docs = document.getElementById('docs');
-    let leftNav = document.getElementById('docs-left-nav');
+    /* import needed by the code executed by eval() */
+    import { Gridify } from '../../dist/gridify.js';
 
-    const addLeftNavItems = function() { 
-        let headers = docs.querySelectorAll('h1, h2'); 
-        Array.from(headers).forEach(h => {
-            if(h.tagName === 'H1') { 
-                let span = document.createElement('span');
-                span.innerHTML = h.innerHTML;
-                leftNav.appendChild(span);
+    const colorizeCodeBlocks = function() { 
+        Array.from(document.getElementsByTagName('code'))
+            .forEach(code => {
+                code.className = 'language-javascript';
+                Prism.highlightElement(code);
+            });
+    }
+
+    const executeCodeSnippets = function(md) { 
+        let codes = /```[^`]*```/g;
+        let code = '';
+        while(code = codes.exec(md)){
+            code = code[0].replace(/```/g, "");
+            eval(code);
+        }
+    }
+
+    const buildLeftNavigation = function() { 
+        let leftNav = document.getElementById('docs-left-nav');
+        let headers = document.getElementById('docs')
+            .querySelectorAll('h1, h2');
+        Array.from(headers).forEach(header => {
+            // Set the id for our hash navigation
+            header.id = header.innerHTML;
+            
+            if(header.tagName === 'H1') { 
+                let span = leftNav.appendChild(document.createElement('span'));
+                span.innerHTML = header.innerHTML;
             }
-            if(h.tagName === 'H2') {
-                h.id = h.innerHTML;
-                let a = document.createElement('a');
-                
-                a.href = '#' + h.innerHTML;
-                a.innerHTML = h.innerHTML;
-                
-                leftNav.appendChild(a);
-            }
+            else if (header.tagName === 'H2') {
+                let a = leftNav.appendChild(document.createElement('a'));
+                a.href = '#' + header.innerHTML;
+                a.innerHTML = header.innerHTML;    
+             }
         });
     }
 
     fetch('./documentation.md').then(response => { 
-        response.text().then(t => {
-            docs.innerHTML = docs.innerHTML + marked(t);
-            addLeftNavItems();
+        response.text().then(md => {
+            docs.innerHTML = marked(md);
+
+            colorizeCodeBlocks();
+            executeCodeSnippets(md);
+            buildLeftNavigation();
         });
     });
-
 </script>
 
