@@ -43,11 +43,11 @@
 
 #docs { 
     padding : 10px 0 0 10px;
-    width:70%;
+    width:90%;
 }
 
 #docs code {
-    /* overrides from how code is handled on code.html */
+    font-size: .8em;
     height: auto;
     resize: none;
     overflow-y:auto;
