@@ -5,33 +5,6 @@ export const StylingTests = function() {
     describe('Styling', function() {
         let assert = chai.assert;
 
-        describe('Defaults', function() { 
-            it('Should apply default stylings to the <table> element', function() { 
-                let grid = new Gridify();
-                assert(grid.html.style.borderCollapse === 'collapse');
-            });
-            it('Should apply default stylings to the <th> elements', function() {
-                let grid = new Gridify({
-                    columns : [ { header : 'test header' } ]
-                });
-                assert(grid.html.tHead.rows[0].cells[0].style.textAlign === 'center');
-            });
-            it('Should apply default stylings to the body <td> elements', function() { 
-                let grid = new Gridify({
-                    data : [
-                        { fieldA : 1 }
-                    ]
-                });
-                assert(grid.html.tBodies[0].rows[0].cells[0].style.textAlign === 'left');
-            });
-            it('Should apply default stylings to the footer <td> elements', function() { 
-                let grid = new Gridify({
-                    columns : [ { footer : 'test footer' } ]
-                });
-                assert(grid.html.tFoot.rows[0].cells[0].style.textAlign === 'center');
-            });
-        });
-
         describe('Classes', function() { 
             it('Should set the class of the table if .className is set in the grid options', function() { 
                 let grid = new Gridify({

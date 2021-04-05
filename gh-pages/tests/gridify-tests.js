@@ -337,44 +337,10 @@ const styling = function() {
     };
 
     grid.styling = {
-        defaults : { 
-            table : `border-collapse:collapse`
-            , tHead : {
-                tr : ``
-                , th : `
-                    text-align:center;` 
-            }
-            , tBody : {
-                tr : `` 
-                , td : `
-                    text-align:left;
-                    text-overflow:ellipsis;
-                    white-space:nowrap`
-            }
-            , tFoot : {
-                tr : ``
-                , td : `
-                    text-align:center;`
-            }
-        }
-        , stylize : function(el, options) {
-            grid.styling.setDefaultStyle(el);
+        stylize : function(el, options) {
             if(!options) { return; }
             if(options.className) { el.className = options.className; }
             if(options.style) { grid.styling.setStyle(el, options.style); }
-        }
-        , setDefaultStyle : function(el) { 
-            let defaults = '';
-            switch(el.tagName) {
-                case 'TABLE' : defaults = grid.styling.defaults.table; break;
-                case 'TH' : defaults = grid.styling.defaults.tHead.th; break;
-                case 'TD' : 
-                    defaults = el.id.includes('tbody') 
-                        ? grid.styling.defaults.tBody.td 
-                        : grid.styling.defaults.tFoot.td;
-                    break;
-            }
-            grid.styling.setStyle(el, defaults);
         }
         , setStyle : function(el, style) {
             (style||'').split(';')
@@ -989,33 +955,6 @@ const StylingTests = function() {
     describe('Styling', function() {
         let assert = chai.assert;
 
-        describe('Defaults', function() { 
-            it('Should apply default stylings to the <table> element', function() { 
-                let grid = new Gridify();
-                assert(grid.html.style.borderCollapse === 'collapse');
-            });
-            it('Should apply default stylings to the <th> elements', function() {
-                let grid = new Gridify({
-                    columns : [ { header : 'test header' } ]
-                });
-                assert(grid.html.tHead.rows[0].cells[0].style.textAlign === 'center');
-            });
-            it('Should apply default stylings to the body <td> elements', function() { 
-                let grid = new Gridify({
-                    data : [
-                        { fieldA : 1 }
-                    ]
-                });
-                assert(grid.html.tBodies[0].rows[0].cells[0].style.textAlign === 'left');
-            });
-            it('Should apply default stylings to the footer <td> elements', function() { 
-                let grid = new Gridify({
-                    columns : [ { footer : 'test footer' } ]
-                });
-                assert(grid.html.tFoot.rows[0].cells[0].style.textAlign === 'center');
-            });
-        });
-
         describe('Classes', function() { 
             it('Should set the class of the table if .className is set in the grid options', function() { 
                 let grid = new Gridify({
@@ -1055,8 +994,6 @@ const StylingTests = function() {
                 let grid = new Gridify({
                     caption : { text : 'test', style : 'font-weight:bold;'}
                 });
-                console.log('eh');
-                window.grid = grid;
                 assert(grid.html.caption.style.fontWeight === 'bold');
             });
             it('Should set the css style of the body cells if .style is set in the column definition', function() { 

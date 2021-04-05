@@ -35,44 +35,10 @@ export const styling = function() {
     }
 
     grid.styling = {
-        defaults : { 
-            table : `border-collapse:collapse`
-            , tHead : {
-                tr : ``
-                , th : `
-                    text-align:center;` 
-            }
-            , tBody : {
-                tr : `` 
-                , td : `
-                    text-align:left;
-                    text-overflow:ellipsis;
-                    white-space:nowrap`
-            }
-            , tFoot : {
-                tr : ``
-                , td : `
-                    text-align:center;`
-            }
-        }
-        , stylize : function(el, options) {
-            grid.styling.setDefaultStyle(el);
+        stylize : function(el, options) {
             if(!options) { return; }
             if(options.className) { el.className = options.className; }
             if(options.style) { grid.styling.setStyle(el, options.style); }
-        }
-        , setDefaultStyle : function(el) { 
-            let defaults = '';
-            switch(el.tagName) {
-                case 'TABLE' : defaults = grid.styling.defaults.table; break;
-                case 'TH' : defaults = grid.styling.defaults.tHead.th; break;
-                case 'TD' : 
-                    defaults = el.id.includes('tbody') 
-                        ? grid.styling.defaults.tBody.td 
-                        : grid.styling.defaults.tFoot.td;
-                    break;
-            }
-            grid.styling.setStyle(el, defaults);
         }
         , setStyle : function(el, style) {
             (style||'').split(';')
