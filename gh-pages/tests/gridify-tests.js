@@ -398,6 +398,7 @@ const Gridify = function(options = {}) {
         grid.header.create(options.columns);
         grid.body.create(options.data, options.columns);
         grid.footer.create(options.columns);
+        grid.onTableCreated(_table, options);
 
         if(grid.container) {
             grid.container.appendChild(_table); 
@@ -432,7 +433,7 @@ const Gridify = function(options = {}) {
         create : function(options) {
             _table = grid.table.initialize(options);
             _setAttributes(_table, options.attributes);
-            grid.onTableCreated(_table, _table.options);
+            //grid.onTableCreated(_table, _table.options);
         }
         , initialize : function(options) {
             _table = document.createElement('table');
@@ -804,6 +805,42 @@ const GridifyTests = function() {
                         done();
                     }
                 });
+            });
+            it('Should call all events in order', function(done) {
+                let events = [];
+                new Gridify({
+                    container : 'events-doc',
+                    caption : 'caption',
+                    columns : [
+                        {
+                            field : 'col',
+                            header : 'header',
+                            footer : 'footer'
+                        }
+                    ],
+                    data : [
+                        { col : 'col value' }
+                    ],
+                    onCaptionCreated : function(table, caption) { events.push(0); },
+                    
+                    onHeaderCellCreated : function(th, column) { events.push(1); },
+                    onHeaderCreated : function(tHead, columns) { events.push(2); },
+                    
+                    onTableCellCreated : function(td, column) { events.push(3); },
+                    onTableRowCreated : function(tr, columns) { events.push(4); }, 
+                    onTableBodyCreated : function(tBody, columns) { events.push(5); },
+                    
+                    onFooterCellCreated : function(td, column) { events.push(6); },
+                    onFooterCreated : function(tFoot, columns) { events.push(7); },
+                
+                    onTableCreated : function(table, options) { 
+                        events.push(8); 
+                        console.log(events, events.join(''));
+                        assert(events.join('') == '012345678');
+                        done();
+                    },
+                });
+
             });
             it('Should execute a click event if .click is set on the column definition', function(done) { 
                 let grid = new Gridify({

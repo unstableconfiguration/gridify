@@ -152,6 +152,41 @@ export const GridifyTests = function() {
                     }
                 });
             });
+            it('Should call all events in order', function(done) {
+                let events = [];
+                let grid = new Gridify({
+                    container : 'events-doc',
+                    caption : 'caption',
+                    columns : [
+                        {
+                            field : 'col',
+                            header : 'header',
+                            footer : 'footer'
+                        }
+                    ],
+                    data : [
+                        { col : 'col value' }
+                    ],
+                    onCaptionCreated : function(table, caption) { events.push(0); },
+                    
+                    onHeaderCellCreated : function(th, column) { events.push(1); },
+                    onHeaderCreated : function(tHead, columns) { events.push(2); },
+                    
+                    onTableCellCreated : function(td, column) { events.push(3); },
+                    onTableRowCreated : function(tr, columns) { events.push(4); }, 
+                    onTableBodyCreated : function(tBody, columns) { events.push(5); },
+                    
+                    onFooterCellCreated : function(td, column) { events.push(6); },
+                    onFooterCreated : function(tFoot, columns) { events.push(7); },
+                
+                    onTableCreated : function(table, options) { 
+                        events.push(8); 
+                        assert(events.join('') == '012345678');
+                        done();
+                    },
+                });
+
+            });
             it('Should execute a click event if .click is set on the column definition', function(done) { 
                 let grid = new Gridify({
                     columns : [

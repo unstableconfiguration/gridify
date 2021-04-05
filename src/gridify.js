@@ -19,6 +19,8 @@ export const Gridify = function(options = {}) {
         grid.header.create(options.columns);
         grid.body.create(options.data, options.columns);
         grid.footer.create(options.columns);
+        // Called here so that onTableCreated is passed the completed table.
+        grid.onTableCreated(_table, options);
 
         if(grid.container) {
             grid.container.appendChild(_table); 
@@ -53,7 +55,6 @@ export const Gridify = function(options = {}) {
         create : function(options) {
             _table = grid.table.initialize(options);
             _setAttributes(_table, options.attributes);
-            grid.onTableCreated(_table, _table.options);
         }
         , initialize : function(options) {
             _table = document.createElement('table');
