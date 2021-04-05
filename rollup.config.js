@@ -5,23 +5,26 @@ import del from 'rollup-plugin-delete';
 export default [
     {
         input: 'src/index.js',
-        output: {
+        output: [{
             file: 'dist/gridify.js',
             format: 'es'
         },
+        {
+            file : 'gh-pages/scripts/gridify.js',
+            format : 'es'
+        }],
         plugins :[
-            del({ targets: [
+           del({ targets: [
                 'dist/*', 
                 'gh-pages/scripts/gridify.js',
                 'gh-pages/css/gridify.css'
-            ] }),
+            ], verbose : true }),
             babel({ babelHelpers: 'bundled' }),
             copy({
                 targets : [
-                    { src : 'dist/gridify.js', dest: 'gh-pages/scripts' },
                     { src : 'src/css/gridify.css', dest : 'dist' },
                     { src : 'src/css/gridify.css', dest : 'gh-pages/css'}
-                ]
+                ], verbose : true
             })
         ]
     },
