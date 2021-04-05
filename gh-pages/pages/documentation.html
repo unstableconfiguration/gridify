@@ -38,7 +38,6 @@
     const colorizeCodeBlocks = function() { 
         Array.from(document.getElementsByTagName('code'))
             .forEach(code => {
-                code.className = 'language-javascript';
                 Prism.highlightElement(code);
             });
     }
@@ -46,8 +45,11 @@
     const executeCodeSnippets = function(md) { 
         let codes = /```[^`]*```/g;
         let code = '';
-        while(code = codes.exec(md)){
-            code = code[0].replace(/```/g, "");
+        while(code = codes.exec(md)) {
+            if(code[0].substr(0, 7) === '```html') { continue; }
+            code = code[0]
+                .replace(/```javascript/, "```")
+                .replace(/```/g, "");
             eval(code);
         }
     }
