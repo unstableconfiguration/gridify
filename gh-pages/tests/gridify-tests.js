@@ -373,7 +373,12 @@ const styling = function() {
         , setStyle : function(el, style) {
             (style||'').split(';')
                 .map(x => x.trim().split(':'))
-                .forEach(kv => el.style[kv[0]]=kv[1]);
+                .forEach(kv => {
+                    if(!kv || kv.length !== 2) { return; }
+                    let key = kv[0].trim(), value = kv[1].trim();
+                    el.style[key] = value;
+                });
+
         }
     };
 };
@@ -1004,11 +1009,24 @@ const StylingTests = function() {
                 });
                 assert(grid.html.style.borderWidth === 'thin');
             });
+            it('Should set the css style of the body cells if .style is set in the column definition', function() { 
+                let grid = new Gridify({
+                    columns : [ { field : 'colA', style : 'font-weight:bold' } ],
+                    data : [ { colA : 123 } ]
+                });
+                assert(grid.html.tBodies[0].rows[0].cells[0].style.fontWeight === 'bold');
+            });
             it('Should set the css style of the header cells if .style is set in the header options', function() {
                 let grid = new Gridify({
-                    columns : [ { header : { text : 'test header', style : 'font-weight:bold' } } ]
+                    columns : [ { header : { text : 'test header', style : 'font-weight:bold;' } } ]
                 });
                 assert(grid.html.tHead.rows[0].cells[0].style.fontWeight === 'bold');
+            });
+            it('Should set the css style of the footer cells if .style is set in the footer options', function() { 
+                let grid = new Gridify({
+                    columns : [ { footer : { text : 'test footer', style : 'font-weight:bold' } } ]
+                });
+                assert(grid.html.tFoot.rows[0].cells[0].style.fontWeight === 'bold');
             });
             it('Should set the css style of the body cells if .style is set in the column options', function() { 
                 let grid = new Gridify({
