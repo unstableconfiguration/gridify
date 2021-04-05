@@ -67,6 +67,12 @@ export const StylingTests = function() {
                 });
                 assert(grid.html.style.borderWidth === 'thin')
             });
+            it('Should set the css style of the caption if .style is set in the caption definition', function() { 
+                let grid = new Gridify({
+                    caption : { text : 'test', style : 'font-weight:bold;'}
+                });
+                assert(grid.html.caption.style.fontWeight === 'bold');
+            });
             it('Should set the css style of the body cells if .style is set in the column definition', function() { 
                 let grid = new Gridify({
                     columns : [ { field : 'colA', style : 'font-weight:bold' } ],

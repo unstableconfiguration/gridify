@@ -310,6 +310,12 @@ const styling = function() {
         onTableCreated(table, options);
     };
 
+    let onCaptionCreated = grid.onCaptionCreated;
+    grid.onCaptionCreated = function(caption, options) { 
+        grid.styling.stylize(caption, options);
+        onCaptionCreated(caption, options);
+    };
+
     let onHeaderCellCreated = grid.onHeaderCellCreated;
     grid.onHeaderCellCreated = function(th, options) {        
         if(options.style) { grid.styling.setStyle(th, options.style); }
@@ -398,6 +404,7 @@ const Gridify = function(options = {}) {
         grid.header.create(options.columns);
         grid.body.create(options.data, options.columns);
         grid.footer.create(options.columns);
+        // Called here so that onTableCreated is passed the completed table.
         grid.onTableCreated(_table, options);
 
         if(grid.container) {
@@ -433,7 +440,6 @@ const Gridify = function(options = {}) {
         create : function(options) {
             _table = grid.table.initialize(options);
             _setAttributes(_table, options.attributes);
-            //grid.onTableCreated(_table, _table.options);
         }
         , initialize : function(options) {
             _table = document.createElement('table');
@@ -835,7 +841,6 @@ const GridifyTests = function() {
                 
                     onTableCreated : function(table, options) { 
                         events.push(8); 
-                        console.log(events, events.join(''));
                         assert(events.join('') == '012345678');
                         done();
                     },
@@ -1045,6 +1050,14 @@ const StylingTests = function() {
                     style : 'border: thin'
                 });
                 assert(grid.html.style.borderWidth === 'thin');
+            });
+            it('Should set the css style of the caption if .style is set in the caption definition', function() { 
+                let grid = new Gridify({
+                    caption : { text : 'test', style : 'font-weight:bold;'}
+                });
+                console.log('eh');
+                window.grid = grid;
+                assert(grid.html.caption.style.fontWeight === 'bold');
             });
             it('Should set the css style of the body cells if .style is set in the column definition', function() { 
                 let grid = new Gridify({
