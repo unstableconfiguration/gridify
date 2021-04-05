@@ -8,6 +8,12 @@ export const styling = function() {
         onTableCreated(table, options);
     }
 
+    let onCaptionCreated = grid.onCaptionCreated;
+    grid.onCaptionCreated = function(caption, options) { 
+        grid.styling.stylize(caption, options);
+        onCaptionCreated(caption, options);
+    }
+
     let onHeaderCellCreated = grid.onHeaderCellCreated;
     grid.onHeaderCellCreated = function(th, options) {        
         if(options.style) { grid.styling.setStyle(th, options.style); }
