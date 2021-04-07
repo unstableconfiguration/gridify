@@ -247,9 +247,23 @@ new Gridify({
 <div id='class-demo'></div>
 
 # Sorting 
+The grid can be sorted based on a column's values by adding .sort to its column definition. 
+
+## the sort header
+When .sort is set on a column definition, it will modify the column header. A \<span class='sort'> will be appended to the header cell, which gridify.css will style into a sort icon. A click event will also be added to the column header that will trigger the sort function.
+
+```html
+<th id="default-sort-grid-thead-number" style="padding-right: 30px;">
+    Column Header
+    <span class="sort"></span>
+</th>
+```
 
 ## .sort = true
-When set to true, .sort will rely on the default javascript array.sort() behavior.
+When .sort is set to true, the column sort will use a default sort function.
+```javascript
+    let defaultSort = function(a, b) { return a >= b ? 1 : -1; }
+```
 
 ```javascript
 new Gridify({
@@ -329,10 +343,58 @@ delaySort();
 <div id='sort-function'></div>
 
 # Filtering
+Columns can be filtered by a column's values by adding a filter value to the column definition. 
+
+## the filter header
+when .filter is set on a column definition, a new header row will be added, and a filter control will be placed under the column header.
+
+```html
+    filters need revisiting.
+```
 
 ## .filter = true
+When set to true, a default filter will be added to the column. The default filter is a textbox, and the default filter rule is to match column values that begin with what is typed in the filter.  
+
+```javascript
+new Gridify({
+    container : 'default-filter',
+    columns : [
+        { field : 'binary', filter : true, header : 'Default% Filter' }
+    ],
+    data : [
+        { binary : '000' }, { binary : '001' }, 
+        { binary : '010' }, { binary : '011' }, 
+        { binary : '100' }, { binary : '101' }, 
+        { binary : '110' }, { binary : '111' }
+    ]
+});
+```
+<div id='default-filter'></div>
 
 ## .filter = function()
+.filter can be set to a compare function. If this is done, the filter control will still be a textbox, but it will use the compare function for the filter logic.  
+
+```javascript
+new Gridify({
+    container : 'custom-filter-function',
+    columns : [
+        { 
+            field : 'binary', 
+            filter : (columnValue, filterValue) => {
+                return columnValue.includes(filterValue);
+            },
+            header : '%Custom% Filter'
+        }
+    ],
+    data : [
+        { binary : '000' }, { binary : '001' }, 
+        { binary : '010' }, { binary : '011' }, 
+        { binary : '100' }, { binary : '101' }, 
+        { binary : '110' }, { binary : '111' }
+    ]
+});
+```
+<div id='custom-filter-function'></div>
 
 ## .filter = {}
 
