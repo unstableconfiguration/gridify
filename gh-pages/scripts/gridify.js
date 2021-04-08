@@ -1,98 +1,101 @@
-//Gridify.prototype.extensions.filtering = filtering
-var filtering = function filtering() {
+var filters = function filters() {
   var grid = this;
-  var onHeaderCreated = grid.onHeaderCreated;
 
-  grid.onHeaderCreated = function (header, headers) {
-    var hasFilters = headers.some(h => h.filter);
-
-    if (hasFilters) {
-      grid.filtering.addFilters(headers);
-    }
-
-    onHeaderCreated(header, headers);
+  grid.filter = function () {
+    grid.filters.filter();
   };
 
-  grid.filtering = {
-    initialize: function initialize(headers) {
+  var onHeaderCreated = grid.onHeaderCreated;
+
+  grid.onHeaderCreated = function (th, columns) {
+    var hasFilters = columns.some(column => column.filter);
+
+    if (hasFilters) {
+      grid.filters.initialize(columns);
+      grid.filters.addFilters(columns);
+    }
+
+    onHeaderCreated(th, columns);
+  };
+
+  grid.filters = {
+    initialize: function initialize(columns) {
       var filterRow = grid.html.tHead.insertRow();
-      filterRow.id = grid.html.id + '-filters'; //headers.forEach(h => grid.filtering._addFilterCell(filterRow.cells.length));
+      filterRow.id = grid.html.id + '-filters';
+      columns.forEach(col => {
+        filterRow.insertCell(); // .id = xyz, but do we need to name he cell?
+      });
     },
-    addFilters: function addFilters(headers) {
-      grid.filtering.initialize(headers);
-
-      for (var idx in headers) {
-        var th = grid.filtering._addFilterCell(idx);
-
-        grid.filtering.addFilter(th, idx, headers[idx].filter);
-      }
+    addFilters: function addFilters(columns) {
+      var th = grid.html.tHead.rows[1];
+      columns.forEach((column, idx) => {
+        var filter = grid.filters.addFilter(column);
+        th.cells[idx].appendChild(filter);
+      });
     },
-    addFilter: function addFilter(th, idx, options) {
-      if (!options) {
+    addFilter: function addFilter(column) {
+      if (!column.filter) {
         return;
       }
 
-      options = grid.filtering._getFilterOptions(options);
-      var control = options.control;
-      control.idx = idx;
-      control.rule = options.rule;
-      control.addEventListener(options.event, () => {
-        grid.filtering.filter();
-      });
-      th.appendChild(control);
+      var filter = grid.filters.__getFilterDefinition(column);
+
+      var control = filter.control;
+      control.id = grid.html.id + '-filters-' + column.field;
+      control.compare = filter.compare;
+      return control;
     },
     cells: function cells() {
       return Array.from(grid.html.tHead.rows[1].cells);
     },
     filter: function filter() {
-      var filterControls = grid.filtering.getControls();
-      Array.from(grid.html.tBodies[0].rows).forEach((row, i) => {
-        var filteredOut = filterControls.some(filterControl => {
-          var cellValue = row.cells[filterControl.idx].value;
-          return !filterControl.rule(cellValue, filterControl.value);
+      var controls = grid.filters.getControls();
+      var rows = Array.from(grid.html.tBodies[0].rows);
+      rows.forEach(row => {
+        var cells = Array.from(row.cells);
+        var isFiltered = controls.some(control => {
+          var cell = cells.find(td => {
+            return control.id.split('-').slice(-1)[0] == td.id.split('-').slice(-1)[0];
+          });
+          return !control.compare(cell.value, control.value);
         });
-        row.filtered = filteredOut;
-        row.style.display = filteredOut ? 'none' : '';
+        row.filtered = isFiltered;
+        row.style.display = isFiltered ? 'none' : '';
       });
-      grid.filtering.onFiltered();
     },
-    onFiltered: function onFiltered() {},
     getControls: function getControls() {
-      return grid.filtering.cells().map(cell => cell.firstChild).filter(x => !!x);
+      return grid.filters.cells().map(cell => cell.firstChild).filter(x => !!x);
     },
-    _addFilterCell: function _addFilterCell(idx) {
-      var th = document.createElement('th');
-      th.id = grid.html.id + '-filters-' + idx;
-      grid.html.tHead.rows[1].appendChild(th);
-      return th;
-    },
-    _getFilterOptions: function _getFilterOptions(filter) {
-      var options = {
-        rule: grid.filtering._defaultFilterRule,
-        control: grid.filtering._getDefaultFilterControl(),
-        event: 'keyup'
+    __getFilterDefinition: function __getFilterDefinition(column) {
+      var definition = {
+        control: grid.filters.__getDefaultFilterControl(column),
+        compare: grid.filters.__getDefaultCompare()
       };
 
-      if (typeof filter === 'function') {
-        options.rule = filter;
+      if (typeof column.filter === 'function') {
+        definition.compare = column.filter;
       }
 
-      if (typeof filter === 'object') {
-        for (var k in filter) {
-          options[k] = filter[k];
+      if (typeof column.filter === 'object') {
+        for (var key in column.filter) {
+          definition[key] = column.filter[key];
         }
       }
 
-      return options;
+      return definition;
     },
-    _defaultFilterRule: function _defaultFilterRule(cellValue, fieldValue) {
-      return ('' + cellValue).toLowerCase().substr(0, fieldValue.length) === fieldValue.toLowerCase();
+    __getDefaultCompare: function __getDefaultCompare() {
+      return function (tdValue, filterValue) {
+        return ('' + tdValue).toLowerCase().substr(0, filterValue.length) == filterValue.toLowerCase();
+      };
     },
-    _getDefaultFilterControl: function _getDefaultFilterControl(field) {
+    __getDefaultFilterControl: function __getDefaultFilterControl(column) {
       var control = document.createElement('input');
       control.type = 'text';
-      control.id = grid.table.id + '_fiter_' + field;
-      control.style = 'width:80%; display: block; margin: auto;';
+      control.style = 'display:block; margin: auto; width:80%;';
+      control.addEventListener('change', () => {
+        grid.filters.filter();
+      });
       return control;
     }
   };
@@ -191,10 +194,10 @@ var paging = function paging() {
       }
     },
     extendFiltering: function extendFiltering() {
-      if (typeof grid.filtering !== 'undefined') {
-        var filter = grid.filtering.filter;
+      if (typeof grid.filters !== 'undefined') {
+        var filter = grid.filters.filter;
 
-        grid.filtering.filter = function () {
+        grid.filters.filter = function () {
           grid.paging.clear();
           filter();
           grid.paging.page();
@@ -760,7 +763,7 @@ var Gridify = function Gridify() {
   return grid;
 };
 Gridify.prototype.extensions = {
-  filtering: filtering,
+  filters: filters,
   sorting: sorting,
   paging: paging,
   styling: styling
