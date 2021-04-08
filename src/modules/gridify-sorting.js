@@ -1,6 +1,7 @@
 //Gridify.prototype.extensions.sorting = function(){
 export const sorting = function() {
     let grid = this;
+    grid.sort = function(col) { grid.sorting.sort(col); }
 
     let onHeaderCellCreated = grid.onHeaderCellCreated;
     grid.onHeaderCellCreated = function(th, headerDefinition) {
