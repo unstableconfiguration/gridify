@@ -1,83 +1,92 @@
-//Gridify.prototype.extensions.filtering = filtering
-const filtering = function() { 
+const filters = function() { 
     let grid = this;
+    grid.filter = function() { grid.filters.filter(); };
 
     let onHeaderCreated = grid.onHeaderCreated;
-    grid.onHeaderCreated = function(header, headers) {
-        let hasFilters = headers.some(h => h.filter);
-        if(hasFilters) { grid.filtering.addFilters(headers); }
+    grid.onHeaderCreated = function(th, columns) {
+        let hasFilters = columns.some(column => column.filter);
+        if(hasFilters) { 
+            grid.filters.initialize(columns);
+            grid.filters.addFilters(columns); 
+        }
         
-        onHeaderCreated(header, headers);
+        onHeaderCreated(th, columns);
     };
 
-    grid.filtering = { 
-        initialize : function(headers) {
+    grid.filters = { 
+        initialize : function(columns) {
             let filterRow = grid.html.tHead.insertRow();
             filterRow.id = grid.html.id + '-filters';
-            //headers.forEach(h => grid.filtering._addFilterCell(filterRow.cells.length));
+            columns.forEach(col => { 
+                filterRow.insertCell(); // .id = xyz, but do we need to name he cell?
+            });
         }
-        , addFilters : function(headers) { 
-            grid.filtering.initialize(headers);
-            for(let idx in headers) { 
-                let th = grid.filtering._addFilterCell(idx);
-                grid.filtering.addFilter(th, idx, headers[idx].filter);
-            }
+        , addFilters : function(columns) {
+            let th = grid.html.tHead.rows[1];
+            columns.forEach((column, idx) => {
+                let filter = grid.filters.addFilter(column);
+                th.cells[idx].appendChild(filter);
+            });
         }
-        , addFilter : function(th, idx, options) {
-            if(!options) { return; }
-            options = grid.filtering._getFilterOptions(options);
+        , addFilter : function(column) {
+            if(!column.filter) { return; }
 
-            let control = options.control;
-            control.idx = idx;
-            control.rule = options.rule;
-            control.addEventListener(options.event, () => { grid.filtering.filter(); });
-            th.appendChild(control);
+            let filter = grid.filters.__getFilterDefinition(column);
+            
+            let control = filter.control;
+            control.id = grid.html.id + '-filters-' + column.field;
+            control.compare = filter.compare;
+            return control;
         }
         , cells : function() { return Array.from(grid.html.tHead.rows[1].cells); }
         , filter : function() {
-            let filterControls = grid.filtering.getControls();
-            Array.from(grid.html.tBodies[0].rows).forEach((row, i)=>{
-                let filteredOut = filterControls.some((filterControl)=>{
-                    let cellValue = row.cells[filterControl.idx].value;
-                    return !filterControl.rule(cellValue, filterControl.value);
+            let controls = grid.filters.getControls();
+            let rows = Array.from(grid.html.tBodies[0].rows);
+
+            rows.forEach(row => {
+                let cells = Array.from(row.cells);
+                let isFiltered = controls.some(control => { 
+                    let cell = cells.find(td => {
+                        return control.id.split('-').slice(-1)[0] == td.id.split('-').slice(-1)[0];
+                    });
+
+                    return !control.compare(cell.value, control.value);
                 });
-                row.filtered = filteredOut;
-                row.style.display = filteredOut ? 'none' : '';
-            }); 
-            grid.filtering.onFiltered();
+
+                row.filtered = isFiltered;
+                row.style.display  = isFiltered ? 'none' : '';
+            });
+
         }
-        , onFiltered : function() { }
-        , getControls : function(){
-            return grid.filtering.cells().map(cell => cell.firstChild).filter(x => !!x);
+        , getControls : function() {
+            return grid.filters.cells().map(cell => cell.firstChild).filter(x => !!x);
         }
-        , _addFilterCell : function(idx) {
-            let th = document.createElement('th');
-            th.id = grid.html.id + '-filters-' + idx;
-            grid.html.tHead.rows[1].appendChild(th);
-            return th;
-        }
-        , _getFilterOptions : function(filter) { 
-            let options = {
-                rule : grid.filtering._defaultFilterRule,
-                control : grid.filtering._getDefaultFilterControl(),
-                event : 'keyup'
+        , __getFilterDefinition : function(column) {
+            let definition = {
+                control : grid.filters.__getDefaultFilterControl(column),
+                compare : grid.filters.__getDefaultCompare()
             };
-            if(typeof(filter) === 'function') { options.rule = filter; }
-            if(typeof(filter) === 'object') {
-                for(let k in filter) { options[k] = filter[k]; }
+
+            if(typeof(column.filter) === 'function') { definition.compare = column.filter; }
+            if(typeof(column.filter) === 'object') { 
+                for(let key in column.filter) {
+                    definition[key] = column.filter[key];
+                }
             }
 
-            return options;
+            return definition;
         }
-        , _defaultFilterRule : function(cellValue, fieldValue) {
-            return (''+cellValue).toLowerCase()
-                .substr(0, fieldValue.length) === fieldValue.toLowerCase();
+        , __getDefaultCompare : function() {
+            return function (tdValue, filterValue) {
+                return ('' + tdValue).toLowerCase()
+                    .substr(0, filterValue.length) == filterValue.toLowerCase();
+            }
         }
-        , _getDefaultFilterControl : function(field){
+        , __getDefaultFilterControl : function(column){
             let control = document.createElement('input');
             control.type = 'text';
-            control.id = grid.table.id + '_fiter_' + field;
-            control.style = 'width:80%; display: block; margin: auto;';
+            control.style = 'display:block; margin: auto; width:80%;';
+            control.addEventListener('change', () => { grid.filters.filter(); });
             return control;
         }
     };
@@ -178,9 +187,9 @@ const paging = function() {
             }
         }
         , extendFiltering : function() {
-            if(typeof(grid.filtering) !== 'undefined'){
-                let filter = grid.filtering.filter;
-                grid.filtering.filter = function() {  
+            if(typeof(grid.filters) !== 'undefined'){
+                let filter = grid.filters.filter;
+                grid.filters.filter = function() {  
                     grid.paging.clear();
                     filter(); 
                     grid.paging.page();
@@ -621,7 +630,7 @@ const Gridify = function(options = {}) {
 };
 
 Gridify.prototype.extensions = {
-    filtering : filtering,
+    filters : filters,
     sorting : sorting,
     paging : paging,
     styling : styling
@@ -1050,13 +1059,19 @@ const FilteringTests = function() {
     describe('Filtering', function(){
         let assert = chai.assert;
 
+        let getHiddenRows = function(grid) { 
+            return Array.from(grid.html.tBodies[0].rows)
+                .filter(row => row.style.display == 'none');
+        };
+        
         it('Adds a filter textbox on filterable columns', function() {
             let grid = new Gridify({
                 columns : [ { field : 'Col', header : 'Col', filter : true } ],
                 data : [ { Col : 'a' } ]
             });
-            assert.isTrue(grid.html.tHead.rows[1].cells[0].firstChild != undefined);
+            assert(grid.html.tHead.rows[1].cells[0].firstChild.id == 'new-grid-filters-Col');
         });
+
         it('Defaults to xyz% filtering function', function(){
             let grid = new Gridify({
                 columns : [ { field : 'Col', header : 'Col', filter : true } ],
@@ -1065,17 +1080,12 @@ const FilteringTests = function() {
 
             let filterTextbox = grid.html.tHead.rows[1].cells[0].firstChild;
             filterTextbox.value = 'a';
-            grid.filtering.filter();
-            assert.isTrue(
-                Array.from(grid.html.tBodies[0].rows)
-                    .filter(r => r.style.display == 'none').length == 1
-            );
+            grid.filter();
+            assert(getHiddenRows(grid).length == 1);
+            
             filterTextbox.value = 'aa';
-            grid.filtering.filter();
-            assert.isTrue(
-                Array.from(grid.html.tBodies[0].rows)
-                    .filter(r => r.style.display == 'none').length == 2
-            );
+            grid.filter();
+            assert(getHiddenRows(grid).length == 2);
         });
         it('Applies all filters to the data set', function() {
             let grid = new Gridify({
@@ -1092,11 +1102,8 @@ const FilteringTests = function() {
 
             grid.html.tHead.rows[1].cells[0].firstChild.value = 'a';
             grid.html.tHead.rows[1].cells[1].firstChild.value = 'b';
-            grid.filtering.filter();
-            assert.isTrue(
-                Array.from(grid.html.tBodies[0].rows)
-                    .filter(r => r.style.display == 'none').length == 3
-            );
+            grid.filter();
+            assert(getHiddenRows(grid).length == 3);
         });
         it('Allows for custom filter logic', function() {
             let grid = new Gridify({
@@ -1105,7 +1112,7 @@ const FilteringTests = function() {
                         field : 'Col', 
                         header : 'Col A',
                         filter : { 
-                            rule : (cellValue, filterValue) => {
+                            compare : (cellValue, filterValue) => {
                                 return cellValue.includes(filterValue);
                             }
                         }
@@ -1115,47 +1122,34 @@ const FilteringTests = function() {
             });
 
             grid.html.tHead.rows[1].cells[0].firstChild.value = 'bc';
-            grid.filtering.filter();
-            assert.isTrue(
-                Array.from(grid.html.tBodies[0].rows)
-                    .filter(r => r.style.display == 'none').length == 1
-            );
+            grid.filter();
+            assert(getHiddenRows(grid).length == 1);
         });
         it('Allows for custom filter control', function() {
-            let ddl = document.createElement('select');
-            let s0 = document.createElement('option');
-            s0.value = 0; s0.innerHTML = 'zero';
-            ddl.appendChild(s0);
-            let s1 = document.createElement('option');
-            s1.value = 1; s1.innerHTML = 'one';
-            ddl.appendChild(s1);
-            let s2 = document.createElement('option');
-            s2.value = 2; s2.innerHTML = 'two';
-            ddl.appendChild(s2);
-            
+            let chk = document.createElement('input');
+            chk.type = 'checkbox';
+  
             let grid = new Gridify({ 
                 columns : [ 
                     { 
                         field : 'Col', 
                         header : 'Col A',
                         filter : {
-                                control : ddl,
-                                rule : function(cellValue, filterValue) {
+                                control : chk,
+                                compare : function(cellValue, filterValue) {
                                     if(+filterValue === 0) { return true; }
                                     return +filterValue === +cellValue;
-                                },
-                                event : 'change'
+                                }
                             }
                         }  
                     ],
-                data : [ { Col : 1 }, { Col : 2 }, { Col : 3 } ]
+                data : [ { Col : 1 }, { Col : 0 }, { Col : 1 } ]
             });
-
+            //chk.addEventListener('change', () => { grid.filter() });
+            
             grid.html.tHead.rows[1].cells[0].firstChild.value = 1;
-            grid.filtering.filter();
-            assert.isTrue(
-                Array.from(grid.html.tBodies[0].rows)
-                    .filter(r => r.style.display == 'none').length == 2);
+            grid.filter();
+            assert(getHiddenRows(grid).length == 1);
         });
     });
 };
