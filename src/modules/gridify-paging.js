@@ -93,9 +93,9 @@ export const paging = function() {
             }
         }
         , extendFiltering : function() {
-            if(typeof(grid.filtering) !== 'undefined'){
-                let filter = grid.filtering.filter;
-                grid.filtering.filter = function() {  
+            if(typeof(grid.filters) !== 'undefined'){
+                let filter = grid.filters.filter;
+                grid.filters.filter = function() {  
                     grid.paging.clear();
                     filter(); 
                     grid.paging.page();
