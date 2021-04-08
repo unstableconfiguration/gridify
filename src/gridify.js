@@ -1,4 +1,4 @@
-import { filtering } from './modules/gridify-filtering';
+import { filters } from './modules/gridify-filters';
 import { paging } from './modules/gridify-paging';
 import { sorting } from './modules/gridify-sorting';
 import { styling } from './modules/gridify-styling';
@@ -272,7 +272,7 @@ export const Gridify = function(options = {}) {
 }
 
 Gridify.prototype.extensions = {
-    filtering : filtering,
+    filters : filters,
     sorting : sorting,
     paging : paging,
     styling : styling
