@@ -1,11 +1,10 @@
-//Gridify.prototype.extensions.paging = function(){
 export const paging = function() {
     let grid = this;
 
-    let onFooterCreated = grid.onFooterCreated;
-    grid.onFooterCreated = function(footer, footers) { 
-        grid.paging.initialize(grid.html.options.paging);
-        onFooterCreated(footer, footers); 
+    let onTableCreated = grid.onTableCreated;
+    grid.onTableCreated = function(table, options) { 
+        if(options.paging) { grid.paging.initialize(options.paging); }
+        onTableCreated(table, options);
     }
 
     grid.footer.pager = {
