@@ -110,7 +110,7 @@ export const Gridify = function(options = {}) {
 
     grid.header = {
         create : function(columns) {
-            if(!columns.find(col => col.header)) { return ; }
+            if(!columns) { return ; }
             let tHead = grid.header.initialize();
 
             grid.header.addHeaderCells(columns);
@@ -134,13 +134,15 @@ export const Gridify = function(options = {}) {
             headerRow.appendChild(th);
 
             let options = grid.header.__options(column);
-            th.innerText = options.text;
-            _setAttributes(th, options.attributes);
-
+            if(options) {
+                th.innerText = options.text;
+                _setAttributes(th, options.attributes);
+            }
+            
             grid.onHeaderCellCreated(th, column); 
         }
         , __options : function(column) { 
-            if(!column.header) { return {}; }
+            if(!column.header) { return; }
             if(typeof(column.header) === 'string') { return { text : column.header } }
             return column.header;
         }
@@ -208,7 +210,7 @@ export const Gridify = function(options = {}) {
 
     grid.footer = { 
         create : function(columns) {
-            if(!columns.find(col => col.footer)) { return ; }
+            if(!columns) { return ; }
             let tFoot = grid.footer.initialize(columns);
 
             grid.footer.addFooterCells(tFoot, columns);

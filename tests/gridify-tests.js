@@ -51,12 +51,12 @@ export const GridifyTests = function() {
         });
 
         describe('Headers', function() {
-            it('Should not create tHead if no column has a .header', function() { 
+            it('Should create an textless th if the column does not have a .header', function() { 
                 let grid = new Gridify({
                     columns : [ { field : 'a' } ],
                     data : [ { a : 1 } ]
                 });
-                assert(grid.html.tHead === null);
+                assert(grid.html.tHead.rows[0].cells[0].innerText === '');
             });
             it('Should create a th element with text if the column .header is a string', function() {
                 let grid = new Gridify({
