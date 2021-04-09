@@ -261,7 +261,7 @@ var sorting = function sorting() {
   var onHeaderCellCreated = grid.onHeaderCellCreated;
 
   grid.onHeaderCellCreated = function (th, column) {
-    if (column.sort) {
+    if (column.sort && column.header) {
       grid.sorting.initialize(th, column);
     }
 

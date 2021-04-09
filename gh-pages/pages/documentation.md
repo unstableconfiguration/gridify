@@ -328,7 +328,7 @@ Sorting can be done programmatically by calling the sort function. .sort() requi
 ```javascript
 let grid = new Gridify({
     container : 'sort-function',
-    columns : [ { field : 'fieldName', header : 'Name', sort : true } ],
+    columns : [ { field : 'fieldName', sort : true } ],
     data : [
         { fieldName : 1 }, { fieldName : 2 }, { fieldName : 3 }
     ]
