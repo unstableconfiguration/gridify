@@ -92,14 +92,13 @@ const filters = function() {
     };
 };
 
-//Gridify.prototype.extensions.paging = function(){
 const paging = function() {
     let grid = this;
 
-    let onFooterCreated = grid.onFooterCreated;
-    grid.onFooterCreated = function(footer, footers) { 
-        grid.paging.initialize(grid.html.options.paging);
-        onFooterCreated(footer, footers); 
+    let onTableCreated = grid.onTableCreated;
+    grid.onTableCreated = function(table, options) { 
+        if(options.paging) { grid.paging.initialize(options.paging); }
+        onTableCreated(table, options);
     };
 
     grid.footer.pager = {
@@ -234,73 +233,92 @@ const paging = function() {
     };
 };
 
-//Gridify.prototype.extensions.sorting = function(){
 const sorting = function() {
     let grid = this;
+    grid.sort = function(col) { grid.sorting.sort(col); };
 
     let onHeaderCellCreated = grid.onHeaderCellCreated;
-    grid.onHeaderCellCreated = function(th, headerDefinition) {
-        grid.sorting.initialize(th, headerDefinition);
-
-        onHeaderCellCreated(th, headerDefinition);
+    grid.onHeaderCellCreated = function(th, column) {
+        if(column.sort) {
+            grid.sorting.initialize(th, column);
+        }
+        
+        onHeaderCellCreated(th, column);
     };
 
     grid.sorting = {
-        initialize : function(th, headerDefinition) { 
-            if(!headerDefinition.sort) { return; }
-
-            let options = grid.sorting._parseOptions(headerDefinition.sort);
-            let idx = Array.from(th.parentElement.children).indexOf(th);
-            options.idx = idx;
-            th.sort = options;
-
-            grid.sorting._addSortIcon(th);
-            
-            let sortCallback = grid.sorting._getSortCallback();  
-            th.addEventListener('click', sortCallback);    
+        initialize : function(th, column) {   
+            grid.sorting.__addSortIcon(th);
+            th.addEventListener('click', (th) => {
+                let field = th.id.split('-').slice(-1)[0];
+                grid.sort(field);
+            });  
         }
-        , _parseOptions : function(sortOptions) { 
-            let options = { compare : grid.sorting.defaultCompare };
-            if(typeof(sortOptions) === 'function') { options.compare = sortOptions; }
-            else if(typeof(sortOptions) === 'object') {
-                for(let k in sortOptions) { options[k] = sortOptions[k]; }
+        /*  .sort('field')
+            .sort({ field : '', compare : ()=>{}, direction : 'asc'|'desc'})
+        */
+        , sort : function(args) {
+            let field = typeof(args) === 'string' ? args : args.field;
+            if(!field) { return; }
+
+            let options = grid.sorting.__getSortOptions(field);
+            if(args.direction) {
+                options.direction = args.direction.substr(0, 3) === 'asc' ? 1 : -1;
+            }
+            else { 
+                options.direction = options.direction === 1 ? -1 : 1;
+            }
+            
+            let compare = args.compare || options.compare;
+
+
+            let rows = Array.from(grid.html.tBodies[0].rows);            
+            let colIdx = Array.from(rows[0].cells).findIndex(td => {
+                return td.id.split('-').slice(-1)[0] == field;
+            });
+
+            rows.sort((x, y) => {
+                let xv = x.cells[colIdx].value;
+                let yv = y.cells[colIdx].value; 
+                let compared = compare(xv, yv);
+                return +compared * options.direction;
+            });
+            
+            grid.sorting.__redrawGrid(rows);
+        }
+        , __getSortOptions : function(field) { 
+            if(!grid.html.sortOptions) { grid.sorting.__setSortOptions(); }
+
+            return grid.html.sortOptions[field];
+        }
+        , __setSortOptions : function() {
+            let sortOptions = {};
+
+            let columns = grid.html.options.columns;
+            columns.forEach(col => {
+                sortOptions[col.field] = grid.sorting.__options(col);
+            });
+
+            grid.html.sortOptions = sortOptions;
+        }
+        , __options : function(column) { 
+            let options = {
+                compare : (a, b) => a <= b ? 1 : -1,
+                direction : 1
+            };
+            if(typeof(column.sort) === 'function') { options.compare = column.sort; }
+            if(column.sort && column.sort.compare) {
+                options.compare = column.sort.compare;
             }
 
             return options;
         }
-        , getSortOptionsByField : function(field) { 
-            let idx = grid.html.tBodies[0].options
-                .findIndex(colDef => colDef.field == field);
-
-            let th = grid.html.tHead.rows[0].cells[idx];
-            return th.sort;
-        }
-        , sort : function(options) {
-            if(typeof(options) === 'string') { 
-                options = grid.sorting.getSortOptionsByField(options); 
-            }
-
-            options.direction = options.direction === -1 ? 1 : -1;
-
-            let rows = Array.from(grid.html.tBodies[0].rows);            
-            rows.sort((x, y) => {
-                let xv = x.cells[options.idx].value;
-                let yv = y.cells[options.idx].value; 
-                let compared = options.compare(xv, yv);
-                return +compared * options.direction;
-            });
-            
-            grid.sorting._redrawGrid(rows);
-        }
-        , _addSortIcon : function(th) { 
+        , __addSortIcon : function(th) { 
             let icon = th.appendChild(document.createElement('span'));
             icon.className = 'sort';
             th.style.paddingRight = '30px';
         }
-        , _getSortCallback : function() {
-            return (e) => { grid.sorting.sort(e.target.sort); }
-        }
-        , _redrawGrid : function(rows) {
+        , __redrawGrid : function(rows) {
             grid.body.clear();
             let tBody = grid.html.tBodies[0];
             rows.forEach(r => tBody.appendChild(r));
@@ -387,14 +405,13 @@ const Gridify = function(options = {}) {
         }
     };
 
-
     grid.onTableCreated = function(table, options) { if(options.onTableCreated) { options.onTableCreated(table, options); } };
     grid.onCaptionCreated = function(caption, captionDefinition) { if(options.onCaptionCreated) { options.onCaptionCreated(caption, captionDefinition); } };
     grid.onHeaderCreated = function(tHead, headers) { if(options.onHeaderCreated) { options.onHeaderCreated(tHead, headers); } };
-    grid.onHeaderCellCreated = function(th, headerDefinition) { if(options.onHeaderCellCreated) { options.onHeaderCellCreated(th, headerDefinition); } };
+    grid.onHeaderCellCreated = function(th, column) { if(options.onHeaderCellCreated) { options.onHeaderCellCreated(th, column); } };
     grid.onTableBodyCreated = function(tBody, columns) { if(options.onTableBodyCreated) { options.onTableBodyCreated(tBody, columns); } };
     grid.onTableRowCreated = function(tr, columns) { if(options.onTableRowCreated) { options.onTableRowCreated(tr, columns); } };
-    grid.onTableCellCreated = function(td, columnDefinition) { if(options.onTableCellCreated) { options.onTableCellCreated(td, columnDefinition); } };
+    grid.onTableCellCreated = function(td, column) { if(options.onTableCellCreated) { options.onTableCellCreated(td, column); } };
     grid.onFooterCreated = function(tFoot, footers) { if(options.onFooterCreated) { options.onFooterCreated(tFoot, footers); } };
     grid.onFooterCellCreated = function(td, footerDefinition) { if(options.onFooterCellCreated) { options.onFooterCellCreated(td, footerDefinition); } };
 
@@ -419,7 +436,7 @@ const Gridify = function(options = {}) {
         , initialize : function(options) {
             _table = document.createElement('table');
             _table.id = grid.table._getTableId(options);
-            _table.options = options;
+            _table.options = grid.table.__options(options);
             return _table;
         }
         , _getTableId : function(options) {
@@ -428,135 +445,127 @@ const Gridify = function(options = {}) {
             if(grid.container) { return grid.container.id + '-grid'; }
             return 'new-grid';
         }
+        , __options : function(options) { 
+            if(!options.columns) {
+                options.columns = [];
+                if(Array.isArray(options.data) && options.data.length > 0){
+                    for(let field in options.data[0]) {
+                        options.columns.push({
+                            field : field
+                        });
+                    }
+                }
+            }
+
+            return options;
+        }
     };
     Object.defineProperty(grid, 'html', { get : () => _table });
 
     grid.caption = {
-        create : function(captionOptions) {
-            if(!captionOptions) { return; }
-            let caption = grid.caption.initialize(captionOptions);
+        create : function(captionDef) {
+            if(!captionDef) { return; }
+            let caption = grid.caption.initialize();
 
-            _setAttributes(caption, caption.options.attributes);
-            caption.innerText = caption.options.text;
+            let options = grid.caption.__options(captionDef);
+            _setAttributes(caption, options.attributes);
+            caption.innerText = options.text;
 
-            grid.onCaptionCreated(caption, caption.options);
+            grid.onCaptionCreated(caption, options);
         }
-        , initialize : function(captionOptions) {
+        , initialize : function() {
             let caption = _table.createCaption();
-
             caption.id = _table.id + '-caption';
-            caption.options = typeof(captionOptions) === 'string' 
-                ? { text : captionOptions } 
-                : captionOptions;
 
             return caption;
+        }
+        , __options : function(caption) {
+            return typeof(caption) === 'string'
+                ? { text : caption }
+                : caption;
         }
     };
 
     grid.header = {
         create : function(columns) {
             if(!columns) { return ; }
-            let tHead = grid.header.initialize(columns);
+            let tHead = grid.header.initialize();
 
-            grid.header.addHeaderCells();
+            grid.header.addHeaderCells(columns);
 
-            grid.onHeaderCreated(tHead, tHead.options);
+            grid.onHeaderCreated(tHead, columns);
         }
-        , initialize : function(columns) {
+        , initialize : function() {
             if(_table.tHead) { _table.removeChild(_table.tHead); }
             let tHead = _table.createTHead();
-
             tHead.id = _table.id + '-thead';
-            tHead.options = grid.header._parseOptions(columns);
             
             return tHead;
         }
-        , _parseOptions : function(columns) {
-            return columns.map(opt => {
-                if(typeof(opt.header) === 'string') { 
-                    opt.header = { text : opt.header }; 
-                }
-                return opt;
-            });
-        }
-        , addHeaderCells : function() {
+        , addHeaderCells : function(columns) {
             let hr = _table.tHead.insertRow();
-            _table.tHead.options
-                .forEach(o => { grid.header.addHeaderCell(hr, o); });
+            columns.forEach(col => { grid.header.addHeaderCell(hr, col); });
         }
-        , addHeaderCell : function(headerRow, columnDefinition) {
+        , addHeaderCell : function(headerRow, column) {
             let th = document.createElement('th');
-            th.id = _table.tHead.id + '-' + columnDefinition.field || headerRow.cells.length;
+            th.id = _table.tHead.id + '-' + column.field || headerRow.cells.length;
             headerRow.appendChild(th);
 
-            if(columnDefinition.header) {
-                th.innerText = columnDefinition.header.text || '';
-                _setAttributes(th, columnDefinition.header.attributes);
+            let options = grid.header.__options(column);
+            if(options) {
+                th.innerText = options.text;
+                _setAttributes(th, options.attributes);
             }
-
-            grid.onHeaderCellCreated(th, columnDefinition); 
+            
+            grid.onHeaderCellCreated(th, column); 
+        }
+        , __options : function(column) { 
+            if(!column.header) { return; }
+            if(typeof(column.header) === 'string') { return { text : column.header } }
+            return column.header;
         }
     };
 
     grid.body = {
-        create : function(data, columns = options.columns) {
-            let tBody = grid.body.initialize(columns);
-
-            for(let idx in data) {
-                grid.body.addTableRow(tBody, idx, data[idx]);
-            }
-
-            grid.onTableBodyCreated(tBody, tBody.options);
-        }
-        , initialize : function(columns) {  
+        initialize : function() {  
             while(_table.tBodies.length) { _table.removeChild(_table.tBodies[0]); }
             let tBody = _table.createTBody();
             tBody.id = _table.id + '-tbody';
-            tBody.options = columns;
             return tBody;
         }
-        , _parseColumns : function(columns) {
-            return columns.map(col => {
-            });
-        }
         , clear : function() { _clear(_table.tBodies[0]); }
-        , getColumnDefinition : function(field) {
-            let colDefs = _table.tBodies[0].options;
-            if(!colDefs) { return; }
-            return colDefs.find(d => d.field == field);
-        }
-        , addTableRow : function(tBody, ridx, rowData) {
-            let tr = tBody.insertRow();
-            tr.id = tBody.id + '-' + ridx;
+        , create : function(data, columns) {
+            let tBody = grid.body.initialize();
+            if(!data) { return;}
 
-            let colDefs = tBody.options;
-            if(colDefs){
-                for(let d in colDefs) {
-                    let field = colDefs[d].field;
-                    grid.body.addTableCell(tr, field, rowData[field]);
-                }
-            }
-            else { 
-                for(let field in rowData) {
-                    grid.body.addTableCell(tr, field, rowData[field]);
-                }
-            }
+            data.forEach(row => {
+                grid.body.addTableRow(tBody, row);
+            });
+
+            grid.onTableBodyCreated(tBody, columns);
+        }
+        , addTableRow : function(tBody, dataRow) {
+            let tr = tBody.insertRow();
+            tr.id = tBody.id + '-' + tBody.rows.length;
+
+            _table.options.columns.forEach(col => {
+                grid.body.addTableCell(tr, col, dataRow[col.field]);
+            });
 
             grid.onTableRowCreated(tr);
         }
-        , addTableCell : function(tr, field, value) {
+        , addTableCell : function(tr, column, value) {
             let td = tr.insertCell();
-            td.id = tr.id + '-' + field;
+            td.id = tr.id + '-' + column.field;
 
-            td.field = field;
+            td.field = column.field;
             td.value = value;
             td.innerText = value;
 
-            let colDef = grid.body.getColumnDefinition(field);
-            if(colDef && colDef.attributes) { _setAttributes(td, colDef.attributes); }
-            if(colDef && colDef.click) { td.onclick = colDef.click; }
+            _setAttributes(td, column.attributes);
+            if(column.click) { td.onclick = column.click; }
 
-            grid.onTableCellCreated(td, colDef);
+            grid.onTableCellCreated(td, column);
         }
     };
 
@@ -582,41 +591,42 @@ const Gridify = function(options = {}) {
             if(!columns) { return ; }
             let tFoot = grid.footer.initialize(columns);
 
-            grid.footer.addFooterCells();
+            grid.footer.addFooterCells(tFoot, columns);
 
-            grid.onFooterCreated(tFoot, tFoot.options);
+            grid.onFooterCreated(tFoot, columns);
         }
-        , initialize : function(columns) {
+        , initialize : function() {
             if(_table.tFoot) { _table.removeChild(_table.tFoot); }
             let tFoot = _table.createTFoot();
             
             tFoot.id = _table.id + '-tfoot';
-            tFoot.options = grid.footer._parseOptions(columns);            
+            
             return tFoot;
         }
-        , _parseOptions : function(columns) {
-            return columns.map(opt => { 
-                if(typeof(opt.footer) === 'string') {
-                    opt.footer = { text : opt.footer };
-                }
-                return opt;
+        , addFooterCells : function(tFoot, columns) {
+            let tr = tFoot.insertRow();
+            columns.forEach(column => { 
+                grid.footer.addFooterCell(tr, column); 
             });
         }
-        , addFooterCells : function() {
-            let fr = _table.tFoot.insertRow();
-            _table.tFoot.options
-                .forEach(o => { grid.footer.addFooterCell(fr, o); });
-        }
-        , addFooterCell : function(footerRow, columnDefinition) {
-            let td = footerRow.insertCell();
-            td.id = _table.tFoot.id + '-' + columnDefinition.field || footerRow.cells.length;
+        , addFooterCell : function(tr, column) {
+            let td = tr.insertCell();
+            td.id = _table.tFoot.id + '-' + column.field || tr.cells.length;
 
-            if(columnDefinition.footer) {
-                td.innerText = columnDefinition.footer.text || '';
-                _setAttributes(td, columnDefinition.footer.attributes);
+            let footer = grid.footer.__options(column);
+            if(footer) {
+                td.innerText = footer.text;
+                _setAttributes(td, footer.attributes);
             }
 
-            grid.onFooterCellCreated(td, columnDefinition);
+            grid.onFooterCellCreated(td, column);
+        }
+        , __options : function(column) { 
+            if(!column.footer) { return; }
+            if(typeof(column.footer) === 'string') {
+                return { text : column.footer };
+            }
+            return column.footer;
         }
     };
 
@@ -884,7 +894,6 @@ const PagingTests = function() {
                 data : [ { Col : '1' }, { Col : '2' }, { Col : '3' } ],
                 paging : { rows : 2 }
             });
-
             let rows = Array.from(grid.html.tBodies[0].rows);
             rows = rows.filter(r => r.style.display === '');
             assert.isTrue(rows.length === 2);

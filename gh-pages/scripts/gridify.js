@@ -101,14 +101,16 @@ var filters = function filters() {
   };
 };
 
-//Gridify.prototype.extensions.paging = function(){
 var paging = function paging() {
   var grid = this;
-  var onFooterCreated = grid.onFooterCreated;
+  var onTableCreated = grid.onTableCreated;
 
-  grid.onFooterCreated = function (footer, footers) {
-    grid.paging.initialize(grid.html.options.paging);
-    onFooterCreated(footer, footers);
+  grid.onTableCreated = function (table, options) {
+    if (options.paging) {
+      grid.paging.initialize(options.paging);
+    }
+
+    onTableCreated(table, options);
   };
 
   grid.footer.pager = {
@@ -249,81 +251,102 @@ var paging = function paging() {
   };
 };
 
-//Gridify.prototype.extensions.sorting = function(){
 var sorting = function sorting() {
   var grid = this;
+
+  grid.sort = function (col) {
+    grid.sorting.sort(col);
+  };
+
   var onHeaderCellCreated = grid.onHeaderCellCreated;
 
-  grid.onHeaderCellCreated = function (th, headerDefinition) {
-    grid.sorting.initialize(th, headerDefinition);
-    onHeaderCellCreated(th, headerDefinition);
+  grid.onHeaderCellCreated = function (th, column) {
+    if (column.sort) {
+      grid.sorting.initialize(th, column);
+    }
+
+    onHeaderCellCreated(th, column);
   };
 
   grid.sorting = {
-    initialize: function initialize(th, headerDefinition) {
-      if (!headerDefinition.sort) {
+    initialize: function initialize(th, column) {
+      grid.sorting.__addSortIcon(th);
+
+      th.addEventListener('click', th => {
+        var field = th.id.split('-').slice(-1)[0];
+        grid.sort(field);
+      });
+    }
+    /*  .sort('field')
+        .sort({ field : '', compare : ()=>{}, direction : 'asc'|'desc'})
+    */
+    ,
+    sort: function sort(args) {
+      var field = typeof args === 'string' ? args : args.field;
+
+      if (!field) {
         return;
       }
 
-      var options = grid.sorting._parseOptions(headerDefinition.sort);
+      var options = grid.sorting.__getSortOptions(field);
 
-      var idx = Array.from(th.parentElement.children).indexOf(th);
-      options.idx = idx;
-      th.sort = options;
+      if (args.direction) {
+        options.direction = args.direction.substr(0, 3) === 'asc' ? 1 : -1;
+      } else {
+        options.direction = options.direction === 1 ? -1 : 1;
+      }
 
-      grid.sorting._addSortIcon(th);
+      var compare = args.compare || options.compare;
+      var rows = Array.from(grid.html.tBodies[0].rows);
+      var colIdx = Array.from(rows[0].cells).findIndex(td => {
+        return td.id.split('-').slice(-1)[0] == field;
+      });
+      rows.sort((x, y) => {
+        var xv = x.cells[colIdx].value;
+        var yv = y.cells[colIdx].value;
+        var compared = compare(xv, yv);
+        return +compared * options.direction;
+      });
 
-      var sortCallback = grid.sorting._getSortCallback();
-
-      th.addEventListener('click', sortCallback);
+      grid.sorting.__redrawGrid(rows);
     },
-    _parseOptions: function _parseOptions(sortOptions) {
+    __getSortOptions: function __getSortOptions(field) {
+      if (!grid.html.sortOptions) {
+        grid.sorting.__setSortOptions();
+      }
+
+      return grid.html.sortOptions[field];
+    },
+    __setSortOptions: function __setSortOptions() {
+      var sortOptions = {};
+      var columns = grid.html.options.columns;
+      columns.forEach(col => {
+        sortOptions[col.field] = grid.sorting.__options(col);
+      });
+      grid.html.sortOptions = sortOptions;
+    },
+    __options: function __options(column) {
       var options = {
-        compare: grid.sorting.defaultCompare
+        compare: (a, b) => a <= b ? 1 : -1,
+        direction: 1
       };
 
-      if (typeof sortOptions === 'function') {
-        options.compare = sortOptions;
-      } else if (typeof sortOptions === 'object') {
-        for (var k in sortOptions) {
-          options[k] = sortOptions[k];
-        }
+      if (typeof column.sort === 'function') {
+        options.compare = column.sort;
+      }
+
+      if (column.sort && column.sort.compare) {
+        options.compare = column.sort.compare;
       }
 
       return options;
     },
-    getSortOptionsByField: function getSortOptionsByField(field) {
-      var idx = grid.html.tBodies[0].options.findIndex(colDef => colDef.field == field);
-      var th = grid.html.tHead.rows[0].cells[idx];
-      return th.sort;
-    },
-    sort: function sort(options) {
-      if (typeof options === 'string') {
-        options = grid.sorting.getSortOptionsByField(options);
-      }
-
-      options.direction = options.direction === -1 ? 1 : -1;
-      var rows = Array.from(grid.html.tBodies[0].rows);
-      rows.sort((x, y) => {
-        var xv = x.cells[options.idx].value;
-        var yv = y.cells[options.idx].value;
-        var compared = options.compare(xv, yv);
-        return +compared * options.direction;
-      });
-
-      grid.sorting._redrawGrid(rows);
-    },
-    _addSortIcon: function _addSortIcon(th) {
+    __addSortIcon: function __addSortIcon(th) {
       var icon = th.appendChild(document.createElement('span'));
       icon.className = 'sort';
       th.style.paddingRight = '30px';
     },
-    _getSortCallback: function _getSortCallback() {
-      return e => {
-        grid.sorting.sort(e.target.sort);
-      };
-    },
-    _redrawGrid: function _redrawGrid(rows) {
+    __redrawGrid: function __redrawGrid(rows) {
       grid.body.clear();
       var tBody = grid.html.tBodies[0];
       rows.forEach(r => tBody.appendChild(r));
@@ -455,9 +478,9 @@ var Gridify = function Gridify() {
     }
   };
 
-  grid.onHeaderCellCreated = function (th, headerDefinition) {
+  grid.onHeaderCellCreated = function (th, column) {
     if (options.onHeaderCellCreated) {
-      options.onHeaderCellCreated(th, headerDefinition);
+      options.onHeaderCellCreated(th, column);
     }
   };
 
@@ -473,9 +496,9 @@ var Gridify = function Gridify() {
     }
   };
 
-  grid.onTableCellCreated = function (td, columnDefinition) {
+  grid.onTableCellCreated = function (td, column) {
     if (options.onTableCellCreated) {
-      options.onTableCellCreated(td, columnDefinition);
+      options.onTableCellCreated(td, column);
     }
   };
 
@@ -514,7 +537,7 @@ var Gridify = function Gridify() {
     initialize: function initialize(options) {
       _table = document.createElement('table');
       _table.id = grid.table._getTableId(options);
-      _table.options = options;
+      _table.options = grid.table.__options(options);
       return _table;
     },
     _getTableId: function _getTableId(options) {
@@ -531,32 +554,51 @@ var Gridify = function Gridify() {
       }
 
       return 'new-grid';
+    },
+    __options: function __options(options) {
+      if (!options.columns) {
+        options.columns = [];
+
+        if (Array.isArray(options.data) && options.data.length > 0) {
+          for (var field in options.data[0]) {
+            options.columns.push({
+              field: field
+            });
+          }
+        }
+      }
+
+      return options;
     }
   };
   Object.defineProperty(grid, 'html', {
     get: () => _table
   });
   grid.caption = {
-    create: function create(captionOptions) {
-      if (!captionOptions) {
+    create: function create(captionDef) {
+      if (!captionDef) {
         return;
       }
 
-      var caption = grid.caption.initialize(captionOptions);
+      var caption = grid.caption.initialize();
 
-      _setAttributes(caption, caption.options.attributes);
+      var options = grid.caption.__options(captionDef);
 
-      caption.innerText = caption.options.text;
-      grid.onCaptionCreated(caption, caption.options);
+      _setAttributes(caption, options.attributes);
+
+      caption.innerText = options.text;
+      grid.onCaptionCreated(caption, options);
     },
-    initialize: function initialize(captionOptions) {
+    initialize: function initialize() {
       var caption = _table.createCaption();
 
       caption.id = _table.id + '-caption';
-      caption.options = typeof captionOptions === 'string' ? {
-        text: captionOptions
-      } : captionOptions;
       return caption;
+    },
+    __options: function __options(caption) {
+      return typeof caption === 'string' ? {
+        text: caption
+      } : caption;
     }
   };
   grid.header = {
@@ -565,11 +607,11 @@ var Gridify = function Gridify() {
         return;
       }
 
-      var tHead = grid.header.initialize(columns);
-      grid.header.addHeaderCells();
-      grid.onHeaderCreated(tHead, tHead.options);
+      var tHead = grid.header.initialize();
+      grid.header.addHeaderCells(columns);
+      grid.onHeaderCreated(tHead, columns);
     },
-    initialize: function initialize(columns) {
+    initialize: function initialize() {
       if (_table.tHead) {
         _table.removeChild(_table.tHead);
       }
@@ -577,53 +619,46 @@ var Gridify = function Gridify() {
       var tHead = _table.createTHead();
 
       tHead.id = _table.id + '-thead';
-      tHead.options = grid.header._parseOptions(columns);
       return tHead;
     },
-    _parseOptions: function _parseOptions(columns) {
-      return columns.map(opt => {
-        if (typeof opt.header === 'string') {
-          opt.header = {
-            text: opt.header
-          };
-        }
-
-        return opt;
-      });
-    },
-    addHeaderCells: function addHeaderCells() {
+    addHeaderCells: function addHeaderCells(columns) {
       var hr = _table.tHead.insertRow();
 
-      _table.tHead.options.forEach(o => {
-        grid.header.addHeaderCell(hr, o);
+      columns.forEach(col => {
+        grid.header.addHeaderCell(hr, col);
       });
     },
-    addHeaderCell: function addHeaderCell(headerRow, columnDefinition) {
+    addHeaderCell: function addHeaderCell(headerRow, column) {
       var th = document.createElement('th');
-      th.id = _table.tHead.id + '-' + columnDefinition.field || headerRow.cells.length;
+      th.id = _table.tHead.id + '-' + column.field || headerRow.cells.length;
       headerRow.appendChild(th);
 
-      if (columnDefinition.header) {
-        th.innerText = columnDefinition.header.text || '';
+      var options = grid.header.__options(column);
 
-        _setAttributes(th, columnDefinition.header.attributes);
+      if (options) {
+        th.innerText = options.text;
+
+        _setAttributes(th, options.attributes);
       }
 
-      grid.onHeaderCellCreated(th, columnDefinition);
+      grid.onHeaderCellCreated(th, column);
+    },
+    __options: function __options(column) {
+      if (!column.header) {
+        return;
+      }
+
+      if (typeof column.header === 'string') {
+        return {
+          text: column.header
+        };
+      }
+
+      return column.header;
     }
   };
   grid.body = {
-    create: function create(data) {
-      var columns = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : options.columns;
-      var tBody = grid.body.initialize(columns);
-
-      for (var idx in data) {
-        grid.body.addTableRow(tBody, idx, data[idx]);
-      }
-
-      grid.onTableBodyCreated(tBody, tBody.options);
-    },
-    initialize: function initialize(columns) {
+    initialize: function initialize() {
       while (_table.tBodies.length) {
         _table.removeChild(_table.tBodies[0]);
       }
@@ -631,60 +666,47 @@ var Gridify = function Gridify() {
       var tBody = _table.createTBody();
 
       tBody.id = _table.id + '-tbody';
-      tBody.options = columns;
       return tBody;
-    },
-    _parseColumns: function _parseColumns(columns) {
-      return columns.map(col => {
-      });
     },
     clear: function clear() {
       _clear(_table.tBodies[0]);
     },
-    getColumnDefinition: function getColumnDefinition(field) {
-      var colDefs = _table.tBodies[0].options;
+    create: function create(data, columns) {
+      var tBody = grid.body.initialize();
 
-      if (!colDefs) {
+      if (!data) {
         return;
       }
 
-      return colDefs.find(d => d.field == field);
+      data.forEach(row => {
+        grid.body.addTableRow(tBody, row);
+      });
+      grid.onTableBodyCreated(tBody, columns);
     },
-    addTableRow: function addTableRow(tBody, ridx, rowData) {
+    addTableRow: function addTableRow(tBody, dataRow) {
       var tr = tBody.insertRow();
-      tr.id = tBody.id + '-' + ridx;
-      var colDefs = tBody.options;
+      tr.id = tBody.id + '-' + tBody.rows.length;
 
-      if (colDefs) {
-        for (var d in colDefs) {
-          var field = colDefs[d].field;
-          grid.body.addTableCell(tr, field, rowData[field]);
-        }
-      } else {
-        for (var _field in rowData) {
-          grid.body.addTableCell(tr, _field, rowData[_field]);
-        }
-      }
+      _table.options.columns.forEach(col => {
+        grid.body.addTableCell(tr, col, dataRow[col.field]);
+      });
 
       grid.onTableRowCreated(tr);
     },
-    addTableCell: function addTableCell(tr, field, value) {
+    addTableCell: function addTableCell(tr, column, value) {
       var td = tr.insertCell();
-      td.id = tr.id + '-' + field;
-      td.field = field;
+      td.id = tr.id + '-' + column.field;
+      td.field = column.field;
       td.value = value;
       td.innerText = value;
-      var colDef = grid.body.getColumnDefinition(field);
 
-      if (colDef && colDef.attributes) {
-        _setAttributes(td, colDef.attributes);
+      _setAttributes(td, column.attributes);
+
+      if (column.click) {
+        td.onclick = column.click;
       }
 
-      if (colDef && colDef.click) {
-        td.onclick = colDef.click;
-      }
-
-      grid.onTableCellCreated(td, colDef);
+      grid.onTableCellCreated(td, column);
     }
   };
   grid.data = {
@@ -709,10 +731,10 @@ var Gridify = function Gridify() {
       }
 
       var tFoot = grid.footer.initialize(columns);
-      grid.footer.addFooterCells();
-      grid.onFooterCreated(tFoot, tFoot.options);
+      grid.footer.addFooterCells(tFoot, columns);
+      grid.onFooterCreated(tFoot, columns);
     },
-    initialize: function initialize(columns) {
+    initialize: function initialize() {
       if (_table.tFoot) {
         _table.removeChild(_table.tFoot);
       }
@@ -720,38 +742,40 @@ var Gridify = function Gridify() {
       var tFoot = _table.createTFoot();
 
       tFoot.id = _table.id + '-tfoot';
-      tFoot.options = grid.footer._parseOptions(columns);
       return tFoot;
     },
-    _parseOptions: function _parseOptions(columns) {
-      return columns.map(opt => {
-        if (typeof opt.footer === 'string') {
-          opt.footer = {
-            text: opt.footer
-          };
-        }
-
-        return opt;
+    addFooterCells: function addFooterCells(tFoot, columns) {
+      var tr = tFoot.insertRow();
+      columns.forEach(column => {
+        grid.footer.addFooterCell(tr, column);
       });
     },
-    addFooterCells: function addFooterCells() {
-      var fr = _table.tFoot.insertRow();
+    addFooterCell: function addFooterCell(tr, column) {
+      var td = tr.insertCell();
+      td.id = _table.tFoot.id + '-' + column.field || tr.cells.length;
 
-      _table.tFoot.options.forEach(o => {
-        grid.footer.addFooterCell(fr, o);
-      });
-    },
-    addFooterCell: function addFooterCell(footerRow, columnDefinition) {
-      var td = footerRow.insertCell();
-      td.id = _table.tFoot.id + '-' + columnDefinition.field || footerRow.cells.length;
+      var footer = grid.footer.__options(column);
 
-      if (columnDefinition.footer) {
-        td.innerText = columnDefinition.footer.text || '';
+      if (footer) {
+        td.innerText = footer.text;
 
-        _setAttributes(td, columnDefinition.footer.attributes);
+        _setAttributes(td, footer.attributes);
       }
 
-      grid.onFooterCellCreated(td, columnDefinition);
+      grid.onFooterCellCreated(td, column);
+    },
+    __options: function __options(column) {
+      if (!column.footer) {
+        return;
+      }
+
+      if (typeof column.footer === 'string') {
+        return {
+          text: column.footer
+        };
+      }
+
+      return column.footer;
     }
   };
 
