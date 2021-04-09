@@ -85,17 +85,17 @@ export const Gridify = function(options = {}) {
     Object.defineProperty(grid, 'html', { get : () => _table });
 
     grid.caption = {
-        create : function(caption) {
-            if(!caption) { return; }
-            let caption = grid.caption.initialize(caption);
+        create : function(captionDef) {
+            if(!captionDef) { return; }
+            let caption = grid.caption.initialize();
 
-            let options = grid.caption.__options(caption);
+            let options = grid.caption.__options(captionDef);
             _setAttributes(caption, options.attributes);
             caption.innerText = options.text;
 
             grid.onCaptionCreated(caption, options);
         }
-        , initialize : function(caption) {
+        , initialize : function() {
             let caption = _table.createCaption();
             caption.id = _table.id + '-caption';
 
@@ -110,7 +110,7 @@ export const Gridify = function(options = {}) {
 
     grid.header = {
         create : function(columns) {
-            if(!columns) { return ; }
+            if(!columns.find(col => col.header)) { return ; }
             let tHead = grid.header.initialize();
 
             grid.header.addHeaderCells(columns);
@@ -156,32 +156,29 @@ export const Gridify = function(options = {}) {
         , clear : function() { _clear(_table.tBodies[0]); }
         , create : function(data, columns) {
             let tBody = grid.body.initialize();
+            if(!data) { return;}
 
             data.forEach(row => {
-
+                grid.body.addTableRow(tBody, row);
             });
-
-            for(let idx in data) {
-                grid.body.addTableRow(tBody, idx, data[idx]);
-            }
 
             grid.onTableBodyCreated(tBody, columns);
         }
-        , addTableRow : function(tBody, rowData) {
+        , addTableRow : function(tBody, dataRow) {
             let tr = tBody.insertRow();
             tr.id = tBody.id + '-' + tBody.rows.length;
 
             _table.options.columns.forEach(col => {
-                grid.body.addTableCell(tr, col, rowData[col.field]);
+                grid.body.addTableCell(tr, col, dataRow[col.field]);
             });
 
             grid.onTableRowCreated(tr);
         }
         , addTableCell : function(tr, column, value) {
             let td = tr.insertCell();
-            td.id = tr.id + '-' + field;
+            td.id = tr.id + '-' + column.field;
 
-            td.field = field;
+            td.field = column.field;
             td.value = value;
             td.innerText = value;
 
