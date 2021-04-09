@@ -322,20 +322,21 @@ new Gridify({
 ```
 <div id='sort-object'></div>
 
-## .sort('')
-Sorting can be done programmatically by calling the sort function. .sort() requires a string parameter, where the string is the name of the data property to sort by. 
+## .sort('field')
+grid.sort() is a function that can be called to sort any column, regardless of whether there is a .sort property in the column definition. It requires a field name to sort on and the sort behavior will be the same as if a sorting header was clicked.
 
 ```javascript
 let grid = new Gridify({
     container : 'sort-function',
-    columns : [ { field : 'fieldName', sort : true } ],
     data : [
-        { fieldName : 1 }, { fieldName : 2 }, { fieldName : 3 }
+        { int : 1 }, 
+        { int : 2 }, 
+        { int : 3 }
     ]
 });
 // sorts every 2 seconds
 let delaySort = function() { 
-    grid.sorting.sort('fieldName');
+    grid.sort('int');
     setTimeout(delaySort, 2000);
 }
 delaySort();
@@ -397,6 +398,43 @@ new Gridify({
 <div id='custom-filter-function'></div>
 
 ## .filter = {}
+The filter definition can be an object to allow further customization. A control other than the default text input can be passed in via the .filter.control option. Similarly, a custom compare function can be passed in via .filter.compare.  
+
+The filterValue parameter is the .value attribute of the filter element. grid.filter() must be called to activate the filters. In the below example, we handle both of these requirements by having our checkbox click event set the checkbox .value and call grid.filter().
+
+```javascript
+let checkbox = document.createElement('input');
+checkbox.type = 'checkbox';
+checkbox.addEventListener('click', (e) => { 
+    // .value is what is passed to the compare function
+    e.target.value = e.target.checked
+    grid.filter(); 
+});
+// If checked, hide bit = 0 records.
+let compare = function(columnValue, filterValue) {
+    return filterValue == 'true'
+        ? columnValue == 1
+        : true;
+}
+
+let grid = new Gridify({
+    container : 'custom-filter-object',
+    columns : [
+        {
+            field : 'bit',
+            filter : {
+                control : checkbox,
+                compare : compare
+            },
+        }
+    ],
+    data : [
+        { bit : 0 }, { bit : 1 }, { bit : 0 }, { bit : 1 }
+    ]
+});
+```
+<div id='custom-filter-object'></div>
 
 ## .filter()
-?
+grid.filter() is a function that can be called at any time. For now, it simply triggers all active filters on the grid and is called whenever a filter has its value changed.
+

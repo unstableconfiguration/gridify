@@ -263,7 +263,7 @@ const sorting = function() {
 
             let options = grid.sorting.__getSortOptions(field);
             if(args.direction) {
-                options.direction = args.direction.substr(0, 3) === 'asc' ? 1 : -1;
+                options.direction = args.direction.substr(0, 3) === 'asc' ? -1 : 1;
             }
             else { 
                 options.direction = options.direction === 1 ? -1 : 1;
