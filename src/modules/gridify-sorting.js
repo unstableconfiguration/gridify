@@ -1,71 +1,89 @@
-//Gridify.prototype.extensions.sorting = function(){
 export const sorting = function() {
     let grid = this;
     grid.sort = function(col) { grid.sorting.sort(col); }
 
     let onHeaderCellCreated = grid.onHeaderCellCreated;
-    grid.onHeaderCellCreated = function(th, headerDefinition) {
-        grid.sorting.initialize(th, headerDefinition);
-
-        onHeaderCellCreated(th, headerDefinition);
+    grid.onHeaderCellCreated = function(th, column) {
+        if(column.sort) {
+            grid.sorting.initialize(th, column);
+        }
+        
+        onHeaderCellCreated(th, column);
     }
 
     grid.sorting = {
-        initialize : function(th, headerDefinition) { 
-            if(!headerDefinition.sort) { return; }
-
-            let options = grid.sorting._parseOptions(headerDefinition.sort);
-            let idx = Array.from(th.parentElement.children).indexOf(th);
-            options.idx = idx;
-            th.sort = options;
-
-            grid.sorting._addSortIcon(th);
-            
-            let sortCallback = grid.sorting._getSortCallback();  
-            th.addEventListener('click', sortCallback);    
+        initialize : function(th, column) {   
+            grid.sorting.__addSortIcon(th);
+            th.addEventListener('click', (th) => {
+                let field = th.id.split('-').slice(-1)[0];
+                grid.sort(field);
+            });  
         }
-        , _parseOptions : function(sortOptions) { 
-            let options = { compare : grid.sorting.defaultCompare };
-            if(typeof(sortOptions) === 'function') { options.compare = sortOptions; }
-            else if(typeof(sortOptions) === 'object') {
-                for(let k in sortOptions) { options[k] = sortOptions[k]; }
+        /*  .sort('field')
+            .sort({ field : '', compare : ()=>{}, direction : 'asc'|'desc'})
+        */
+        , sort : function(args) {
+            let field = typeof(args) === 'string' ? args : args.field;
+            if(!field) { return; }
+
+            let options = grid.sorting.__getSortOptions(field);
+            if(args.direction) {
+                options.direction = args.direction.substr(0, 3) === 'asc' ? 1 : -1
+            }
+            else { 
+                options.direction = options.direction === 1 ? -1 : 1;
+            }
+            
+            let compare = args.compare || options.compare;
+
+
+            let rows = Array.from(grid.html.tBodies[0].rows);            
+            let colIdx = Array.from(rows[0].cells).findIndex(td => {
+                return td.id.split('-').slice(-1)[0] == field;
+            });
+
+            rows.sort((x, y) => {
+                let xv = x.cells[colIdx].value;
+                let yv = y.cells[colIdx].value; 
+                let compared = compare(xv, yv);
+                return +compared * options.direction;
+            });
+            
+            grid.sorting.__redrawGrid(rows);
+        }
+        , __getSortOptions : function(field) { 
+            if(!grid.html.sortOptions) { grid.sorting.__setSortOptions(); }
+
+            return grid.html.sortOptions[field];
+        }
+        , __setSortOptions : function() {
+            let sortOptions = {};
+
+            let columns = grid.html.options.columns;
+            columns.forEach(col => {
+                sortOptions[col.field] = grid.sorting.__options(col);
+            });
+
+            grid.html.sortOptions = sortOptions;
+        }
+        , __options : function(column) { 
+            let options = {
+                compare : (a, b) => a <= b ? 1 : -1,
+                direction : 1
+            }
+            if(typeof(column.sort) === 'function') { options.compare = column.sort; }
+            if(column.sort && column.sort.compare) {
+                options.compare = column.sort.compare;
             }
 
             return options;
         }
-        , getSortOptionsByField : function(field) { 
-            let idx = grid.html.tBodies[0].options
-                .findIndex(colDef => colDef.field == field);
-
-            let th = grid.html.tHead.rows[0].cells[idx];
-            return th.sort;
-        }
-        , sort : function(options) {
-            if(typeof(options) === 'string') { 
-                options = grid.sorting.getSortOptionsByField(options); 
-            }
-
-            options.direction = options.direction === -1 ? 1 : -1;
-
-            let rows = Array.from(grid.html.tBodies[0].rows);            
-            rows.sort((x, y) => {
-                let xv = x.cells[options.idx].value;
-                let yv = y.cells[options.idx].value; 
-                let compared = options.compare(xv, yv);
-                return +compared * options.direction;
-            });
-            
-            grid.sorting._redrawGrid(rows);
-        }
-        , _addSortIcon : function(th) { 
+        , __addSortIcon : function(th) { 
             let icon = th.appendChild(document.createElement('span'));
             icon.className = 'sort'
             th.style.paddingRight = '30px';
         }
-        , _getSortCallback : function() {
-            return (e) => { grid.sorting.sort(e.target.sort); }
-        }
-        , _redrawGrid : function(rows) {
+        , __redrawGrid : function(rows) {
             grid.body.clear();
             let tBody = grid.html.tBodies[0];
             rows.forEach(r => tBody.appendChild(r));
