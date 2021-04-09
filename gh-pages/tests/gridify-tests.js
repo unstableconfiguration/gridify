@@ -536,11 +536,12 @@ const Gridify = function(options = {}) {
         , clear : function() { _clear(_table.tBodies[0]); }
         , create : function(data, columns) {
             let tBody = grid.body.initialize();
-            if(!data) { return;}
-
-            data.forEach(row => {
-                grid.body.addTableRow(tBody, row);
-            });
+            
+            if(data) {
+                data.forEach(row => {
+                    grid.body.addTableRow(tBody, row);
+                });
+            }
 
             grid.onTableBodyCreated(tBody, columns);
         }
@@ -894,6 +895,7 @@ const PagingTests = function() {
                 data : [ { Col : '1' }, { Col : '2' }, { Col : '3' } ],
                 paging : { rows : 2 }
             });
+
             let rows = Array.from(grid.html.tBodies[0].rows);
             rows = rows.filter(r => r.style.display === '');
             assert.isTrue(rows.length === 2);

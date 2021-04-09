@@ -158,11 +158,12 @@ export const Gridify = function(options = {}) {
         , clear : function() { _clear(_table.tBodies[0]); }
         , create : function(data, columns) {
             let tBody = grid.body.initialize();
-            if(!data) { return;}
-
-            data.forEach(row => {
-                grid.body.addTableRow(tBody, row);
-            });
+            
+            if(data) {
+                data.forEach(row => {
+                    grid.body.addTableRow(tBody, row);
+                });
+            }
 
             grid.onTableBodyCreated(tBody, columns);
         }

@@ -674,13 +674,12 @@ var Gridify = function Gridify() {
     create: function create(data, columns) {
       var tBody = grid.body.initialize();
 
-      if (!data) {
-        return;
+      if (data) {
+        data.forEach(row => {
+          grid.body.addTableRow(tBody, row);
+        });
       }
 
-      data.forEach(row => {
-        grid.body.addTableRow(tBody, row);
-      });
       grid.onTableBodyCreated(tBody, columns);
     },
     addTableRow: function addTableRow(tBody, dataRow) {
