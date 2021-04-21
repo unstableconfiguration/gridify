@@ -2,20 +2,39 @@
 <!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
+    <title>index</title>
     <link href='./css/site.css' rel='stylesheet' />
 
 </head>
 <body>
     <div class='site-header'>
         <a href='index.html'>gridify</a>
-    </div>
-    <div class='top-nav'>
-        <a href='pages/demo.html'>demo</a>
-        <a href='pages/code.html'>code</a>
-        <a href='pages/tests.html'>tests</a>
-        <a href='pages/documentation.html'>docs</a>
+        <div class='top-nav'>
+            <a href='pages/code.html'>code</a>
+            <a href='pages/tests.html'>tests</a>
+            <a href='pages/documentation.html'>docs</a>
+        </div>
     </div>
     <div class='content'>
-        <p>HTML table generator I use on my private site. My focus with it has been to keep it lightweight and minimal and to offer transparency and control over the html generation process and the generated html rather than a large number of configuration options. </p>
+        <p>Minimal and lightweight table generator. It has four main focuses to its design philosophy. </p>
+        <ul>
+            <li>
+                <b>Having an easy and intuitive syntax.</b> The principle of least surprise is in full effect. 
+                When possible, grid configuration properties are named after their native html/js counterparts.             
+            </li>
+            <li>
+                <b>Not attempting to do everything.</b> Gridify will avoid adding a .width 
+                property to column definitions since that is something that can easily be done through CSS. It 
+                relies on the developer's knowledge of the base web technologies rather than knowledge of gridify itself.    
+            </li>
+            <li>
+                <b>Generating readable markup.</b> The generated markup is intended to resemble something a developer 
+                would type-out. It can be easily read and programmatically manipulated by a developer.     
+            </li>
+            <li>
+                <b>Giving the developer full control.</b> Event hooks execute at every stage of table creation, giving 
+                the developer full control over how the table is built as it is being built.     
+            </li>
+        </ul>
     </div>
 </body>

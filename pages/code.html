@@ -2,6 +2,8 @@
 <!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
+    <title>code samples</title>
+
     <link href='../css/site.css' rel='stylesheet' />
     <link href='../css/code.css' rel='stylesheet' />
 
@@ -12,12 +14,11 @@
 <body>
     <div class='site-header'>
         <a href='../index.html'>gridify</a>
-    </div>
-    <div class='top-nav'>
-        <a href='./demo.html'>demo</a>
-        <a href='./code.html'>code</a>
-        <a href='./tests.html'>tests</a>
-        <a href='documentation.html'>docs</a>
+        <div class='top-nav'>
+            <a href='./code.html'>code</a>
+            <a href='./tests.html'>tests</a>
+            <a href='documentation.html'>docs</a>
+        </div>
     </div>
     <div class='content'>
         <p><h3>main code</h3></p>
@@ -69,7 +70,7 @@
                 Prism.highlight(text, Prism.languages.javascript, 'javascript');
         });
 
-        fetchCode(raws + 'src/modules/gridify-filtering.js', (text) => {
+        fetchCode(raws + 'src/modules/gridify-filters.js', (text) => {
             document.getElementById('filteringCode').innerHTML = 
                 Prism.highlight(text, Prism.languages.javascript, 'javascript');
         });
