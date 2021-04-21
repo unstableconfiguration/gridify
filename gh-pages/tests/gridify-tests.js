@@ -114,7 +114,7 @@ const paging = function() {
             let centerCell = pagingRow.insertCell();
             centerCell.id = grid.html.id + '-paging-center';
             centerCell.style = 'width:33%;';
-            centerCell.appendChild(grid.footer.pager.centerCell_control(options));
+            centerCell.appendChild(grid.footer.pager.pagingControl(options));
 
             let rightCell = pagingRow.insertCell();
             rightCell.id = grid.html.id + '-paging-right';
@@ -125,7 +125,7 @@ const paging = function() {
             if(textbox) { textbox.value = pageNumber; }
             // set row counter when up
         }
-        , centerCell_control : function(options){
+        , pagingControl : function(options){
             let container = document.createElement('div');
             container.style = 'width:120px';
 

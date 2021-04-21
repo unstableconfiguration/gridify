@@ -124,7 +124,7 @@ var paging = function paging() {
       var centerCell = pagingRow.insertCell();
       centerCell.id = grid.html.id + '-paging-center';
       centerCell.style = 'width:33%;';
-      centerCell.appendChild(grid.footer.pager.centerCell_control(options));
+      centerCell.appendChild(grid.footer.pager.pagingControl(options));
       var rightCell = pagingRow.insertCell();
       rightCell.id = grid.html.id + '-paging-right';
       rightCell.style = 'width:33%;';
@@ -137,7 +137,7 @@ var paging = function paging() {
       } // set row counter when up
 
     },
-    centerCell_control: function centerCell_control(options) {
+    pagingControl: function pagingControl(options) {
       var container = document.createElement('div');
       container.style = 'width:120px';
       var textbox = document.createElement('input');
