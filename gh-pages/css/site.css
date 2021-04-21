@@ -18,8 +18,9 @@ body {
     border-bottom: solid thin var(--light);
     border-top: solid thin var(--light);
     display:block;
-    padding: 1% 5% 1% 5%;
+    padding-top: .2em;
 }
+
 
 /* Main header text */
 .site-header > a {
@@ -27,6 +28,7 @@ body {
     font-size:2em;
     font-weight:bold;
     text-decoration:none;
+    padding-left:5%;
 }
 .site-header > a:visited { color: var(--dark); }
 .site-header > a:hover { font-style:italic }
