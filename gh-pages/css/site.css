@@ -55,7 +55,7 @@ body {
 .content { 
     display:block;
     color:var(--medium);
-    padding:3% 5% 3% 5%;
+    padding:.4em 2em;
 }
 .content a:hover { font-style:italic }
 
