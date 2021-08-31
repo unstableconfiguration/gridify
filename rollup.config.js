@@ -1,6 +1,6 @@
-import babel from '@rollup/plugin-babel';
 import copy from 'rollup-plugin-copy'
 import del from 'rollup-plugin-delete';
+import { terser } from 'rollup-plugin-terser'
 
 export default {
     input: 'index.js',
@@ -10,12 +10,12 @@ export default {
     },
     plugins :[
         del({ targets: 'dist/*', verbose : true }),
-        babel({ babelHelpers: 'bundled' }),
         copy({
             targets : [
                 { src : 'app/css/gridify.css', dest : 'dist' },
             ]
-        })
+        }),
+        terser()
     ]
 }
 
