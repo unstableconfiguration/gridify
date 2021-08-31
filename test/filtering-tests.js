@@ -1,4 +1,4 @@
-import { Gridify } from '../src/gridify.js';
+import { Gridify } from '../app/gridify.js';
 
 export const FilteringTests = function() {
     describe('Filtering', function(){

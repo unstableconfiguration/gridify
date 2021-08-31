@@ -1,5 +1,5 @@
 
-import { Gridify } from '../src/gridify.js';
+import { Gridify } from '../app/gridify.js';
 
 export const StylingTests = function() {
     describe('Styling', function() {
