@@ -1,7 +1,7 @@
-import { filters } from './modules/gridify-filters';
-import { paging } from './modules/gridify-paging';
-import { sorting } from './modules/gridify-sorting';
-import { styling } from './modules/gridify-styling';
+import { filters } from './modules/gridify-filters.js';
+import { paging } from './modules/gridify-paging.js';
+import { sorting } from './modules/gridify-sorting.js';
+import { styling } from './modules/gridify-styling.js';
 
 
 export const Gridify = function(options = {}) { 
