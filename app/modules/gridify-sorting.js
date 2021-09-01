@@ -14,8 +14,8 @@ export const sorting = function() {
     grid.sorting = {
         initialize : function(th, column) {   
             grid.sorting.__addSortIcon(th);
-            th.addEventListener('click', (th) => {
-                let field = th.id.split('-').slice(-1)[0];
+            th.addEventListener('click', (ev) => {
+                let field = ev.target.id.split('-').slice(-1)[0];
                 grid.sort(field);
             });  
         }
