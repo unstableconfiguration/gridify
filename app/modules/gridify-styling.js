@@ -16,7 +16,6 @@ export const styling = function() {
 
     let onHeaderCellCreated = grid.onHeaderCellCreated;
     grid.onHeaderCellCreated = function(th, options) {        
-        if(options.style) { grid.styling.setStyle(th, options.style); }
         grid.styling.stylize(th, options.header);
 
         onHeaderCellCreated(th, options);
