@@ -16,6 +16,17 @@ describe('Filtering', function(){
         assert(grid.html.tHead.rows[1].cells[0].firstChild.id == 'new-grid-filters-Col');
     });
 
+    it('Bugfix: Allows some columns to have filters and some not', function(done) { 
+        new Gridify({
+           columns : [
+               { field : 'ColA', header : 'ColA', filter : true },
+               { field : 'ColB', header : 'ColB' }
+           ],
+           data : [{ ColA : 1, ColB : 2}]
+        });
+        done();
+    });
+
     it('Defaults to xyz% filtering function', function(){
         let grid = new Gridify({
             columns : [ { field : 'Col', header : 'Col', filter : true } ],

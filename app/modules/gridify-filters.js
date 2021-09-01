@@ -25,7 +25,7 @@ export const filters = function() {
             let th = grid.html.tHead.rows[1];
             columns.forEach((column, idx) => {
                 let filter = grid.filters.addFilter(column);
-                th.cells[idx].appendChild(filter);
+                if(filter) { th.cells[idx].appendChild(filter); }
             });
         }
         , addFilter : function(column) {
