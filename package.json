@@ -1,6 +1,6 @@
 {
     "name": "gridify",
-    "version": "1.0.4",
+    "version": "1.0.5",
     "description": "HTML Table generation utility.",
     "main": "index.js",
     "private": true,
