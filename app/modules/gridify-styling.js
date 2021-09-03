@@ -15,7 +15,12 @@ export const styling = function() {
     }
 
     let onHeaderCellCreated = grid.onHeaderCellCreated;
-    grid.onHeaderCellCreated = function(th, options) {        
+    grid.onHeaderCellCreated = function(th, options) {
+        // Allow columns to set width of header
+        let width = (options.style||'').split(';')
+            .find(s => s.includes('width'));
+        grid.styling.stylize(th, { style : width });  
+        
         grid.styling.stylize(th, options.header);
 
         onHeaderCellCreated(th, options);
